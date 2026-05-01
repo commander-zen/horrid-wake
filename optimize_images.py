@@ -7,8 +7,7 @@ chars = ["dennis", "mac", "charlie", "dee", "frank"]
 results = {}
 
 for name in chars:
-    src = os.path.join(img_dir, f"{name}.png")
-    resized = os.path.join(img_dir, f"{name}_resized.png")
+    src = os.path.join(img_dir, f"{name}.jpg")
     webp_out = os.path.join(img_dir, f"{name}.webp")
 
     orig_size = os.path.getsize(src)
@@ -19,16 +18,14 @@ for name in chars:
     if w > 800:
         new_h = int(h * 800 / w)
         img = img.resize((800, new_h), Image.LANCZOS)
-    img.save(resized, "PNG")
 
     # Convert to WebP at quality 82
-    img2 = Image.open(resized)
-    img2.save(webp_out, "WEBP", quality=82)
+    img.save(webp_out, "WEBP", quality=82)
 
     webp_size = os.path.getsize(webp_out)
     saving_pct = (1 - webp_size / orig_size) * 100
 
-    print(f"{name}: {orig_size/1024:.1f} KB PNG  ->  {webp_size/1024:.1f} KB WebP  ({saving_pct:.1f}% smaller)")
+    print(f"{name}: {orig_size/1024:.1f} KB JPG  ->  {webp_size/1024:.1f} KB WebP  ({saving_pct:.1f}% smaller)")
 
     with open(webp_out, "rb") as f:
         b64 = base64.b64encode(f.read()).decode("ascii")
@@ -39,7 +36,6 @@ print("\nAll images encoded. Patching index.html...")
 with open(html_path, "r", encoding="utf-8") as f:
     html = f.read()
 
-# Build replacement block — single-line per entry to match what the JS parser expects
 entries = ", ".join(f'{name}: "{results[name]}"' for name in chars)
 new_imgs_block = f"window.CHAR_IMGS = {{ {entries} }};"
 
@@ -55,16 +51,13 @@ with open(html_path, "w", encoding="utf-8", newline="") as f:
 
 print("index.html patched.")
 
-# Verify
 with open(html_path, "r", encoding="utf-8") as f:
     verify = f.read()
 
 for name in chars:
-    marker = f'{name}: "data:image/webp;base64,'
-    if marker in verify:
+    if f'{name}: "data:image/webp;base64,' in verify:
         print(f"  [OK] {name} embedded")
     else:
         print(f"  [FAIL] {name} MISSING")
 
-html_mb = os.path.getsize(html_path) / (1024 * 1024)
-print(f"\nFinal index.html size: {html_mb:.2f} MB")
+print(f"\nFinal index.html size: {os.path.getsize(html_path) / (1024*1024):.2f} MB")
