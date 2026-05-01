@@ -173,18 +173,6 @@ body::after{content:'';position:fixed;inset:0;z-index:999;pointer-events:none;op
   pointer-events:none;
 }
 
-/* name */
-.card-label{
-  position:relative;z-index:2;
-  font-size:clamp(7px,1.8vw,11px);
-  letter-spacing:2px;color:rgba(190,115,25,.8);
-  text-transform:uppercase;text-align:center;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  max-width:96%;padding:0 3px;
-  transition:color .2s;
-  text-shadow:0 1px 4px rgba(0,0,0,.9);
-}
-.char-card:active .card-label{color:var(--gold-lt);}
 
 /* tap hint */
 .tap-hint{
@@ -321,7 +309,7 @@ canvas{position:fixed;inset:0;z-index:2;pointer-events:none;}
   <div class="s-vignette"></div>
 
   <div class="s-title">
-    <h1>Horrid Wake</h1>
+    <h1>The Gang Goes on an Adventure</h1>
     <p>The Gang · Dark Fantasy · No Escape</p>
     <div class="s-rule"><div class="s-rule-line"></div><div class="s-rule-gem"></div><div class="s-rule-line"></div></div>
   </div>
@@ -465,7 +453,7 @@ function buildCards(){
       <div class="card-top-fade"></div>
       <div class="card-sides"></div>
       <div class="card-bottom-fade"></div>
-      <div class="card-label">${c.name.split(' ').slice(-1)[0].replace(/['"]/g,'')}</div>
+
     `;
     card.addEventListener('click', ()=>openDetail(c.id));
     row.appendChild(card);
