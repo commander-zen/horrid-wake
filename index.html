@@ -4,8 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Horrid Wake</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=UnifrakturMaguntia&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
 <style>
+@font-face {
+  font-family: 'AVQuest';
+  src: url('/fonts/AVQuest.ttf') format('truetype');
+}
 :root {
   --gold: #c8943a;
   --gold-lt: #f0c85a;
@@ -47,7 +51,7 @@ body::after{content:'';position:fixed;inset:0;z-index:999;pointer-events:none;op
   text-align:center;padding:20px 16px 0;pointer-events:none;
 }
 .s-title h1{
-  font-family:'UnifrakturMaguntia',cursive;
+  font-family:'AVQuest',cursive;
   font-size:clamp(28px,8vw,50px);
   color:var(--gold-lt);
   text-shadow:0 0 40px rgba(210,130,10,.75),0 0 80px rgba(160,60,0,.4),2px 3px 0 rgba(0,0,0,.95);
@@ -243,7 +247,7 @@ canvas{position:fixed;inset:0;z-index:2;pointer-events:none;}
 /* name editable */
 .d-name-row{display:flex;align-items:baseline;gap:8px;margin-bottom:1px;}
 .d-name{
-  font-family:'UnifrakturMaguntia',cursive;
+  font-family:'AVQuest',cursive;
   font-size:clamp(22px,6.5vw,34px);
   color:var(--gold-lt);
   text-shadow:0 0 18px rgba(200,130,10,.5);
@@ -310,7 +314,7 @@ canvas{position:fixed;inset:0;z-index:2;pointer-events:none;}
 
   <div class="s-title">
     <h1>The Gang Goes on an Adventure</h1>
-    <p>The Gang · Dark Fantasy · No Escape</p>
+
     <div class="s-rule"><div class="s-rule-line"></div><div class="s-rule-gem"></div><div class="s-rule-line"></div></div>
   </div>
 
