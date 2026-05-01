@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-Command cwebp -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command magick -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command convert -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command ffmpeg -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command python, python3, node, winget, choco -ErrorAction SilentlyContinue)",
+      "PowerShell(python -c \"from PIL import Image; print\\('Pillow OK'\\); import PIL; print\\(PIL.__version__\\)\")",
+      "PowerShell(python -m pip install Pillow --quiet)",
+      "PowerShell(python -c \"from PIL import Image; print\\('Pillow OK'\\)\")",
+      "PowerShell(python \"c:\\\\Users\\\\beine\\\\OneDrive\\\\Desktop\\\\old docs\\\\horrid-wake\\\\optimize_images.py\")"
+    ]
+  }
+}
