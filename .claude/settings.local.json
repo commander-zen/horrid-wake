@@ -9,7 +9,15 @@
       "PowerShell(python -c \"from PIL import Image; print\\('Pillow OK'\\); import PIL; print\\(PIL.__version__\\)\")",
       "PowerShell(python -m pip install Pillow --quiet)",
       "PowerShell(python -c \"from PIL import Image; print\\('Pillow OK'\\)\")",
-      "PowerShell(python \"c:\\\\Users\\\\beine\\\\OneDrive\\\\Desktop\\\\old docs\\\\horrid-wake\\\\optimize_images.py\")"
+      "PowerShell(python \"c:\\\\Users\\\\beine\\\\OneDrive\\\\Desktop\\\\old docs\\\\horrid-wake\\\\optimize_images.py\")",
+      "Bash(curl -L \"https://raw.githubusercontent.com/5etools-mirror-3/5etools-src/main/data/adventure/adventure-lmop.json\" -o lmop-raw.json)",
+      "Bash(node -e \"const d = require\\('./lmop-raw.json'\\); console.log\\('Top-level keys:', Object.keys\\(d\\)\\); console.log\\('Adventure keys:', Object.keys\\(d.adventure || d[Object.keys\\(d\\)[0]] || {}\\)\\);\")",
+      "Bash(node -e ' *)",
+      "Bash(curl -L \"https://raw.githubusercontent.com/5etools-mirror-3/5etools-src/main/data/bestiary/bestiary-mm.json\" -o bestiary-mm-raw.json)",
+      "Bash(mkdir -p data)",
+      "Bash(mv lmop-raw.json data/lmop.json)",
+      "Bash(mv bestiary-mm-raw.json data/bestiary-mm.json)",
+      "Read(//c/c/Users/beine/OneDrive/Desktop/old docs/horrid-wake/**)"
     ]
   }
 }

@@ -404,6 +404,108 @@ canvas{position:fixed;inset:0;z-index:2;pointer-events:none;}
   transition:color .2s;
 }
 .sc-resume:active{color:rgba(155,180,80,.8);}
+.sc-status-line{
+  text-align:center;margin-top:8px;
+  font-family:'Josefin Sans',sans-serif;font-weight:300;
+  font-size:10px;letter-spacing:1.5px;
+  color:rgba(155,175,85,.55);
+}
+
+/* ═══════════════════════════════════════
+   ADVENTURE VIEW
+═══════════════════════════════════════ */
+#adventureView{
+  position:fixed;inset:0;z-index:110;
+  transform:translateX(100%);
+  transition:transform .35s ease;
+  background:#0a0703;
+  display:flex;flex-direction:column;
+  height:100dvh;
+}
+#adventureView.open{transform:translateX(0);}
+
+.adv-topbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px 10px;
+  background:rgba(10,7,3,.97);
+  border-bottom:1px solid rgba(80,40,5,.4);
+  flex-shrink:0;
+}
+.adv-close{
+  background:none;border:1px solid rgba(120,70,12,.45);
+  color:rgba(200,148,58,.65);font-size:15px;
+  width:34px;height:34px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;flex-shrink:0;
+}
+.adv-close:active{border-color:var(--gold);color:var(--gold);}
+.adv-char-name{
+  font-family:'AVQuest',cursive;
+  font-size:13px;color:var(--gold-lt);letter-spacing:1px;
+}
+.adv-hp{
+  font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;
+  transition:color .3s;
+}
+
+.adv-log{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:16px 16px 8px;
+  display:flex;flex-direction:column;
+}
+.adv-narration{
+  font-family:'Cinzel',serif;
+  font-size:15px;line-height:1.7;
+  color:#e8d5b0;
+  padding:14px 0;
+  border-top:1px solid rgba(200,148,58,.15);
+}
+.adv-narration:first-child{border-top:none;}
+.adv-readaloud{
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:14px;line-height:1.7;
+  color:#f0dfc0;
+  padding:12px 14px;
+  margin:8px 0;
+  border-left:2px solid rgba(200,148,58,.3);
+  background:rgba(200,148,58,.04);
+}
+.adv-player{
+  font-family:'Josefin Sans',sans-serif;font-weight:300;
+  font-size:12px;line-height:1.5;
+  color:rgba(200,148,58,.6);
+  text-align:right;
+  padding:8px 0;
+}
+.adv-system{
+  font-family:'Josefin Sans',sans-serif;font-weight:300;font-style:italic;
+  font-size:11px;color:var(--ember);
+  text-align:center;padding:10px 0;letter-spacing:1px;
+}
+
+.adv-input-row{
+  display:flex;align-items:center;gap:8px;
+  padding:10px 12px;
+  background:rgba(10,7,3,.97);
+  border-top:1px solid rgba(80,40,5,.4);
+  flex-shrink:0;
+}
+.adv-input{
+  flex:1;background:rgba(20,12,4,.6);
+  border:none;border-bottom:1px solid rgba(200,148,58,.4);
+  color:#e8d5b0;
+  font-family:'Josefin Sans',sans-serif;font-weight:300;
+  font-size:15px;padding:10px 4px;outline:none;
+}
+.adv-input::placeholder{color:rgba(200,148,58,.25);font-style:italic;}
+.adv-send{
+  background:none;border:none;color:var(--ember);
+  font-size:22px;padding:8px 10px;cursor:pointer;
+  transition:color .2s;flex-shrink:0;line-height:1;
+}
+.adv-send:active{color:var(--gold-lt);}
+.adv-typing{opacity:.5;font-style:italic;animation:pulse 1s infinite;}
+@keyframes pulse{0%,100%{opacity:.3;}50%{opacity:.7;}}
 
 /* ═══════════════════════════════════════
    SHEET VIEW
@@ -645,6 +747,20 @@ canvas{position:fixed;inset:0;z-index:2;pointer-events:none;}
     <div class="sc-hero-fade"></div>
   </div>
   <div class="sc-body" id="scBody"></div>
+</div>
+
+<!-- ADVENTURE VIEW -->
+<div id="adventureView">
+  <div class="adv-topbar">
+    <button class="adv-close" onclick="closeAdventure()">✕</button>
+    <span class="adv-char-name" id="advCharName"></span>
+    <span class="adv-hp" id="advHp"></span>
+  </div>
+  <div class="adv-log" id="advLog"></div>
+  <div class="adv-input-row">
+    <input class="adv-input" id="advInput" type="text" placeholder="What do you do?" autocomplete="off" />
+    <button class="adv-send" id="advSend">→</button>
+  </div>
 </div>
 
 <script>
@@ -1110,9 +1226,274 @@ function renderSummerCamp(){
           </div>`).join('')}
       </div>
     </div>
-    <button class="sc-begin-btn" onclick="console.log('Summer Camp adventure started for ${c.name}')">Begin the Adventure &#8594;</button>
-    <div class="sc-resume" onclick="console.log('Resume summer camp for ${c.name}')">Already adventuring? Resume your journey &#8594;</div>
+    ${(()=>{
+      const hasProg = AdventureState.hasProgress(scCharId);
+      if (hasProg) {
+        const st = AdventureState.load(scCharId);
+        return `
+          <button class="sc-begin-btn" onclick="startOrResumeAdventure('${scCharId}')">Resume Your Journey &#8594;</button>
+          <div class="sc-status-line">Chapter ${st.chapterIndex} &middot; Level ${st.level} &middot; ${st.hp}/${st.maxHp} HP</div>
+        `;
+      }
+      return `
+        <button class="sc-begin-btn" onclick="startOrResumeAdventure('${scCharId}')">Begin the Adventure &#8594;</button>
+        <div class="sc-resume" onclick="startOrResumeAdventure('${scCharId}')">Already adventuring? Resume your journey &#8594;</div>
+      `;
+    })()}
   `;
+}
+
+async function startOrResumeAdventure(id) {
+  let state = AdventureState.load(id);
+  if (!state) {
+    const sheet = SHEETS[id].level1;
+    state = AdventureState.startNew(id, sheet);
+  }
+  window.activeAdventureState = state;
+  window.activeAdventureId = id;
+  openAdventureView(id, state);
+}
+
+function openAdventureView(id, state) {
+  const char = CHARS.find(c => c.id === id);
+
+  document.getElementById('advCharName').textContent = char.name;
+  updateAdvHp(state);
+  document.getElementById('advLog').innerHTML = '';
+
+  if (state.conversationHistory.length === 0) {
+    renderOpeningScene(id, state);
+  } else {
+    const recent = state.conversationHistory.slice(-10);
+    recent.forEach(msg => {
+      if (msg.role === 'assistant') appendNarration(msg.content);
+      if (msg.role === 'user') appendPlayerMessage(msg.content);
+    });
+    scrollLog();
+  }
+
+  document.getElementById('adventureView').classList.add('open');
+  setTimeout(() => document.getElementById('advInput').focus(), 400);
+
+  document.getElementById('advSend').onclick = handlePlayerInput;
+  document.getElementById('advInput').onkeydown = e => {
+    if (e.key === 'Enter') handlePlayerInput();
+  };
+}
+
+function closeAdventure() {
+  document.getElementById('adventureView').classList.remove('open');
+}
+
+function updateAdvHp(state) {
+  const el = document.getElementById('advHp');
+  el.textContent = `${state.hp} / ${state.maxHp} HP`;
+  el.style.color = state.hp / state.maxHp < 0.5 ? '#c0392b' : 'var(--ember)';
+}
+
+function appendNarration(text) {
+  const el = document.createElement('div');
+  el.className = 'adv-narration';
+  el.textContent = text;
+  document.getElementById('advLog').appendChild(el);
+  scrollLog();
+}
+
+function appendReadAloud(text) {
+  const el = document.createElement('div');
+  el.className = 'adv-readaloud';
+  el.textContent = text;
+  document.getElementById('advLog').appendChild(el);
+  scrollLog();
+}
+
+function appendPlayerMessage(text) {
+  const el = document.createElement('div');
+  el.className = 'adv-player';
+  el.textContent = '> ' + text;
+  document.getElementById('advLog').appendChild(el);
+  scrollLog();
+}
+
+function appendSystemMessage(text) {
+  const el = document.createElement('div');
+  el.className = 'adv-system';
+  el.textContent = text;
+  document.getElementById('advLog').appendChild(el);
+  scrollLog();
+}
+
+function scrollLog() {
+  const log = document.getElementById('advLog');
+  log.scrollTop = log.scrollHeight;
+}
+
+
+function buildSystemPrompt(id, state) {
+  const char = CHARS.find(c => c.id === id);
+  const sheet = SHEETS[id][`level${state.level}`] || SHEETS[id].level1;
+  const rooms = DataEngine.getChapterRooms(state.chapterIndex);
+  const currentRoom = rooms.find(r => r.id === state.roomId) || rooms[0];
+
+  const monsterBlocks = (currentRoom?.creatures || [])
+    .map(name => DataEngine.getMonster(name))
+    .filter(Boolean)
+    .map(m => DataEngine.formatMonsterBlock(m))
+    .join('\n');
+
+  return `You are the Dungeon Master for a text-based D&D 5e adventure running Lost Mines of Phandelver. You are running this for a group of friends who have never played D&D before. Keep narration vivid, punchy, and under 120 words per response. Never use D&D jargon without briefly explaining it. End every response with an implicit or explicit prompt for the player's next action.
+
+THE PLAYER'S CHARACTER:
+Name: ${char.name}
+Class: ${sheet.class} ${sheet.subclass ? '(' + sheet.subclass + ')' : ''}
+Level: ${state.level}
+HP: ${state.hp} / ${state.maxHp}
+AC: ${sheet.ac}
+Key stats: STR ${sheet.str} DEX ${sheet.dex} CON ${sheet.con} INT ${sheet.int} WIS ${sheet.wis} CHA ${sheet.cha}
+Equipment: ${sheet.equipment?.join(', ') || 'none'}
+Features: ${sheet.features?.join(', ') || 'none'}
+
+CURRENT LOCATION:
+Module: Lost Mines of Phandelver
+Chapter: ${state.chapterIndex}
+Room: ${currentRoom?.name || 'Unknown'}
+${currentRoom?.readAloud?.length ? 'Description: ' + currentRoom.readAloud[0] : ''}
+${monsterBlocks ? 'Creatures present:\n' + monsterBlocks : ''}
+${currentRoom?.treasure?.length ? 'Treasure available: ' + currentRoom.treasure[0] : ''}
+
+ADVENTURE STATE:
+Visited rooms: ${state.visitedRooms.join(', ') || 'none yet'}
+Inventory: ${state.inventory.join(', ') || 'nothing'}
+Gold: ${state.gold} gp
+Conditions: ${state.conditions.join(', ') || 'none'}
+
+RULES:
+- Stay true to the Lost Mines of Phandelver module structure and story beats
+- When the player enters a new room, describe it using the module's read-aloud text as inspiration
+- When combat starts, describe it cinematically — reference the actual monster stats for outcomes
+- When treasure is found, name it from the module data
+- Never reveal that you are an AI or that this is a structured module
+- If the player tries something creative, reward it
+- Track HP changes and tell the player their current HP after taking damage`;
+}
+
+async function renderOpeningScene(id, state) {
+  const char = CHARS.find(c => c.id === id);
+  const rooms = DataEngine.getChapterRooms(1);
+  const firstRoom = rooms[0];
+
+  appendSystemMessage('— Chapter 1: Goblin Arrows —');
+
+  if (firstRoom?.readAloud?.length) {
+    appendReadAloud(firstRoom.readAloud[0]);
+  }
+
+  AdventureState.visitRoom(state, firstRoom?.name || 'Cave Mouth');
+  AdventureState.update(state, { roomId: firstRoom?.id || null });
+
+  const openingPrompt = `The adventure begins. Set the scene at the start of the Triboar Trail and draw the player into the first encounter with goblins. Address the player's character ${char.name} directly.`;
+  AdventureState.addMessage(state, 'user', openingPrompt);
+
+  const indicator = document.createElement('div');
+  indicator.className = 'adv-narration adv-typing';
+  indicator.textContent = '…';
+  document.getElementById('advLog').appendChild(indicator);
+  scrollLog();
+
+  try {
+    const systemPrompt = buildSystemPrompt(id, state);
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: openingPrompt }]
+      })
+    });
+
+    const data = await response.json();
+    const reply = data.content?.[0]?.text || 'Your journey begins...';
+    indicator.remove();
+    appendNarration(reply);
+    AdventureState.addMessage(state, 'assistant', reply);
+
+  } catch (err) {
+    indicator.remove();
+    appendNarration(`${char.name} stands at the trailhead. The road ahead is dark. What do you do?`);
+    console.error('[Adventure] Opening scene error:', err);
+  }
+}
+
+async function handlePlayerInput() {
+  const input = document.getElementById('advInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+
+  const state = window.activeAdventureState;
+  const id = window.activeAdventureId;
+
+  appendPlayerMessage(text);
+  AdventureState.addMessage(state, 'user', text);
+
+  const indicator = document.createElement('div');
+  indicator.className = 'adv-narration adv-typing';
+  indicator.textContent = '…';
+  document.getElementById('advLog').appendChild(indicator);
+  scrollLog();
+
+  document.getElementById('advInput').disabled = true;
+  document.getElementById('advSend').disabled = true;
+
+  try {
+    const systemPrompt = buildSystemPrompt(id, state);
+
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: state.conversationHistory.map(m => ({
+          role: m.role,
+          content: m.content
+        }))
+      })
+    });
+
+    const data = await response.json();
+    const reply = data.content?.[0]?.text || 'The dungeon falls silent.';
+
+    indicator.remove();
+    appendNarration(reply);
+    AdventureState.addMessage(state, 'assistant', reply);
+
+    const dmgMatch = reply.match(/(\d+)\s*(damage|hp)/i);
+    if (dmgMatch) {
+      const dmg = parseInt(dmgMatch[1]);
+      AdventureState.setHp(state, state.hp - dmg);
+      updateAdvHp(state);
+      if (state.hp <= 0) {
+        appendSystemMessage('— You have fallen. Your journey ends here. —');
+      }
+    }
+
+  } catch (err) {
+    indicator.remove();
+    appendSystemMessage('The dungeon stirs but does not speak. (Connection lost — try again.)');
+    console.error('[Adventure] API error:', err);
+  } finally {
+    document.getElementById('advInput').disabled = false;
+    document.getElementById('advSend').disabled = false;
+    document.getElementById('advInput').focus();
+  }
 }
 
 // ═══════════════════════════════════════
@@ -1127,5 +1508,7 @@ window.CHAR_IMGS = { dennis: "data:image/webp;base64,UklGRo4vAQBXRUJQVlA4IIIvAQD
 IMGS = window.CHAR_IMGS;
 init();
 </script>
+<script src="/js/dataEngine.js"></script>
+<script src="/js/adventureState.js"></script>
 </body>
 </html>
