@@ -20,7 +20,8 @@
       "Read(//c/c/Users/beine/OneDrive/Desktop/old docs/horrid-wake/**)",
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(curl \"https://generativelanguage.googleapis.com/v1beta/models?key=AIzaSyBsOgLsA25qFEhx-eNx27JtA1KPkNGpAM4\")"
     ]
   }
 }
