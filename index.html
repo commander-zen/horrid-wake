@@ -302,6 +302,150 @@ canvas{position:fixed;inset:0;z-index:2;pointer-events:none;}
   font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:all .2s;
 }
 .d-btn-enter:active{background:linear-gradient(180deg,rgba(185,115,15,.38),rgba(95,50,8,.38));box-shadow:0 0 14px rgba(185,115,15,.28);}
+
+/* ═══════════════════════════════════════
+   SHEET VIEW
+═══════════════════════════════════════ */
+#sheetView{
+  position:fixed;inset:0;z-index:100;
+  transform:translateX(100%);
+  transition:transform .42s cubic-bezier(.23,1,.32,1);
+  background:linear-gradient(160deg,#100804 0%,#060301 100%);
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+}
+#sheetView.open{transform:translateX(0);}
+
+.sh-topbar{
+  position:sticky;top:0;z-index:10;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px 10px;
+  background:rgba(6,3,1,.97);
+  border-bottom:1px solid rgba(80,40,5,.5);
+}
+.sh-close{
+  background:none;border:1px solid rgba(120,70,12,.5);
+  color:rgba(200,148,58,.7);font-size:15px;
+  width:34px;height:34px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;flex-shrink:0;
+}
+.sh-close:active{border-color:var(--gold);color:var(--gold);}
+.sh-lvl-wrap{display:flex;}
+.sh-lvl{
+  background:rgba(20,10,2,.8);
+  border:1px solid rgba(70,35,5,.6);
+  color:rgba(145,82,15,.7);
+  font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;
+  padding:7px 16px;cursor:pointer;transition:all .2s;
+}
+.sh-lvl:first-child{border-right:none;}
+.sh-lvl.active{
+  background:linear-gradient(180deg,rgba(120,72,10,.45),rgba(55,28,4,.45));
+  border-color:var(--gold);color:var(--gold-lt);
+}
+
+.sh-hero{
+  position:relative;height:220px;overflow:hidden;flex-shrink:0;
+}
+.sh-hero-img{
+  position:absolute;inset:0;background-size:cover;background-position:center 15%;
+  filter:brightness(.72) contrast(1.1) saturate(1.05);
+  transform:scale(1.04);
+}
+.sh-hero-fade{
+  position:absolute;inset:0;
+  background:linear-gradient(0deg,rgba(6,3,1,1) 0%,rgba(6,3,1,.55) 32%,transparent 70%);
+}
+.sh-hero-info{position:absolute;bottom:16px;left:18px;right:18px;}
+.sh-char-name{
+  font-family:'AVQuest',cursive;
+  font-size:clamp(17px,5.5vw,26px);
+  color:var(--gold-lt);line-height:1;margin-bottom:5px;
+  text-shadow:0 2px 14px rgba(0,0,0,.95);
+}
+.sh-class-line{
+  font-size:8px;letter-spacing:3px;text-transform:uppercase;
+  color:rgba(155,90,18,.85);
+}
+.sh-lvl-badge{
+  display:inline-block;margin-left:8px;
+  background:rgba(55,28,4,.85);border:1px solid rgba(110,62,10,.6);
+  color:var(--gold);font-family:'Cinzel',serif;
+  font-size:7px;letter-spacing:2px;padding:2px 7px;vertical-align:middle;
+}
+
+.sh-body{padding:4px 16px 44px;}
+
+.sh-vitals{display:flex;gap:8px;margin:16px 0 20px;}
+.sh-vital{
+  flex:1;text-align:center;padding:10px 4px;
+  background:rgba(14,8,1,.75);
+  border:1px solid rgba(65,32,5,.6);
+}
+.sh-vital-v{
+  font-family:'Cinzel Decorative',serif;
+  font-size:22px;line-height:1;margin-bottom:3px;
+}
+.sh-vital-l{font-size:7px;letter-spacing:2px;color:rgba(140,78,14,.7);text-transform:uppercase;}
+
+.sh-section{margin-bottom:20px;}
+.sh-section-title{
+  font-family:'AVQuest',cursive;
+  font-size:13px;letter-spacing:2px;color:var(--gold);
+  border-bottom:1px solid rgba(75,38,5,.6);
+  padding-bottom:5px;margin-bottom:10px;text-transform:uppercase;
+}
+
+.sh-ability-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.sh-ability{
+  text-align:center;padding:10px 4px;
+  background:rgba(12,6,1,.85);
+  border:1px solid rgba(65,32,5,.5);
+  transition:box-shadow .3s;
+}
+.sh-ability.primary{
+  border-color:rgba(200,148,58,.45);
+  box-shadow:0 0 14px rgba(217,79,0,.18) inset;
+}
+.sh-ability-label{font-size:7px;letter-spacing:2px;color:rgba(140,78,14,.7);text-transform:uppercase;margin-bottom:4px;}
+.sh-ability-score{font-family:'Cinzel Decorative',serif;font-size:20px;line-height:1;color:rgba(215,170,85,.9);}
+.sh-ability-mod{font-size:11px;color:rgba(200,100,20,.9);margin-top:3px;}
+.sh-ability.primary .sh-ability-mod{color:var(--gold-lt);}
+
+.sh-skills{display:flex;flex-direction:column;gap:3px;}
+.sh-skill{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:5px 9px;
+  background:rgba(12,6,1,.6);
+  border-left:2px solid rgba(80,40,5,.55);
+}
+.sh-skill-name{font-size:11px;color:rgba(195,150,58,.85);}
+.sh-skill-val{font-family:'Cinzel',serif;font-size:12px;color:var(--gold-lt);}
+
+.sh-spell-group{margin-bottom:10px;}
+.sh-spell-group-label{font-size:8px;letter-spacing:2px;color:rgba(140,78,14,.7);text-transform:uppercase;margin-bottom:5px;}
+.sh-spell-list{display:flex;flex-wrap:wrap;gap:5px;}
+.sh-spell{
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:12px;color:rgba(195,150,58,.9);
+  background:rgba(18,9,1,.75);
+  border:1px solid rgba(65,32,5,.5);
+  padding:4px 9px;
+}
+
+.sh-feature{
+  font-size:11px;color:rgba(185,142,54,.85);
+  padding:5px 9px;
+  border-left:2px solid rgba(190,140,50,.28);
+  margin-bottom:4px;
+  background:rgba(12,6,1,.45);
+}
+.sh-equip{
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:12px;color:rgba(170,126,48,.8);
+  padding:5px 0;border-bottom:1px solid rgba(38,18,3,.7);
+}
+.sh-equip:last-child{border-bottom:none;}
 </style>
 </head>
 <body>
@@ -357,6 +501,26 @@ canvas{position:fixed;inset:0;z-index:2;pointer-events:none;}
   </div>
 </div>
 
+<!-- SHEET VIEW -->
+<div id="sheetView">
+  <div class="sh-topbar">
+    <button class="sh-close" onclick="closeSheet()">✕</button>
+    <div class="sh-lvl-wrap">
+      <button class="sh-lvl" id="shLvl1" onclick="setSheetLevel(1)">LEVEL 1</button>
+      <button class="sh-lvl active" id="shLvl5" onclick="setSheetLevel(5)">LEVEL 5</button>
+    </div>
+  </div>
+  <div class="sh-hero" id="shHero">
+    <div class="sh-hero-img" id="shHeroImg"></div>
+    <div class="sh-hero-fade"></div>
+    <div class="sh-hero-info">
+      <div class="sh-char-name" id="shCharName"></div>
+      <div class="sh-class-line" id="shClassLine"></div>
+    </div>
+  </div>
+  <div class="sh-body" id="shBody"></div>
+</div>
+
 <script>
 // ═══════════════════════════════════════
 // CHARACTER DATA
@@ -408,6 +572,128 @@ const CHARS = [
     imgKey: 'frank', accentColor: '#806020',
   },
 ];
+
+// ═══════════════════════════════════════
+// CHARACTER SHEETS
+// ═══════════════════════════════════════
+const SHEETS = {
+  dennis: {
+    level1: {
+      class:'Sorcerer', subclass:null,
+      hp:7, ac:11, speed:30,
+      str:8, dex:12, con:14, int:10, wis:10, cha:16,
+      skills:{ Acrobatics:1, Deception:3, Insight:0, Intimidation:3, Perception:0 },
+      cantrips:['Mage Hand','Prestidigitation','Ray of Frost','Spark of Life'],
+      spells_1:['Magic Missile','Shield'],
+      spells_2:[],
+      features:['Wild Magic Surge (dormant)'],
+      equipment:['Quarterstaff','Dagger','Leather Armor','Spell Component Pouch'],
+    },
+    level5: {
+      class:'Wild Magic Sorcerer', subclass:'Wild Magic',
+      hp:31, ac:13, speed:30,
+      str:8, dex:14, con:16, int:10, wis:12, cha:18,
+      skills:{ Acrobatics:2, Deception:4, Insight:1, Intimidation:4, Perception:1 },
+      cantrips:['Mage Hand','Prestidigitation','Ray of Frost','Spark of Life'],
+      spells_1:['Magic Missile','Shield','Feather Fall','Charm Person'],
+      spells_2:['Scorching Ray','Invisibility','Suggestion'],
+      features:['Wild Magic Surge','Tides of Chaos','Bend Luck'],
+      equipment:['Quarterstaff','Dagger','Leather Armor','Spell Component Pouch','Wild Magic Surge Tokens'],
+    },
+  },
+  mac: {
+    level1: {
+      class:'Paladin', subclass:'Oath of Conquest',
+      hp:12, ac:18, speed:30,
+      str:16, dex:12, con:14, int:10, wis:13, cha:15,
+      skills:{ Acrobatics:1, Athletics:5, Intimidation:2, Perception:2, Persuasion:2 },
+      cantrips:['Light','Thaumaturgy'],
+      spells_1:['Bless','Cure Wounds'],
+      spells_2:[],
+      features:["Divine Sense","Lay on Hands","Conqueror's Strike"],
+      equipment:['Longsword','Shield','Plate Armor','Holy Symbol','Javelin'],
+    },
+    level5: {
+      class:'Paladin', subclass:'Oath of Conquest',
+      hp:44, ac:20, speed:30,
+      str:19, dex:14, con:16, int:10, wis:15, cha:17,
+      skills:{ Acrobatics:2, Athletics:7, Intimidation:5, Perception:4, Persuasion:5 },
+      cantrips:['Light','Thaumaturgy'],
+      spells_1:['Bless','Cure Wounds','Shield of Faith','Protection from Evil and Good'],
+      spells_2:['Aid','Brand of Justice'],
+      features:['Divine Smite',"Conqueror's Strike",'Aura of Conquest','Extra Attack'],
+      equipment:['Longsword','Shield','Plate Armor','Holy Symbol','Javelin'],
+    },
+  },
+  charlie: {
+    level1: {
+      class:'Druid', subclass:'Circle of Spores',
+      hp:9, ac:11, speed:30,
+      str:12, dex:14, con:16, int:10, wis:18, cha:12,
+      skills:{ Acrobatics:2, 'Animal Handling':4, Nature:4, Perception:4, Survival:4 },
+      cantrips:['Shillelagh','Thorn Spray'],
+      spells_1:['Entangle','Cure Wounds'],
+      spells_2:[],
+      features:['Spore Spray','Wild Shape'],
+      equipment:['Quarterstaff','Leather Armor','Druidic Focus','Herbalism Kit'],
+    },
+    level5: {
+      class:'Druid', subclass:'Circle of Spores',
+      hp:38, ac:13, speed:30,
+      str:14, dex:16, con:18, int:12, wis:20, cha:14,
+      skills:{ Acrobatics:3, 'Animal Handling':7, Nature:7, Perception:7, Survival:7 },
+      cantrips:['Shillelagh','Thorn Spray','Guidance','Light'],
+      spells_1:['Entangle','Cure Wounds','Detect Magic','Faerie Fire'],
+      spells_2:['Insect Plague','Suggestion'],
+      features:['Spore Spray','Fungal Network','Wild Shape (CR 1/2)','Symbiotic Entity'],
+      equipment:['Quarterstaff','Leather Armor','Druidic Focus','Herbalism Kit','Spore-Infused Pouch'],
+    },
+  },
+  dee: {
+    level1: {
+      class:'Bard', subclass:'College of Eloquence',
+      hp:8, ac:12, speed:30,
+      str:10, dex:14, con:12, int:10, wis:12, cha:16,
+      skills:{ Acrobatics:2, Deception:3, History:1, Insight:1, Intimidation:3, Performance:3, Persuasion:3 },
+      cantrips:['Blade Ward','Dancing Lights'],
+      spells_1:['Charm Person','Cure Wounds'],
+      spells_2:[],
+      features:['Bardic Inspiration (d6)','Eloquent Speech'],
+      equipment:['Lute','Rapier','Leather Armor','Signet Ring'],
+    },
+    level5: {
+      class:'Bard', subclass:'College of Eloquence',
+      hp:33, ac:14, speed:30,
+      str:12, dex:16, con:14, int:12, wis:14, cha:18,
+      skills:{ Acrobatics:3, Deception:7, History:2, Insight:4, Intimidation:7, Performance:7, Persuasion:7 },
+      cantrips:['Blade Ward','Dancing Lights','Prestidigitation','Vicious Mockery'],
+      spells_1:['Charm Person','Cure Wounds','Detect Magic','Feather Fall'],
+      spells_2:['Invisibility','Suggestion'],
+      features:['Bardic Inspiration (d8)','Eloquent Speech','Unsettling Speech','Jack of All Trades','Song of Rest'],
+      equipment:['Lute','Rapier','Leather Armor','Signet Ring'],
+    },
+  },
+  frank: {
+    level1: {
+      class:'Barbarian', subclass:'Path of the Beast',
+      hp:14, ac:13, speed:30,
+      str:16, dex:12, con:14, int:8, wis:10, cha:8,
+      skills:{ Acrobatics:1, Athletics:5, Intimidation:1, Perception:2, Survival:2 },
+      cantrips:[], spells_1:[], spells_2:[],
+      features:['Rage (2/day)','Unarmored Defense',"Beast's Sense"],
+      equipment:['Greataxe','Leather Armor',"Hunter's Tools"],
+    },
+    level5: {
+      class:'Barbarian', subclass:'Path of the Beast',
+      hp:52, ac:15, speed:30,
+      str:19, dex:14, con:16, int:8, wis:12, cha:10,
+      skills:{ Acrobatics:2, Athletics:7, Intimidation:2, Perception:3, Survival:3 },
+      cantrips:[], spells_1:[], spells_2:[],
+      features:['Rage (3/day)','Reckless Attack','Danger Sense',"Beast's Sense",'Form of the Beast (Wolf / Bear / Eagle)','Extra Attack'],
+      equipment:['Greataxe','Leather Armor','Shield',"Hunter's Tools","Beast's Tooth"],
+    },
+  },
+};
 
 let IMGS = {};
 let activeId = null;
@@ -524,8 +810,110 @@ function enterDungeon(){
   const nameEl = document.getElementById('dName');
   const c = CHARS.find(x=>x.id===activeId);
   if(c) c.name = nameEl.textContent.trim();
-  // TODO: wire to magic item picker + combat sheet
-  alert(`${c.name} steps into the dungeon.\n\nCombat sheet coming next.`);
+  openSheet(activeId);
+}
+
+// ═══════════════════════════════════════
+// SHEET VIEW
+// ═══════════════════════════════════════
+let sheetCharId = null;
+let sheetLevel = 5;
+
+const PRIMARY_STAT = { dennis:'cha', mac:'str', charlie:'wis', dee:'cha', frank:'str' };
+
+function openSheet(id){
+  sheetCharId = id;
+  sheetLevel = 5;
+  document.getElementById('shLvl1').classList.remove('active');
+  document.getElementById('shLvl5').classList.add('active');
+  const c = CHARS.find(x=>x.id===id);
+  document.getElementById('shHeroImg').style.backgroundImage = `url('${IMGS[c.imgKey]||''}')`;
+  renderSheet();
+  document.getElementById('sheetView').classList.add('open');
+}
+
+function closeSheet(){
+  document.getElementById('sheetView').classList.remove('open');
+}
+
+function setSheetLevel(lvl){
+  sheetLevel = lvl;
+  document.getElementById('shLvl1').classList.toggle('active', lvl===1);
+  document.getElementById('shLvl5').classList.toggle('active', lvl===5);
+  renderSheet();
+}
+
+function renderSheet(){
+  const c = CHARS.find(x=>x.id===sheetCharId);
+  const s = SHEETS[sheetCharId][sheetLevel===1?'level1':'level5'];
+  const primary = PRIMARY_STAT[sheetCharId];
+  const mod = v=>{ const m=Math.floor((v-10)/2); return(m>=0?'+':'')+m; };
+
+  document.getElementById('shCharName').textContent = c.name;
+  document.getElementById('shClassLine').innerHTML =
+    `${s.class}${s.subclass?' &middot; '+s.subclass:''}`+
+    `<span class="sh-lvl-badge">LVL ${sheetLevel}</span>`;
+
+  const stats = [
+    {key:'str',label:'STR',val:s.str},{key:'dex',label:'DEX',val:s.dex},
+    {key:'con',label:'CON',val:s.con},{key:'int',label:'INT',val:s.int},
+    {key:'wis',label:'WIS',val:s.wis},{key:'cha',label:'CHA',val:s.cha},
+  ];
+
+  const hasSpells = (s.cantrips&&s.cantrips.length)||(s.spells_1&&s.spells_1.length)||(s.spells_2&&s.spells_2.length);
+
+  const spellGroup = (label, arr) => arr&&arr.length ? `
+    <div class="sh-spell-group">
+      <div class="sh-spell-group-label">${label}</div>
+      <div class="sh-spell-list">${arr.map(sp=>`<div class="sh-spell">${sp}</div>`).join('')}</div>
+    </div>` : '';
+
+  const spellsSection = hasSpells ? `
+    <div class="sh-section">
+      <div class="sh-section-title">Spells</div>
+      ${spellGroup('Cantrips', s.cantrips)}
+      ${spellGroup('1st Level', s.spells_1)}
+      ${spellGroup('2nd Level', s.spells_2)}
+    </div>` : '';
+
+  document.getElementById('shBody').innerHTML = `
+    <div class="sh-vitals">
+      <div class="sh-vital"><div class="sh-vital-v" style="color:#65c040">${s.hp}</div><div class="sh-vital-l">HP</div></div>
+      <div class="sh-vital"><div class="sh-vital-v" style="color:#3d8fd4">${s.ac}</div><div class="sh-vital-l">AC</div></div>
+      <div class="sh-vital"><div class="sh-vital-v" style="color:var(--gold)">${s.speed}</div><div class="sh-vital-l">Speed</div></div>
+    </div>
+    <div class="sh-section">
+      <div class="sh-section-title">Ability Scores</div>
+      <div class="sh-ability-grid">
+        ${stats.map(({key,label,val})=>`
+          <div class="sh-ability${key===primary?' primary':''}">
+            <div class="sh-ability-label">${label}</div>
+            <div class="sh-ability-score">${val}</div>
+            <div class="sh-ability-mod">${mod(val)}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div class="sh-section">
+      <div class="sh-section-title">Skills</div>
+      <div class="sh-skills">
+        ${Object.entries(s.skills).map(([name,val])=>`
+          <div class="sh-skill">
+            <span class="sh-skill-name">${name}</span>
+            <span class="sh-skill-val">${val>=0?'+':''}${val}</span>
+          </div>`).join('')}
+      </div>
+    </div>
+    ${spellsSection}
+    ${s.features&&s.features.length?`
+    <div class="sh-section">
+      <div class="sh-section-title">${hasSpells?'Features &amp; Traits':'Combat Features'}</div>
+      ${s.features.map(f=>`<div class="sh-feature">&#9670; ${f}</div>`).join('')}
+    </div>`:''}
+    <div class="sh-section">
+      <div class="sh-section-title">Equipment</div>
+      ${s.equipment.map(e=>`<div class="sh-equip">${e}</div>`).join('')}
+    </div>
+  `;
 }
 
 // ═══════════════════════════════════════
