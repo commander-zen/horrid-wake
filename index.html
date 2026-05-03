@@ -260,48 +260,172 @@ canvas{position:fixed;inset:0;z-index:2;pointer-events:none;}
 .d-name:focus{border-bottom-color:rgba(100,55,5,.6);}
 .d-name-hint{font-family:'IM Fell English',serif;font-style:italic;font-size:10px;color:rgba(140,80,15,.45);white-space:nowrap;}
 .d-cls{font-size:9px;letter-spacing:3px;color:rgba(155,90,18,.75);text-transform:uppercase;margin-bottom:2px;}
-.d-tag{font-family:'IM Fell English',serif;font-style:italic;color:rgba(130,70,12,.85);font-size:12px;margin-bottom:10px;line-height:1.4;}
+.d-tag{font-family:'IM Fell English',serif;font-style:italic;color:rgba(120,62,10,.7);font-size:11px;margin-bottom:8px;line-height:1.4;}
+
+/* identity block */
+.d-identity{margin-bottom:10px;}
+.d-identity-row{margin-bottom:7px;}
+.d-identity-label{
+  font-family:'AVQuest',cursive;
+  font-size:8px;letter-spacing:2.5px;text-transform:uppercase;
+  color:var(--ember);margin-bottom:3px;
+}
+.d-identity-text{
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:13px;line-height:1.55;
+  color:rgba(200,162,88,.88);
+}
+.d-identity-spacer{
+  height:1px;
+  background:linear-gradient(90deg,rgba(80,40,5,.5),transparent);
+  margin:6px 0 8px;
+}
 
 /* vitals */
-.d-vitals{display:flex;gap:0;margin-bottom:10px;border:1px solid rgba(60,30,5,.7);}
-.d-vital{flex:1;text-align:center;padding:6px 2px;border-right:1px solid rgba(60,30,5,.7);}
+.d-vitals{display:flex;gap:0;margin-bottom:8px;border:1px solid rgba(50,24,4,.6);opacity:.75;}
+.d-vital{flex:1;text-align:center;padding:5px 2px;border-right:1px solid rgba(50,24,4,.6);}
 .d-vital:last-child{border-right:none;}
-.d-vital-v{font-family:'Cinzel Decorative',serif;font-size:17px;line-height:1;margin-bottom:1px;}
-.d-vital-l{font-size:7px;letter-spacing:2px;color:rgba(145,82,15,.7);text-transform:uppercase;}
+.d-vital-v{font-family:'Cinzel Decorative',serif;font-size:14px;line-height:1;margin-bottom:1px;}
+.d-vital-l{font-size:7px;letter-spacing:2px;color:rgba(130,72,12,.6);text-transform:uppercase;}
 
-/* stat bars */
-.d-bars{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+/* stat bars — subordinate reference layer */
+.d-bars{display:flex;flex-direction:column;gap:4px;margin-bottom:10px;opacity:.45;}
 .d-bar{display:flex;align-items:center;gap:6px;}
-.d-bar-lbl{font-size:9px;letter-spacing:1px;color:rgba(155,88,15,.8);width:26px;flex-shrink:0;text-transform:uppercase;}
-.d-bar-track{flex:1;height:7px;background:rgba(255,255,255,.04);border:1px solid rgba(180,130,40,.09);overflow:hidden;}
+.d-bar-lbl{font-size:8px;letter-spacing:1px;color:rgba(140,78,12,.8);width:26px;flex-shrink:0;text-transform:uppercase;}
+.d-bar-track{flex:1;height:4px;background:rgba(255,255,255,.03);border:1px solid rgba(160,110,30,.07);overflow:hidden;}
 .d-bar-fill{
   height:100%;width:0%;
-  background:linear-gradient(90deg,rgba(90,38,4,.9),var(--gold),var(--gold-lt));
-  box-shadow:0 0 5px rgba(190,120,15,.4);
+  background:linear-gradient(90deg,rgba(80,32,4,.8),var(--gold));
   transition:width 1.25s cubic-bezier(.23,1,.32,1);
   position:relative;
 }
-.d-bar-fill::after{content:'';position:absolute;right:0;top:0;bottom:0;width:2px;background:rgba(255,245,200,.7);}
-.d-bar-val{font-size:12px;color:var(--gold-lt);width:20px;text-align:right;flex-shrink:0;}
-.d-bar-mod{font-size:9px;color:rgba(145,88,15,.75);width:20px;flex-shrink:0;}
+.d-bar-fill::after{content:'';position:absolute;right:0;top:0;bottom:0;width:1px;background:rgba(255,245,200,.5);}
+.d-bar-val{font-size:10px;color:rgba(180,140,50,.7);width:20px;text-align:right;flex-shrink:0;}
+.d-bar-mod{font-size:8px;color:rgba(130,78,12,.6);width:20px;flex-shrink:0;}
 
 /* buttons */
-.d-btns{display:flex;gap:8px;}
+.d-btns{display:flex;gap:8px;align-items:flex-start;}
 .d-btn-back{
   padding:11px 14px;background:none;
   border:1px solid rgba(60,30,5,.8);
   color:rgba(155,88,15,.8);font-family:'Cinzel',serif;
   font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;
+  flex-shrink:0;
 }
 .d-btn-back:active{border-color:var(--gold);color:var(--gold);}
+.d-ctas{flex:1;display:flex;flex-direction:column;gap:7px;}
+.d-cta-wrap{display:flex;flex-direction:column;gap:3px;}
 .d-btn-enter{
-  flex:1;padding:11px;
+  width:100%;padding:11px;
   background:linear-gradient(180deg,rgba(120,72,10,.28),rgba(60,32,4,.28));
   border:1px solid var(--gold);
   color:var(--gold-lt);font-family:'Cinzel',serif;
   font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:all .2s;
+  text-align:left;
 }
 .d-btn-enter:active{background:linear-gradient(180deg,rgba(185,115,15,.38),rgba(95,50,8,.38));box-shadow:0 0 14px rgba(185,115,15,.28);}
+.d-btn-camp{
+  width:100%;padding:9px 11px;
+  background:rgba(18,28,10,.5);
+  border:1px solid rgba(55,75,28,.55);
+  color:rgba(125,148,72,.8);font-family:'Cinzel',serif;
+  font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;
+  text-align:left;
+}
+.d-btn-camp:active{background:rgba(28,42,14,.65);border-color:rgba(90,115,45,.7);color:rgba(155,180,90,.9);}
+.d-btn-sub{
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:9px;color:rgba(130,80,15,.5);padding:0 2px;line-height:1.35;
+}
+.d-btn-sub--camp{color:rgba(85,105,42,.55);}
+
+/* ═══════════════════════════════════════
+   SUMMER CAMP VIEW
+═══════════════════════════════════════ */
+#summerCampView{
+  position:fixed;inset:0;z-index:100;
+  transform:translateX(100%);
+  transition:transform .42s cubic-bezier(.23,1,.32,1);
+  background:linear-gradient(160deg,#130a04 0%,#090402 100%);
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+}
+#summerCampView.open{transform:translateX(0);}
+.sc-topbar{
+  position:sticky;top:0;z-index:10;
+  display:flex;align-items:center;gap:10px;
+  padding:12px 16px 10px;
+  background:rgba(8,4,1,.97);
+  border-bottom:1px solid rgba(60,75,28,.4);
+}
+.sc-close{
+  background:none;border:1px solid rgba(75,95,32,.45);
+  color:rgba(140,160,72,.65);font-size:15px;
+  width:34px;height:34px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;flex-shrink:0;
+}
+.sc-close:active{border-color:rgba(120,150,55,.8);color:rgba(170,195,90,.9);}
+.sc-topbar-title{display:flex;align-items:center;gap:8px;}
+.sc-top-name{
+  font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;
+  color:rgba(150,170,80,.8);text-transform:uppercase;
+}
+.sc-lvl-badge{
+  background:rgba(28,40,12,.85);border:1px solid rgba(65,85,30,.55);
+  color:rgba(125,145,65,.85);font-family:'Cinzel',serif;
+  font-size:7px;letter-spacing:2px;padding:2px 7px;
+}
+.sc-hero{position:relative;height:200px;overflow:hidden;flex-shrink:0;}
+.sc-hero-img{
+  position:absolute;inset:0;background-size:cover;background-position:center 15%;
+  filter:brightness(.65) contrast(1.1) saturate(.9) sepia(.12);
+  transform:scale(1.04);
+}
+.sc-hero-fade{
+  position:absolute;inset:0;
+  background:linear-gradient(0deg,rgba(8,4,1,1) 0%,rgba(8,4,1,.5) 30%,transparent 70%);
+}
+.sc-body{padding:4px 16px 48px;}
+.sc-flavor{
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:13px;line-height:1.65;
+  color:rgba(175,155,98,.65);
+  padding:18px 4px 20px;
+  border-bottom:1px solid rgba(55,40,10,.5);
+  margin-bottom:18px;
+}
+.sc-section{margin-bottom:20px;}
+.sc-section-title{
+  font-family:'AVQuest',cursive;
+  font-size:12px;letter-spacing:2px;color:rgba(140,160,72,.85);
+  border-bottom:1px solid rgba(55,75,25,.5);
+  padding-bottom:5px;margin-bottom:10px;text-transform:uppercase;
+}
+.sc-class-line{
+  font-size:9px;letter-spacing:3px;text-transform:uppercase;
+  color:rgba(120,140,60,.7);margin-bottom:12px;
+}
+.sc-begin-btn{
+  width:100%;padding:16px;margin-top:6px;
+  background:linear-gradient(180deg,rgba(140,72,8,.35),rgba(70,32,4,.35));
+  border:1px solid rgba(190,110,20,.7);
+  color:var(--gold-lt);font-family:'AVQuest',cursive;
+  font-size:16px;letter-spacing:2px;cursor:pointer;transition:all .25s;
+  text-align:center;display:block;
+  box-shadow:0 0 18px rgba(180,90,10,.12);
+}
+.sc-begin-btn:active{
+  background:linear-gradient(180deg,rgba(210,110,14,.42),rgba(105,48,6,.42));
+  box-shadow:0 0 28px rgba(217,79,0,.3);
+  border-color:var(--gold-lt);
+}
+.sc-resume{
+  text-align:center;margin-top:14px;
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:11px;color:rgba(120,140,62,.55);cursor:pointer;
+  transition:color .2s;
+}
+.sc-resume:active{color:rgba(155,180,80,.8);}
 
 /* ═══════════════════════════════════════
    SHEET VIEW
@@ -492,11 +616,21 @@ canvas{position:fixed;inset:0;z-index:2;pointer-events:none;}
     </div>
     <div class="d-cls" id="dCls"></div>
     <div class="d-tag" id="dTag"></div>
+    <div class="d-identity" id="dIdentity"></div>
     <div class="d-vitals" id="dVitals"></div>
     <div class="d-bars" id="dBars"></div>
     <div class="d-btns">
       <button class="d-btn-back" onclick="closeDetail()">← Back</button>
-      <button class="d-btn-enter" onclick="enterDungeon()">Enter the Dungeon →</button>
+      <div class="d-ctas">
+        <div class="d-cta-wrap">
+          <button class="d-btn-enter" onclick="enterDungeon()">⚔ Enter the Dungeon</button>
+          <div class="d-btn-sub">Jump straight to Level 5 — ready for the fall.</div>
+        </div>
+        <div class="d-cta-wrap">
+          <button class="d-btn-camp" onclick="openSummerCamp(activeId)">🏕 Summer Camp</button>
+          <div class="d-btn-sub d-btn-sub--camp">Play through Lost Mines of Phandelver with the gang, Levels 1–5.</div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -519,6 +653,22 @@ canvas{position:fixed;inset:0;z-index:2;pointer-events:none;}
     </div>
   </div>
   <div class="sh-body" id="shBody"></div>
+</div>
+
+<!-- SUMMER CAMP VIEW -->
+<div id="summerCampView">
+  <div class="sc-topbar">
+    <button class="sc-close" onclick="closeSummerCamp()">✕</button>
+    <div class="sc-topbar-title">
+      <span class="sc-top-name" id="scTopName"></span>
+      <span class="sc-lvl-badge">LVL 1</span>
+    </div>
+  </div>
+  <div class="sc-hero">
+    <div class="sc-hero-img" id="scHeroImg"></div>
+    <div class="sc-hero-fade"></div>
+  </div>
+  <div class="sc-body" id="scBody"></div>
 </div>
 
 <script>
@@ -572,6 +722,37 @@ const CHARS = [
     imgKey: 'frank', accentColor: '#806020',
   },
 ];
+
+// ═══════════════════════════════════════
+// CHARACTER IDENTITY
+// ═══════════════════════════════════════
+const IDENTITY = {
+  dennis: {
+    doesLabel: 'HE DOES:',
+    does: 'Bends reality with wild, unpredictable magic. Charms enemies, throws chaos into every fight, and occasionally explodes something by accident.',
+    forPlayer: 'The player who wants to feel powerful and unhinged. You\'re not here to follow the plan — you are the plan going wrong in the best possible way.',
+  },
+  mac: {
+    doesLabel: 'HE DOES:',
+    does: 'Charges into battle in heavy armor, smites enemies with holy power, and bends his sworn oath to justify whatever he was going to do anyway.',
+    forPlayer: 'The player who wants to be the muscle with a god complex. You hit hard, you look righteous doing it, and you\'re pretty sure you\'re the main character.',
+  },
+  charlie: {
+    doesLabel: 'THEY DO:',
+    does: 'Controls the battlefield with nature magic, transforms into animals, and communicates with creatures no one else can understand.',
+    forPlayer: 'The player who wants to be quietly indispensable. You won\'t always get the credit, but nothing works without you — and you know things the others don\'t.',
+  },
+  dee: {
+    doesLabel: 'SHE DOES:',
+    does: 'Inspires allies, manipulates enemies with words, and casts spells while maintaining an air of wounded dignity.',
+    forPlayer: 'The player who wants to be the smartest person in the room and make sure everyone knows it. You support the party — on your terms, with commentary.',
+  },
+  frank: {
+    doesLabel: 'HE DOES:',
+    does: 'Rages into combat, shrugs off damage that would kill anyone else, and occasionally transforms into something that should not be possible.',
+    forPlayer: 'The player who wants to cause problems and survive them. No plan, no fear, no explanation. You\'re just built different.',
+  },
+};
 
 // ═══════════════════════════════════════
 // CHARACTER SHEETS
@@ -775,6 +956,19 @@ function openDetail(id){
   document.getElementById('dCls').textContent = c.cls;
   document.getElementById('dTag').textContent = c.tag;
 
+  const ident = IDENTITY[c.id];
+  document.getElementById('dIdentity').innerHTML = `
+    <div class="d-identity-row">
+      <div class="d-identity-label">${ident.doesLabel}</div>
+      <div class="d-identity-text">${ident.does}</div>
+    </div>
+    <div class="d-identity-spacer"></div>
+    <div class="d-identity-row">
+      <div class="d-identity-label">FOR THE PLAYER WHO:</div>
+      <div class="d-identity-text">${ident.forPlayer}</div>
+    </div>
+  `;
+
   document.getElementById('dVitals').innerHTML = `
     <div class="d-vital"><div class="d-vital-v" style="color:#65c040">${c.hp}</div><div class="d-vital-l">HP</div></div>
     <div class="d-vital"><div class="d-vital-v" style="color:#3d8fd4">${c.ac}</div><div class="d-vital-l">AC</div></div>
@@ -913,6 +1107,58 @@ function renderSheet(){
       <div class="sh-section-title">Equipment</div>
       ${s.equipment.map(e=>`<div class="sh-equip">${e}</div>`).join('')}
     </div>
+  `;
+}
+
+// ═══════════════════════════════════════
+// SUMMER CAMP VIEW
+// ═══════════════════════════════════════
+let scCharId = null;
+
+function openSummerCamp(id){
+  scCharId = id;
+  const c = CHARS.find(x=>x.id===id);
+  document.getElementById('scHeroImg').style.backgroundImage = `url('${IMGS[c.imgKey]||''}')`;
+  document.getElementById('scTopName').textContent = c.name;
+  renderSummerCamp();
+  document.getElementById('summerCampView').classList.add('open');
+}
+
+function closeSummerCamp(){
+  document.getElementById('summerCampView').classList.remove('open');
+}
+
+function renderSummerCamp(){
+  const c = CHARS.find(x=>x.id===scCharId);
+  const s = SHEETS[scCharId].level1;
+  const primary = PRIMARY_STAT[scCharId];
+  const mod = v=>{ const m=Math.floor((v-10)/2); return(m>=0?'+':'')+m; };
+  const stats = [
+    {key:'str',label:'STR',val:s.str},{key:'dex',label:'DEX',val:s.dex},
+    {key:'con',label:'CON',val:s.con},{key:'int',label:'INT',val:s.int},
+    {key:'wis',label:'WIS',val:s.wis},{key:'cha',label:'CHA',val:s.cha},
+  ];
+  document.getElementById('scBody').innerHTML = `
+    <p class="sc-flavor">The road to Phandelver is long and the nights are cold. Your story begins here — Level 1, broke, and already in over your head. Adventure with the gang through Lost Mines of Phandelver this summer, and arrive at the table battle-hardened and ready.</p>
+    <div class="sc-section">
+      <div class="sc-section-title">Character Snapshot &middot; Level 1</div>
+      <div class="sh-vitals">
+        <div class="sh-vital"><div class="sh-vital-v" style="color:#65c040">${s.hp}</div><div class="sh-vital-l">HP</div></div>
+        <div class="sh-vital"><div class="sh-vital-v" style="color:#3d8fd4">${s.ac}</div><div class="sh-vital-l">AC</div></div>
+        <div class="sh-vital"><div class="sh-vital-v" style="color:var(--gold)">${s.speed}</div><div class="sh-vital-l">Speed</div></div>
+      </div>
+      <div class="sc-class-line">${s.class}${s.subclass?' &middot; '+s.subclass:''}</div>
+      <div class="sh-ability-grid">
+        ${stats.map(({key,label,val})=>`
+          <div class="sh-ability${key===primary?' primary':''}">
+            <div class="sh-ability-label">${label}</div>
+            <div class="sh-ability-score">${val}</div>
+            <div class="sh-ability-mod">${mod(val)}</div>
+          </div>`).join('')}
+      </div>
+    </div>
+    <button class="sc-begin-btn" onclick="console.log('Summer Camp adventure started for ${c.name}')">Begin the Adventure &#8594;</button>
+    <div class="sc-resume" onclick="console.log('Resume summer camp for ${c.name}')">Already adventuring? Resume your journey &#8594;</div>
   `;
 }
 
