@@ -1244,14 +1244,29 @@ function renderSummerCamp(){
 }
 
 async function startOrResumeAdventure(id) {
-  let state = AdventureState.load(id);
-  if (!state) {
-    const sheet = SHEETS[id].level1;
-    state = AdventureState.startNew(id, sheet);
-  }
-  window.activeAdventureState = state;
   window.activeAdventureId = id;
-  openAdventureView(id, state);
+
+  await PartyState.joinParty(id);
+
+  const sharedState = await PartyState.getAdventureState();
+  const conversation = await PartyState.getConversation();
+
+  const sheet = SHEETS[id].level1;
+  window.activeAdventureState = {
+    characterId: id,
+    level: 1,
+    hp: sheet.hp,
+    maxHp: sheet.hp,
+    chapterIndex: sharedState.chapterIndex || 1,
+    roomId: sharedState.roomId || null,
+    visitedRooms: sharedState.visitedRooms || [],
+    inventory: sharedState.inventory || [],
+    gold: sharedState.gold || 0,
+    conditions: [],
+    conversationHistory: conversation.map(m => ({ role: m.role, content: m.content }))
+  };
+
+  openAdventureView(id, window.activeAdventureState);
 }
 
 function openAdventureView(id, state) {
@@ -1261,17 +1276,6 @@ function openAdventureView(id, state) {
   updateAdvHp(state);
   document.getElementById('advLog').innerHTML = '';
 
-  if (state.conversationHistory.length === 0) {
-    renderOpeningScene(id, state);
-  } else {
-    const recent = state.conversationHistory.slice(-10);
-    recent.forEach(msg => {
-      if (msg.role === 'assistant') appendNarration(msg.content);
-      if (msg.role === 'user') appendPlayerMessage(msg.content);
-    });
-    scrollLog();
-  }
-
   document.getElementById('adventureView').classList.add('open');
   setTimeout(() => document.getElementById('advInput').focus(), 400);
 
@@ -1279,6 +1283,35 @@ function openAdventureView(id, state) {
   document.getElementById('advInput').onkeydown = e => {
     if (e.key === 'Enter') handlePlayerInput();
   };
+
+  PartyState.subscribeToConversation(messages => {
+    const log = document.getElementById('advLog');
+    log.innerHTML = '';
+    messages.forEach(msg => {
+      if (msg.role === 'assistant') appendNarration(msg.content);
+      else {
+        const c = CHARS.find(c => c.id === msg.character);
+        const label = c ? c.name : msg.character;
+        appendPlayerMessageWithLabel(msg.content, label);
+      }
+    });
+    scrollLog();
+  });
+
+  PartyState.subscribeToPartyMembers(members => {
+    console.log('[Party] Online:', members);
+  });
+
+  PartyState.subscribeToHp(hpData => {
+    const myHp = hpData[id];
+    if (myHp) {
+      window.activeAdventureState.hp = myHp.hp;
+      window.activeAdventureState.maxHp = myHp.maxHp;
+      updateAdvHp(window.activeAdventureState);
+    }
+  });
+
+  renderOpeningScene(id, state);
 }
 
 function closeAdventure() {
@@ -1311,6 +1344,14 @@ function appendPlayerMessage(text) {
   const el = document.createElement('div');
   el.className = 'adv-player';
   el.textContent = '> ' + text;
+  document.getElementById('advLog').appendChild(el);
+  scrollLog();
+}
+
+function appendPlayerMessageWithLabel(text, label) {
+  const el = document.createElement('div');
+  el.className = 'adv-player';
+  el.textContent = `> ${label}: ${text}`;
   document.getElementById('advLog').appendChild(el);
   scrollLog();
 }
@@ -1378,16 +1419,22 @@ RULES:
 }
 
 async function renderOpeningScene(id, state) {
+  const existing = await PartyState.getConversation();
+  if (existing.length > 0) {
+    return;
+  }
+
   const char = CHARS.find(c => c.id === id);
   const rooms = DataEngine.getChapterRooms(1);
   const firstRoom = rooms[0];
 
   appendSystemMessage('— Chapter 1: Goblin Arrows —');
 
-  AdventureState.visitRoom(state, firstRoom?.name || 'Cave Mouth');
-  AdventureState.update(state, { roomId: firstRoom?.id || null });
-
-  const openingPrompt = `The adventure begins. Set the scene at the start of the Triboar Trail and draw the player into the first encounter with goblins. Address the player's character ${char.name} directly.`;
+  await PartyState.updateAdventureState({
+    chapterIndex: 1,
+    roomId: firstRoom?.id || null,
+    visitedRooms: [firstRoom?.name || 'Cave Mouth']
+  });
 
   const indicator = document.createElement('div');
   indicator.className = 'adv-narration adv-typing';
@@ -1396,14 +1443,14 @@ async function renderOpeningScene(id, state) {
   scrollLog();
 
   try {
+    const openingPrompt = `The adventure begins. Set the scene at the start of the Triboar Trail and draw the player into the first encounter with goblins. Address the player's character ${char.name} directly.`;
     const systemPrompt = buildSystemPrompt(id, state);
+
     const response = await fetch('/api/chat', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: 'llama-3.3-70b-versatile',
         max_tokens: 1000,
         system: systemPrompt,
         messages: [{ role: 'user', content: openingPrompt }]
@@ -1413,12 +1460,11 @@ async function renderOpeningScene(id, state) {
     const data = await response.json();
     const reply = data.content?.[0]?.text || 'Your journey begins...';
     indicator.remove();
-    appendNarration(reply);
-    AdventureState.addMessage(state, 'assistant', reply);
+    await PartyState.pushDMMessage(reply);
 
   } catch (err) {
     indicator.remove();
-    appendNarration(`${char.name} stands at the trailhead. The road ahead is dark. What do you do?`);
+    await PartyState.pushDMMessage(`The party stands at the trailhead. The road ahead is dark.`);
     console.error('[Adventure] Opening scene error:', err);
   }
 }
@@ -1432,9 +1478,6 @@ async function handlePlayerInput() {
   const state = window.activeAdventureState;
   const id = window.activeAdventureId;
 
-  appendPlayerMessage(text);
-  AdventureState.addMessage(state, 'user', text);
-
   const indicator = document.createElement('div');
   indicator.className = 'adv-narration adv-typing';
   indicator.textContent = '…';
@@ -1445,18 +1488,23 @@ async function handlePlayerInput() {
   document.getElementById('advSend').disabled = true;
 
   try {
-    const systemPrompt = buildSystemPrompt(id, state);
+    await PartyState.pushPlayerMessage(id, text);
+
+    const conversation = await PartyState.getConversation();
+    window.activeAdventureState.conversationHistory = conversation.map(m => ({
+      role: m.role,
+      content: m.content
+    }));
+    const systemPrompt = buildSystemPrompt(id, window.activeAdventureState);
 
     const response = await fetch('/api/chat', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: 'llama-3.3-70b-versatile',
         max_tokens: 1000,
         system: systemPrompt,
-        messages: state.conversationHistory.map(m => ({
+        messages: window.activeAdventureState.conversationHistory.map(m => ({
           role: m.role,
           content: m.content
         }))
@@ -1467,13 +1515,13 @@ async function handlePlayerInput() {
     const reply = data.content?.[0]?.text || 'The dungeon falls silent.';
 
     indicator.remove();
-    appendNarration(reply);
-    AdventureState.addMessage(state, 'assistant', reply);
+    await PartyState.pushDMMessage(reply);
 
     const dmgMatch = reply.match(/(\d+)\s*(damage|hp)/i);
     if (dmgMatch) {
       const dmg = parseInt(dmgMatch[1]);
       AdventureState.setHp(state, state.hp - dmg);
+      await PartyState.setCharacterHp(id, state.hp, state.maxHp);
       updateAdvHp(state);
       if (state.hp <= 0) {
         appendSystemMessage('— You have fallen. Your journey ends here. —');
@@ -1503,7 +1551,34 @@ window.CHAR_IMGS = { dennis: "data:image/webp;base64,UklGRo4vAQBXRUJQVlA4IIIvAQD
 IMGS = window.CHAR_IMGS;
 init();
 </script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+  import { getDatabase, ref, push, onValue, set, get } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAQ82FwdF4IbD6jIAKN5frnUacI3PTc2Ow",
+    authDomain: "horrid-wake.firebaseapp.com",
+    databaseURL: "https://horrid-wake-default-rtdb.firebaseio.com",
+    projectId: "horrid-wake",
+    storageBucket: "horrid-wake.firebasestorage.app",
+    messagingSenderId: "683459567",
+    appId: "1:683459567:web:a5840999d85ad4aac0ec1a"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  window.firebaseDb = db;
+  window.firebaseRef = ref;
+  window.firebasePush = push;
+  window.firebaseOnValue = onValue;
+  window.firebaseSet = set;
+  window.firebaseGet = get;
+
+  console.log('[Firebase] Initialized. DB ready.');
+</script>
 <script src="/js/dataEngine.js"></script>
 <script src="/js/adventureState.js"></script>
+<script src="/js/partyState.js"></script>
 </body>
 </html>
