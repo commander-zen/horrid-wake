@@ -1384,15 +1384,10 @@ async function renderOpeningScene(id, state) {
 
   appendSystemMessage('— Chapter 1: Goblin Arrows —');
 
-  if (firstRoom?.readAloud?.length) {
-    appendReadAloud(firstRoom.readAloud[0]);
-  }
-
   AdventureState.visitRoom(state, firstRoom?.name || 'Cave Mouth');
   AdventureState.update(state, { roomId: firstRoom?.id || null });
 
   const openingPrompt = `The adventure begins. Set the scene at the start of the Triboar Trail and draw the player into the first encounter with goblins. Address the player's character ${char.name} directly.`;
-  AdventureState.addMessage(state, 'user', openingPrompt);
 
   const indicator = document.createElement('div');
   indicator.className = 'adv-narration adv-typing';
