@@ -454,16 +454,18 @@ canvas{position:fixed;inset:0;z-index:2;pointer-events:none;}
   display:flex;flex-direction:column;
 }
 .adv-narration{
-  font-family:'Cinzel',serif;
-  font-size:15px;line-height:1.7;
+  font-family:'Josefin Sans',sans-serif;
+  font-weight:300;
+  font-size:16px;line-height:1.75;
   color:#e8d5b0;
   padding:14px 0;
   border-top:1px solid rgba(200,148,58,.15);
 }
 .adv-narration:first-child{border-top:none;}
 .adv-readaloud{
-  font-family:'IM Fell English',serif;font-style:italic;
-  font-size:14px;line-height:1.7;
+  font-family:'Josefin Sans',sans-serif;font-style:italic;
+  font-weight:300;
+  font-size:16px;line-height:1.75;
   color:#f0dfc0;
   padding:12px 14px;
   margin:8px 0;
@@ -471,8 +473,8 @@ canvas{position:fixed;inset:0;z-index:2;pointer-events:none;}
   background:rgba(200,148,58,.04);
 }
 .adv-player{
-  font-family:'Josefin Sans',sans-serif;font-weight:300;
-  font-size:12px;line-height:1.5;
+  font-family:'Josefin Sans',sans-serif;font-weight:400;
+  font-size:13px;line-height:1.5;
   color:rgba(200,148,58,.6);
   text-align:right;
   padding:8px 0;
@@ -1382,7 +1384,7 @@ function buildSystemPrompt(id, state) {
     .map(m => DataEngine.formatMonsterBlock(m))
     .join('\n');
 
-  return `You are the Dungeon Master for a text-based D&D 5e adventure running Lost Mines of Phandelver. You are running this for a group of friends who have never played D&D before. Keep narration vivid, punchy, and under 120 words per response. Never use D&D jargon without briefly explaining it. End every response with an implicit or explicit prompt for the player's next action.
+  return `You are a third-person narrator running Lost Mines of Phandelver as an interactive story. You have no personality of your own. You are a voice, not a character. Your prose is terse, vivid, and cinematic — like a dark fantasy novel.
 
 THE PLAYER'S CHARACTER:
 Name: ${char.name}
@@ -1409,13 +1411,26 @@ Gold: ${state.gold} gp
 Conditions: ${state.conditions.join(', ') || 'none'}
 
 RULES:
-- Stay true to the Lost Mines of Phandelver module structure and story beats
-- When the player enters a new room, describe it using the module's read-aloud text as inspiration
-- When combat starts, describe it cinematically — reference the actual monster stats for outcomes
-- When treasure is found, name it from the module data
-- Never reveal that you are an AI or that this is a structured module
-- If the player tries something creative, reward it
-- Track HP changes and tell the player their current HP after taking damage`;
+- Write in third person. Never say "you" — say the character's name or "the sorcerer", "the bard", etc.
+- Teach mechanics through narrative, never as instruction. Instead of "roll for initiative", write "Dennis reacts first, his instincts sharp." Instead of "you take 4 damage", write "the blade opens a gash across Dennis's forearm. He's bleeding but upright."
+- Resolve all dice rolls yourself invisibly. Never ask players to roll anything.
+- Keep responses under 80 words. Every sentence earns its place.
+- Multiple characters share this story. Each player message is labeled with their character name. Weave them into the same scene naturally.
+- If a player attempts something impossible, redirect through story. Never correct them directly.
+- Only reference HP when dramatically appropriate — never as a number, always as a physical description. Near death = "barely standing, vision swimming." Full health = no mention needed.
+- Never break the narrative voice. No apologies, no clarifications, no fourth wall.
+- End every response with an open moment — action pending, danger present, decision implied.
+- Players may share their own HP freely if they choose. Never volunteer it — only describe physical condition when dramatically relevant.
+- Monster HP is never revealed as a number. Ever. Describe creature condition through appearance and behavior only:
+  - Above 50% HP: the creature fights with full aggression. No special description needed.
+  - Below 50% HP ("bloodied"): describe visible wounds. Limping, bleeding, favoring a side, breath ragged. Make it felt.
+  - Below 25% HP: describe it almost every beat. The creature is desperate, feral, or fading. The players should feel the kill is close.
+  - At the moment a killing blow is possible — when a player's attack would finish a creature — do not resolve it. Instead, stop the action and deliver exactly this line, on its own, after the setup:
+
+"How do you want to do this?"
+
+  Nothing else on that line. Let it land.
+  Then wait for the player's response and narrate their finishing move with full cinematic weight — the most vivid description in the scene.`;
 }
 
 async function renderOpeningScene(id, state) {
@@ -1517,14 +1532,20 @@ async function handlePlayerInput() {
     indicator.remove();
     await PartyState.pushDMMessage(reply);
 
-    const dmgMatch = reply.match(/(\d+)\s*(damage|hp)/i);
-    if (dmgMatch) {
+    const activeChar = CHARS.find(c => c.id === window.activeAdventureId);
+    const charName = activeChar?.name?.split(' ')[0]?.toLowerCase();
+    const replyLower = reply.toLowerCase();
+    const nameMentioned = charName && replyLower.includes(charName);
+    const dmgMatch = reply.match(/(\d+)\s*(damage|points)/i);
+
+    if (dmgMatch && nameMentioned) {
       const dmg = parseInt(dmgMatch[1]);
-      AdventureState.setHp(state, state.hp - dmg);
-      await PartyState.setCharacterHp(id, state.hp, state.maxHp);
+      const newHp = Math.max(0, state.hp - dmg);
+      AdventureState.setHp(state, newHp);
+      await PartyState.setCharacterHp(window.activeAdventureId, newHp, state.maxHp);
       updateAdvHp(state);
-      if (state.hp <= 0) {
-        appendSystemMessage('— You have fallen. Your journey ends here. —');
+      if (newHp <= 0) {
+        appendSystemMessage('— ' + activeChar.name + ' has fallen. —');
       }
     }
 
