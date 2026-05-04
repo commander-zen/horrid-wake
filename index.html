@@ -414,100 +414,245 @@ canvas{position:fixed;inset:0;z-index:2;pointer-events:none;}
 /* ═══════════════════════════════════════
    ADVENTURE VIEW
 ═══════════════════════════════════════ */
-#adventureView{
-  position:fixed;inset:0;z-index:110;
-  transform:translateX(100%);
-  transition:transform .35s ease;
-  background:#0a0703;
-  display:flex;flex-direction:column;
-  height:100dvh;
+#adventureView {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  background: #0a0703;
+  transform: translateX(100%);
+  transition: transform 0.35s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
 }
-#adventureView.open{transform:translateX(0);}
+#adventureView.open { transform: translateX(0); }
 
-.adv-topbar{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:12px 16px 10px;
-  background:rgba(10,7,3,.97);
-  border-bottom:1px solid rgba(80,40,5,.4);
-  flex-shrink:0;
+.adv-topbar {
+  height: 48px;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  background: rgba(0,0,0,0.8);
+  border-bottom: 1px solid rgba(184,134,11,0.3);
+  z-index: 10;
+  flex-shrink: 0;
 }
-.adv-close{
-  background:none;border:1px solid rgba(120,70,12,.45);
-  color:rgba(200,148,58,.65);font-size:15px;
-  width:34px;height:34px;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  transition:all .2s;flex-shrink:0;
+.adv-close {
+  background: none;
+  border: 1px solid rgba(184,134,11,0.4);
+  color: var(--gold);
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  font-size: 14px;
 }
-.adv-close:active{border-color:var(--gold);color:var(--gold);}
-.adv-char-name{
-  font-family:'AVQuest',cursive;
-  font-size:13px;color:var(--gold-lt);letter-spacing:1px;
+.adv-party-hp {
+  display: flex;
+  gap: 12px;
+  align-items: center;
 }
-.adv-hp{
-  font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;
-  transition:color .3s;
+.adv-hp-pill {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--ember);
+  letter-spacing: 0.05em;
 }
-
-.adv-log{
-  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  padding:16px 16px 8px;
-  display:flex;flex-direction:column;
-}
-.adv-narration{
-  font-family:'Josefin Sans',sans-serif;
-  font-weight:300;
-  font-size:16px;line-height:1.75;
-  color:#e8d5b0;
-  padding:14px 0;
-  border-top:1px solid rgba(200,148,58,.15);
-}
-.adv-narration:first-child{border-top:none;}
-.adv-readaloud{
-  font-family:'Josefin Sans',sans-serif;font-style:italic;
-  font-weight:300;
-  font-size:16px;line-height:1.75;
-  color:#f0dfc0;
-  padding:12px 14px;
-  margin:8px 0;
-  border-left:2px solid rgba(200,148,58,.3);
-  background:rgba(200,148,58,.04);
-}
-.adv-player{
-  font-family:'Josefin Sans',sans-serif;font-weight:400;
-  font-size:13px;line-height:1.5;
-  color:rgba(200,148,58,.6);
-  text-align:right;
-  padding:8px 0;
-}
-.adv-system{
-  font-family:'Josefin Sans',sans-serif;font-weight:300;font-style:italic;
-  font-size:11px;color:var(--ember);
-  text-align:center;padding:10px 0;letter-spacing:1px;
+.adv-hp-pill.danger { color: #c0392b; }
+.adv-sheet-btn {
+  background: none;
+  border: 1px solid rgba(184,134,11,0.4);
+  color: var(--gold);
+  padding: 4px 10px;
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 11px;
+  cursor: pointer;
+  letter-spacing: 0.1em;
 }
 
-.adv-input-row{
-  display:flex;align-items:center;gap:8px;
-  padding:10px 12px;
-  background:rgba(10,7,3,.97);
-  border-top:1px solid rgba(80,40,5,.4);
-  flex-shrink:0;
+/* BATTLE MAT */
+.adv-mat {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #1a1208;
+  background-image:
+    linear-gradient(rgba(184,134,11,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(184,134,11,0.04) 1px, transparent 1px);
+  background-size: 32px 32px;
 }
-.adv-input{
-  flex:1;background:rgba(20,12,4,.6);
-  border:none;border-bottom:1px solid rgba(200,148,58,.4);
-  color:#e8d5b0;
-  font-family:'Josefin Sans',sans-serif;font-weight:300;
-  font-size:15px;padding:10px 4px;outline:none;
+.adv-mat-inner {
+  position: absolute;
+  inset: 0;
 }
-.adv-input::placeholder{color:rgba(200,148,58,.25);font-style:italic;}
-.adv-send{
-  background:none;border:none;color:var(--ember);
-  font-size:22px;padding:8px 10px;cursor:pointer;
-  transition:color .2s;flex-shrink:0;line-height:1;
+
+/* SPRITES */
+.adv-sprite {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
 }
-.adv-send:active{color:var(--gold-lt);}
-.adv-typing{opacity:.5;font-style:italic;animation:pulse 1s infinite;}
-@keyframes pulse{0%,100%{opacity:.3;}50%{opacity:.7;}}
+.adv-sprite:hover { transform: scale(1.2); }
+.adv-sprite-label {
+  position: absolute;
+  bottom: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 8px;
+  color: var(--gold);
+  white-space: nowrap;
+  letter-spacing: 0.05em;
+  pointer-events: none;
+}
+.adv-sprite-hp-bar {
+  position: absolute;
+  top: -6px;
+  left: 0;
+  width: 32px;
+  height: 3px;
+  background: rgba(0,0,0,0.5);
+}
+.adv-sprite-hp-fill {
+  height: 100%;
+  background: #2ecc71;
+  transition: width 0.3s ease;
+}
+.adv-sprite-hp-fill.danger { background: #c0392b; }
+.adv-sprite-hp-fill.warning { background: #e67e22; }
+.adv-sprite.enemy .adv-sprite-label { color: #c0392b; }
+
+/* NARRATION PANEL */
+.adv-narration-panel {
+  position: absolute;
+  bottom: 80px;
+  left: 0;
+  right: 0;
+  max-height: 35vh;
+  background: rgba(10,7,3,0.85);
+  border-top: 1px solid rgba(184,134,11,0.2);
+  padding: 12px 16px;
+  overflow-y: auto;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: max-height 0.3s ease;
+}
+.adv-narration-panel.collapsed {
+  max-height: 44px;
+  overflow: hidden;
+}
+.adv-narration-text {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  color: #e8d5b0;
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+.adv-narration-text.player-msg {
+  color: rgba(184,134,11,0.7);
+  font-size: 12px;
+  font-weight: 400;
+}
+.adv-narration-text.system-msg {
+  color: var(--ember);
+  font-size: 11px;
+  font-style: italic;
+  text-align: center;
+}
+.adv-hdywdt {
+  font-family: 'AVQuest', serif;
+  font-size: 18px;
+  color: var(--ember);
+  text-align: center;
+  padding: 8px 0;
+  letter-spacing: 0.1em;
+}
+.adv-narration-toggle {
+  position: absolute;
+  top: -16px;
+  right: 12px;
+  background: rgba(10,7,3,0.9);
+  border: 1px solid rgba(184,134,11,0.3);
+  color: var(--gold);
+  font-size: 10px;
+  padding: 2px 8px;
+  cursor: pointer;
+  font-family: 'Josefin Sans', sans-serif;
+  letter-spacing: 0.1em;
+}
+
+/* ACTION BAR */
+.adv-action-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: rgba(0,0,0,0.9);
+  border-top: 1px solid rgba(184,134,11,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 12px;
+}
+.adv-action-btn {
+  background: rgba(184,134,11,0.1);
+  border: 1px solid rgba(184,134,11,0.4);
+  color: var(--gold);
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-transform: uppercase;
+}
+.adv-action-btn:active { background: rgba(184,134,11,0.3); }
+.adv-action-btn.used { opacity: 0.3; pointer-events: none; }
+.adv-action-btn.primary { border-color: var(--ember); color: var(--ember); }
+
+/* FREE ACTION INPUT */
+.adv-free-input-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  align-items: flex-end;
+  padding-bottom: 90px;
+  display: none;
+}
+.adv-free-input-overlay.visible { display: flex; }
+.adv-free-input {
+  width: 100%;
+  background: rgba(10,7,3,0.95);
+  border: none;
+  border-top: 1px solid rgba(184,134,11,0.4);
+  color: #e8d5b0;
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 300;
+  padding: 16px;
+  outline: none;
+}
+
+/* TYPING INDICATOR */
+.adv-typing-indicator {
+  font-family: 'Josefin Sans', sans-serif;
+  font-size: 13px;
+  color: rgba(184,134,11,0.5);
+  font-style: italic;
+  animation: pulse 1s infinite;
+}
+@keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.8; } }
 
 /* ═══════════════════════════════════════
    SHEET VIEW
@@ -755,14 +900,30 @@ canvas{position:fixed;inset:0;z-index:2;pointer-events:none;}
 <div id="adventureView">
   <div class="adv-topbar">
     <button class="adv-close" onclick="closeAdventure()">✕</button>
-    <span class="adv-char-name" id="advCharName"></span>
-    <span class="adv-hp" id="advHp"></span>
+    <div class="adv-party-hp" id="advPartyHp"></div>
+    <button class="adv-sheet-btn" onclick="openSheetFromAdventure()">SHEET</button>
   </div>
-  <div class="adv-log" id="advLog"></div>
-  <div class="adv-input-row">
-    <input class="adv-input" id="advInput" type="text" placeholder="What do you do?" autocomplete="off" />
-    <button class="adv-send" id="advSend">→</button>
+
+  <div class="adv-mat" id="advMat">
+    <div class="adv-mat-inner" id="advMatInner"></div>
+
+    <div class="adv-narration-panel" id="advNarrationPanel">
+      <button class="adv-narration-toggle" id="advNarrationToggle" onclick="toggleNarration()">▼ LOG</button>
+      <div id="advNarrationLog"></div>
+    </div>
+
+    <div class="adv-free-input-overlay" id="advFreeInputOverlay">
+      <input
+        class="adv-free-input"
+        id="advFreeInput"
+        type="text"
+        placeholder="Describe your action..."
+        autocomplete="off"
+      />
+    </div>
   </div>
+
+  <div class="adv-action-bar" id="advActionBar"></div>
 </div>
 
 <script>
@@ -1245,15 +1406,37 @@ function renderSummerCamp(){
   `;
 }
 
+// ── BATTLE STATE ──────────────────────────────────────────────
+const BattleState = {
+  entities: {},
+  turnOrder: [],
+  currentTurn: 0,
+  round: 1,
+  actionUsed: false,
+  bonusActionUsed: false,
+  moveUsed: false,
+  narratorCollapsed: false,
+};
+
+const SPRITE_COLORS = {
+  dennis: '#8B4F9E',
+  mac: '#2E5FA3',
+  charlie: '#4A7C3F',
+  dee: '#C4472A',
+  frank: '#8B6914',
+  goblin: '#5A7A3A',
+  bugbear: '#7A5A3A',
+};
+
+// ── OPEN / CLOSE ──────────────────────────────────────────────
 async function startOrResumeAdventure(id) {
   window.activeAdventureId = id;
-
   await PartyState.joinParty(id);
 
   const sharedState = await PartyState.getAdventureState();
   const conversation = await PartyState.getConversation();
-
   const sheet = SHEETS[id].level1;
+
   window.activeAdventureState = {
     characterId: id,
     level: 1,
@@ -1272,103 +1455,315 @@ async function startOrResumeAdventure(id) {
 }
 
 function openAdventureView(id, state) {
-  const char = CHARS.find(c => c.id === id);
-
-  document.getElementById('advCharName').textContent = char.name;
-  updateAdvHp(state);
-  document.getElementById('advLog').innerHTML = '';
-
-  document.getElementById('adventureView').classList.add('open');
-  setTimeout(() => document.getElementById('advInput').focus(), 400);
-
-  document.getElementById('advSend').onclick = handlePlayerInput;
-  document.getElementById('advInput').onkeydown = e => {
-    if (e.key === 'Enter') handlePlayerInput();
-  };
+  initBattleMat(id, state);
+  renderActionBar(id);
+  updatePartyHpBar();
 
   PartyState.subscribeToConversation(messages => {
-    const log = document.getElementById('advLog');
-    log.innerHTML = '';
-    messages.forEach(msg => {
-      if (msg.role === 'assistant') appendNarration(msg.content);
-      else {
-        const c = CHARS.find(c => c.id === msg.character);
-        const label = c ? c.name : msg.character;
-        appendPlayerMessageWithLabel(msg.content, label);
-      }
-    });
-    scrollLog();
-  });
-
-  PartyState.subscribeToPartyMembers(members => {
-    console.log('[Party] Online:', members);
+    renderNarrationLog(messages, id);
   });
 
   PartyState.subscribeToHp(hpData => {
-    const myHp = hpData[id];
-    if (myHp) {
-      window.activeAdventureState.hp = myHp.hp;
-      window.activeAdventureState.maxHp = myHp.maxHp;
-      updateAdvHp(window.activeAdventureState);
-    }
+    Object.entries(hpData).forEach(([charId, hpObj]) => {
+      if (charId === id) {
+        window.activeAdventureState.hp = hpObj.hp;
+        window.activeAdventureState.maxHp = hpObj.maxHp;
+      }
+      updateSpriteHpBar(charId, hpObj.hp, hpObj.maxHp);
+    });
+    updatePartyHpBar();
   });
 
-  renderOpeningScene(id, state);
+  document.getElementById('adventureView').classList.add('open');
+
+  if (state.conversationHistory.length === 0) {
+    renderOpeningScene(id, state);
+  }
+
+  const freeInput = document.getElementById('advFreeInput');
+  freeInput.onkeydown = e => {
+    if (e.key === 'Enter') submitFreeAction();
+    if (e.key === 'Escape') hideFreeInput();
+  };
 }
 
 function closeAdventure() {
   document.getElementById('adventureView').classList.remove('open');
 }
 
-function updateAdvHp(state) {
-  const el = document.getElementById('advHp');
-  el.textContent = `${state.hp} / ${state.maxHp} HP`;
-  el.style.color = state.hp / state.maxHp < 0.5 ? '#c0392b' : 'var(--ember)';
+function openSheetFromAdventure() {
+  openSheet(window.activeAdventureId);
 }
 
-function appendNarration(text) {
+// ── BATTLE MAT ────────────────────────────────────────────────
+function initBattleMat(id, state) {
+  const inner = document.getElementById('advMatInner');
+  inner.innerHTML = '';
+  BattleState.entities = {};
+
+  const mat = document.getElementById('advMat');
+  const cols = Math.floor(mat.offsetWidth / 32);
+  const rows = Math.floor((mat.offsetHeight - 80) / 32);
+  const centerCol = Math.floor(cols / 2);
+  const centerRow = Math.floor(rows / 2);
+
+  placeSprite(id, centerCol, centerRow, {
+    name: CHARS.find(c => c.id === id)?.name?.split(' ')[0] || id,
+    isEnemy: false,
+    hp: state.hp,
+    maxHp: state.maxHp,
+  });
+
+  placeSprite('goblin1', centerCol + 3, centerRow - 2, { name: 'Goblin', isEnemy: true, hp: 7, maxHp: 7 });
+  placeSprite('goblin2', centerCol + 4, centerRow, { name: 'Goblin', isEnemy: true, hp: 7, maxHp: 7 });
+  placeSprite('goblin3', centerCol + 2, centerRow + 2, { name: 'Goblin', isEnemy: true, hp: 7, maxHp: 7 });
+}
+
+function placeSprite(id, col, row, opts) {
+  const inner = document.getElementById('advMatInner');
+
+  const wrapper = document.createElement('div');
+  wrapper.className = `adv-sprite${opts.isEnemy ? ' enemy' : ''}`;
+  wrapper.id = `sprite-${id}`;
+  wrapper.style.left = (col * 32) + 'px';
+  wrapper.style.top = (row * 32) + 'px';
+
+  const hpBar = document.createElement('div');
+  hpBar.className = 'adv-sprite-hp-bar';
+  const hpFill = document.createElement('div');
+  hpFill.className = 'adv-sprite-hp-fill';
+  hpFill.id = `hp-fill-${id}`;
+  hpFill.style.width = '100%';
+  hpBar.appendChild(hpFill);
+
+  const body = document.createElement('div');
+  body.style.cssText = `width:32px;height:32px;background:${SPRITE_COLORS[id] || (opts.isEnemy ? '#5A7A3A' : '#444')};display:flex;align-items:center;justify-content:center;font-size:16px;image-rendering:pixelated;border:1px solid rgba(255,255,255,0.15);`;
+  body.textContent = opts.isEnemy ? '👺' : getCharEmoji(id);
+
+  const label = document.createElement('div');
+  label.className = 'adv-sprite-label';
+  label.textContent = opts.name;
+
+  wrapper.appendChild(hpBar);
+  wrapper.appendChild(body);
+  wrapper.appendChild(label);
+  inner.appendChild(wrapper);
+
+  if (!opts.isEnemy) {
+    wrapper.onclick = () => openSheet(id);
+  }
+
+  BattleState.entities[id] = { col, row, ...opts };
+}
+
+function getCharEmoji(id) {
+  const map = { dennis: '🔮', mac: '🛡️', charlie: '🌿', dee: '🎵', frank: '⚔️' };
+  return map[id] || '⚔️';
+}
+
+function updateSpriteHpBar(charId, hp, maxHp) {
+  const fill = document.getElementById(`hp-fill-${charId}`);
+  if (!fill) return;
+  const pct = Math.max(0, (hp / maxHp) * 100);
+  fill.style.width = pct + '%';
+  fill.className = 'adv-sprite-hp-fill' + (pct < 25 ? ' danger' : pct < 50 ? ' warning' : '');
+}
+
+// ── ACTION BAR ────────────────────────────────────────────────
+function renderActionBar(id) {
+  const bar = document.getElementById('advActionBar');
+  const sheet = SHEETS[id]?.level1;
+  if (!sheet) return;
+  const actions = getCharacterActions(id, sheet);
+  bar.innerHTML = actions.map(a => `
+    <button
+      class="adv-action-btn ${a.primary ? 'primary' : ''} ${a.used ? 'used' : ''}"
+      onclick="handleAction('${a.id}', '${id}')"
+    >${a.label}</button>
+  `).join('');
+}
+
+function getCharacterActions(id, sheet) {
+  const base = [
+    { id: 'move', label: '↑ MOVE', used: BattleState.moveUsed },
+    { id: 'attack', label: '⚔ ATTACK', primary: true, used: BattleState.actionUsed },
+  ];
+  if (sheet.cantrips?.length) base.push({ id: 'cantrip', label: '✨ CANTRIP', used: BattleState.actionUsed });
+  if (sheet.spells_1?.length) base.push({ id: 'spell', label: '📖 SPELL', used: BattleState.actionUsed });
+  if (sheet.features?.some(f => f.toLowerCase().includes('rage'))) base.push({ id: 'rage', label: '💢 RAGE', primary: true, used: BattleState.actionUsed });
+  if (sheet.features?.some(f => f.toLowerCase().includes('bardic'))) base.push({ id: 'inspire', label: '🎵 INSPIRE', used: BattleState.bonusActionUsed });
+  if (sheet.features?.some(f => f.toLowerCase().includes('lay on hands'))) base.push({ id: 'heal', label: '🤲 HEAL', used: BattleState.bonusActionUsed });
+  base.push({ id: 'custom', label: '💬 OTHER' });
+  return base;
+}
+
+async function handleAction(actionId, charId) {
+  const sheet = SHEETS[charId]?.level1;
+  const charName = CHARS.find(c => c.id === charId)?.name;
+
+  if (actionId === 'custom') { showFreeInput(); return; }
+
+  if (actionId === 'move') {
+    BattleState.moveUsed = true; renderActionBar(charId);
+    await submitAction(charId, `${charName} moves into position.`); return;
+  }
+  if (actionId === 'attack') {
+    BattleState.actionUsed = true; renderActionBar(charId);
+    await submitAction(charId, `${charName} attacks the nearest enemy.`); return;
+  }
+  if (actionId === 'cantrip') {
+    BattleState.actionUsed = true; renderActionBar(charId);
+    await submitAction(charId, `${charName} casts ${sheet.cantrips?.[0] || 'a cantrip'}.`); return;
+  }
+  if (actionId === 'spell') {
+    BattleState.actionUsed = true; renderActionBar(charId);
+    await submitAction(charId, `${charName} casts ${sheet.spells_1?.[0] || 'a spell'}.`); return;
+  }
+  if (actionId === 'rage') {
+    BattleState.actionUsed = true; renderActionBar(charId);
+    await submitAction(charId, `${charName} enters a rage.`); return;
+  }
+  if (actionId === 'inspire') {
+    BattleState.bonusActionUsed = true; renderActionBar(charId);
+    await submitAction(charId, `${charName} uses Bardic Inspiration on an ally.`); return;
+  }
+  if (actionId === 'heal') {
+    BattleState.bonusActionUsed = true; renderActionBar(charId);
+    await submitAction(charId, `${charName} uses Lay on Hands.`); return;
+  }
+}
+
+// ── FREE INPUT ────────────────────────────────────────────────
+function showFreeInput() {
+  document.getElementById('advFreeInputOverlay').classList.add('visible');
+  document.getElementById('advFreeInput').focus();
+}
+
+function hideFreeInput() {
+  document.getElementById('advFreeInputOverlay').classList.remove('visible');
+  document.getElementById('advFreeInput').value = '';
+}
+
+async function submitFreeAction() {
+  const input = document.getElementById('advFreeInput');
+  const text = input.value.trim();
+  if (!text) return;
+  hideFreeInput();
+  await submitAction(window.activeAdventureId, text);
+}
+
+// ── CORE ACTION SUBMIT ────────────────────────────────────────
+async function submitAction(charId, actionText) {
+  const state = window.activeAdventureState;
+  const char = CHARS.find(c => c.id === charId);
+
+  await PartyState.pushPlayerMessage(charId, actionText);
+  appendToNarrationLog('…', 'typing');
+
+  try {
+    const conversation = await PartyState.getConversation();
+    state.conversationHistory = conversation.map(m => ({ role: m.role, content: m.content }));
+    const systemPrompt = buildSystemPrompt(charId, state);
+
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'llama-3.3-70b-versatile',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: state.conversationHistory
+      })
+    });
+
+    const data = await response.json();
+    const reply = data.content?.[0]?.text || 'The dungeon stirs.';
+    removeTypingIndicator();
+    await PartyState.pushDMMessage(reply);
+
+    const charFirstName = char?.name?.split(' ')[0]?.toLowerCase();
+    const replyLower = reply.toLowerCase();
+    const nameMentioned = charFirstName && replyLower.includes(charFirstName);
+    const dmgMatch = reply.match(/(\d+)\s*(damage|points)/i);
+
+    if (dmgMatch && nameMentioned) {
+      const dmg = parseInt(dmgMatch[1]);
+      const newHp = Math.max(0, state.hp - dmg);
+      AdventureState.setHp(state, newHp);
+      await PartyState.setCharacterHp(charId, newHp, state.maxHp);
+      updateSpriteHpBar(charId, newHp, state.maxHp);
+      updatePartyHpBar();
+    }
+
+    BattleState.actionUsed = false;
+    BattleState.bonusActionUsed = false;
+    BattleState.moveUsed = false;
+    renderActionBar(charId);
+
+  } catch (err) {
+    removeTypingIndicator();
+    appendToNarrationLog('The dungeon stirs but does not speak.', 'system');
+    console.error('[Adventure]', err);
+  }
+}
+
+// ── NARRATION ─────────────────────────────────────────────────
+function renderNarrationLog(messages, activeCharId) {
+  const log = document.getElementById('advNarrationLog');
+  if (!log) return;
+  log.innerHTML = '';
+  messages.slice(-8).forEach(msg => {
+    if (msg.role === 'assistant') {
+      if (msg.content.includes('How do you want to do this?')) {
+        const hdywdt = document.createElement('div');
+        hdywdt.className = 'adv-hdywdt';
+        hdywdt.textContent = 'How do you want to do this?';
+        log.appendChild(hdywdt);
+      } else {
+        appendToNarrationLog(msg.content, 'narration');
+      }
+    } else {
+      const char = CHARS.find(c => c.id === msg.character);
+      const label = char?.name?.split(' ')[0] || msg.character;
+      appendToNarrationLog(`${label}: ${msg.content}`, 'player');
+    }
+  });
+  const panel = document.getElementById('advNarrationPanel');
+  panel.scrollTop = panel.scrollHeight;
+}
+
+function appendToNarrationLog(text, type) {
+  const log = document.getElementById('advNarrationLog');
+  if (!log) return;
   const el = document.createElement('div');
-  el.className = 'adv-narration';
+  el.className = `adv-narration-text${type === 'player' ? ' player-msg' : type === 'system' ? ' system-msg' : ''}${type === 'typing' ? ' adv-typing-indicator' : ''}`;
   el.textContent = text;
-  document.getElementById('advLog').appendChild(el);
-  scrollLog();
+  log.appendChild(el);
 }
 
-function appendReadAloud(text) {
-  const el = document.createElement('div');
-  el.className = 'adv-readaloud';
-  el.textContent = text;
-  document.getElementById('advLog').appendChild(el);
-  scrollLog();
+function removeTypingIndicator() {
+  const el = document.querySelector('.adv-typing-indicator');
+  if (el) el.remove();
 }
 
-function appendPlayerMessage(text) {
-  const el = document.createElement('div');
-  el.className = 'adv-player';
-  el.textContent = '> ' + text;
-  document.getElementById('advLog').appendChild(el);
-  scrollLog();
+function toggleNarration() {
+  const panel = document.getElementById('advNarrationPanel');
+  const btn = document.getElementById('advNarrationToggle');
+  BattleState.narratorCollapsed = !BattleState.narratorCollapsed;
+  panel.classList.toggle('collapsed', BattleState.narratorCollapsed);
+  btn.textContent = BattleState.narratorCollapsed ? '▲ LOG' : '▼ LOG';
 }
 
-function appendPlayerMessageWithLabel(text, label) {
-  const el = document.createElement('div');
-  el.className = 'adv-player';
-  el.textContent = `> ${label}: ${text}`;
-  document.getElementById('advLog').appendChild(el);
-  scrollLog();
-}
-
-function appendSystemMessage(text) {
-  const el = document.createElement('div');
-  el.className = 'adv-system';
-  el.textContent = text;
-  document.getElementById('advLog').appendChild(el);
-  scrollLog();
-}
-
-function scrollLog() {
-  const log = document.getElementById('advLog');
-  log.scrollTop = log.scrollHeight;
+// ── PARTY HP TOPBAR ───────────────────────────────────────────
+function updatePartyHpBar() {
+  const bar = document.getElementById('advPartyHp');
+  if (!bar) return;
+  const state = window.activeAdventureState;
+  if (!state) return;
+  const char = CHARS.find(c => c.id === state.characterId);
+  const name = char?.name?.split(' ')[0] || state.characterId;
+  const pct = state.hp / state.maxHp;
+  bar.innerHTML = `<span class="adv-hp-pill ${pct < 0.5 ? 'danger' : ''}">${name} ${state.hp}/${state.maxHp} HP</span>`;
 }
 
 
@@ -1433,17 +1828,14 @@ RULES:
   Then wait for the player's response and narrate their finishing move with full cinematic weight — the most vivid description in the scene.`;
 }
 
+// ── OPENING SCENE ─────────────────────────────────────────────
 async function renderOpeningScene(id, state) {
   const existing = await PartyState.getConversation();
-  if (existing.length > 0) {
-    return;
-  }
+  if (existing.length > 0) return;
 
   const char = CHARS.find(c => c.id === id);
   const rooms = DataEngine.getChapterRooms(1);
   const firstRoom = rooms[0];
-
-  appendSystemMessage('— Chapter 1: Goblin Arrows —');
 
   await PartyState.updateAdventureState({
     chapterIndex: 1,
@@ -1451,14 +1843,11 @@ async function renderOpeningScene(id, state) {
     visitedRooms: [firstRoom?.name || 'Cave Mouth']
   });
 
-  const indicator = document.createElement('div');
-  indicator.className = 'adv-narration adv-typing';
-  indicator.textContent = '…';
-  document.getElementById('advLog').appendChild(indicator);
-  scrollLog();
+  appendToNarrationLog('Chapter 1: Goblin Arrows', 'system');
+  appendToNarrationLog('…', 'typing');
 
   try {
-    const openingPrompt = `The adventure begins. Set the scene at the start of the Triboar Trail and draw the player into the first encounter with goblins. Address the player's character ${char.name} directly.`;
+    const openingPrompt = `The adventure begins. Set the scene at the start of the Triboar Trail. The party is about to encounter goblins. Address ${char.name} directly. Be brief and cinematic.`;
     const systemPrompt = buildSystemPrompt(id, state);
 
     const response = await fetch('/api/chat', {
@@ -1473,90 +1862,14 @@ async function renderOpeningScene(id, state) {
     });
 
     const data = await response.json();
-    const reply = data.content?.[0]?.text || 'Your journey begins...';
-    indicator.remove();
+    const reply = data.content?.[0]?.text || 'The trail stretches ahead into shadow.';
+    removeTypingIndicator();
     await PartyState.pushDMMessage(reply);
 
   } catch (err) {
-    indicator.remove();
-    await PartyState.pushDMMessage(`The party stands at the trailhead. The road ahead is dark.`);
+    removeTypingIndicator();
+    await PartyState.pushDMMessage('The Triboar Trail stretches into shadow. Something moves in the trees.');
     console.error('[Adventure] Opening scene error:', err);
-  }
-}
-
-async function handlePlayerInput() {
-  const input = document.getElementById('advInput');
-  const text = input.value.trim();
-  if (!text) return;
-  input.value = '';
-
-  const state = window.activeAdventureState;
-  const id = window.activeAdventureId;
-
-  const indicator = document.createElement('div');
-  indicator.className = 'adv-narration adv-typing';
-  indicator.textContent = '…';
-  document.getElementById('advLog').appendChild(indicator);
-  scrollLog();
-
-  document.getElementById('advInput').disabled = true;
-  document.getElementById('advSend').disabled = true;
-
-  try {
-    await PartyState.pushPlayerMessage(id, text);
-
-    const conversation = await PartyState.getConversation();
-    window.activeAdventureState.conversationHistory = conversation.map(m => ({
-      role: m.role,
-      content: m.content
-    }));
-    const systemPrompt = buildSystemPrompt(id, window.activeAdventureState);
-
-    const response = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        max_tokens: 1000,
-        system: systemPrompt,
-        messages: window.activeAdventureState.conversationHistory.map(m => ({
-          role: m.role,
-          content: m.content
-        }))
-      })
-    });
-
-    const data = await response.json();
-    const reply = data.content?.[0]?.text || 'The dungeon falls silent.';
-
-    indicator.remove();
-    await PartyState.pushDMMessage(reply);
-
-    const activeChar = CHARS.find(c => c.id === window.activeAdventureId);
-    const charName = activeChar?.name?.split(' ')[0]?.toLowerCase();
-    const replyLower = reply.toLowerCase();
-    const nameMentioned = charName && replyLower.includes(charName);
-    const dmgMatch = reply.match(/(\d+)\s*(damage|points)/i);
-
-    if (dmgMatch && nameMentioned) {
-      const dmg = parseInt(dmgMatch[1]);
-      const newHp = Math.max(0, state.hp - dmg);
-      AdventureState.setHp(state, newHp);
-      await PartyState.setCharacterHp(window.activeAdventureId, newHp, state.maxHp);
-      updateAdvHp(state);
-      if (newHp <= 0) {
-        appendSystemMessage('— ' + activeChar.name + ' has fallen. —');
-      }
-    }
-
-  } catch (err) {
-    indicator.remove();
-    appendSystemMessage('The dungeon stirs but does not speak. (Connection lost — try again.)');
-    console.error('[Adventure] API error:', err);
-  } finally {
-    document.getElementById('advInput').disabled = false;
-    document.getElementById('advSend').disabled = false;
-    document.getElementById('advInput').focus();
   }
 }
 
