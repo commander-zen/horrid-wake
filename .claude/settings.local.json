@@ -22,7 +22,8 @@
       "Bash(git commit -m ' *)",
       "Bash(git push *)",
       "Bash(curl \"https://generativelanguage.googleapis.com/v1beta/models?key=AIzaSyBsOgLsA25qFEhx-eNx27JtA1KPkNGpAM4\")",
-      "Bash(mkdir -p public/sprites)"
+      "Bash(mkdir -p public/sprites)",
+      "Bash(git rm *)"
     ]
   }
 }
