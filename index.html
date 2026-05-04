@@ -926,6 +926,35 @@ canvas{position:fixed;inset:0;z-index:2;pointer-events:none;}
   <div class="adv-action-bar" id="advActionBar"></div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAQ82FwdF4IbD6jIAKN5frnUacI3PTc2Ow",
+    authDomain: "horrid-wake.firebaseapp.com",
+    databaseURL: "https://horrid-wake-default-rtdb.firebaseio.com",
+    projectId: "horrid-wake",
+    storageBucket: "horrid-wake.firebasestorage.app",
+    messagingSenderId: "683459567",
+    appId: "1:683459567:web:a5840999d85ad4aac0ec1a"
+  };
+
+  const _app = firebase.initializeApp(firebaseConfig);
+  const _db = firebase.database();
+
+  window.firebaseDb = _db;
+  window.firebaseRef = (db, path) => db.ref(path);
+  window.firebasePush = (ref) => ref.push.bind(ref);
+  window.firebaseOnValue = (ref, cb) => ref.on('value', cb);
+  window.firebaseSet = (ref, val) => ref.set(val);
+  window.firebaseGet = (ref) => ref.once('value');
+
+  console.log('[Firebase] Initialized via compat SDK');
+</script>
+<script src="/js/dataEngine.js"></script>
+<script src="/js/adventureState.js"></script>
+<script src="/js/partyState.js"></script>
+
 <script>
 // ═══════════════════════════════════════
 // CHARACTER DATA
@@ -1885,33 +1914,5 @@ window.CHAR_IMGS = { dennis: "data:image/webp;base64,UklGRo4vAQBXRUJQVlA4IIIvAQD
 IMGS = window.CHAR_IMGS;
 init();
 </script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyAQ82FwdF4IbD6jIAKN5frnUacI3PTc2Ow",
-    authDomain: "horrid-wake.firebaseapp.com",
-    databaseURL: "https://horrid-wake-default-rtdb.firebaseio.com",
-    projectId: "horrid-wake",
-    storageBucket: "horrid-wake.firebasestorage.app",
-    messagingSenderId: "683459567",
-    appId: "1:683459567:web:a5840999d85ad4aac0ec1a"
-  };
-
-  const _app = firebase.initializeApp(firebaseConfig);
-  const _db = firebase.database();
-
-  window.firebaseDb = _db;
-  window.firebaseRef = (db, path) => db.ref(path);
-  window.firebasePush = (ref) => ref.push.bind(ref);
-  window.firebaseOnValue = (ref, cb) => ref.on('value', cb);
-  window.firebaseSet = (ref, val) => ref.set(val);
-  window.firebaseGet = (ref) => ref.once('value');
-
-  console.log('[Firebase] Initialized via compat SDK');
-</script>
-<script src="/js/dataEngine.js"></script>
-<script src="/js/adventureState.js"></script>
-<script src="/js/partyState.js"></script>
 </body>
 </html>
