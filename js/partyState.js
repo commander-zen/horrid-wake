@@ -95,3 +95,6 @@ const PartyState = (() => {
   };
 
 })();
+
+export { PartyState };
+window.PartyState = PartyState;

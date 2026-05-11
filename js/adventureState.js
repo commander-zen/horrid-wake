@@ -147,3 +147,6 @@ const AdventureState = (() => {
   };
 
 })();
+
+export { AdventureState };
+window.AdventureState = AdventureState;

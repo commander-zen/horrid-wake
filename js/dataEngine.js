@@ -1,4 +1,4 @@
-const DataEngine = (() => {
+﻿const DataEngine = (() => {
 
   let lmop = null;
   let bestiary = null;
@@ -69,7 +69,7 @@ const DataEngine = (() => {
       if (e.items) return extractText(e.items);
       return '';
     }).join(' ').replace(/\{@[^}]+\}/g, m => {
-      // Strip tags like {@creature Goblin} → Goblin, {@b text} → text
+      // Strip tags like {@creature Goblin} â†’ Goblin, {@b text} â†’ text
       const inner = m.replace(/\{@\w+ ([^|}]+)[^}]*\}/, '$1');
       return inner;
     });
@@ -113,3 +113,7 @@ const DataEngine = (() => {
   return { init, getAllRooms, getChapterRooms, getChapters, getMonster, formatMonsterBlock, extractText };
 
 })();
+
+export { DataEngine };
+window.DataEngine = DataEngine;
+
