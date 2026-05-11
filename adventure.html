@@ -1,0 +1,1203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Lost Mines — Adventure</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <style>
+    :root {
+      --gold: #c8943a;
+      --gold-lt: #f0c85a;
+      --gold-dk: #3a2208;
+      --bg: #0a0703;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: 'Cinzel', serif;
+      color: var(--gold);
+      background: var(--bg);
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ── SCREENS ── */
+    .screen {
+      display: none;
+      width: 100%;
+      max-width: 480px;
+      min-height: 100dvh;
+      flex-direction: column;
+    }
+    .screen.active { display: flex; }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(20,10,2,0.97);
+      border: 1px solid var(--gold);
+      color: var(--gold-lt);
+      font-family: 'IM Fell English', serif;
+      font-style: italic;
+      font-size: 13px;
+      padding: 8px 18px;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.25s;
+      white-space: nowrap;
+    }
+    .toast.show { opacity: 1; }
+
+    /* ════════════════════════════════
+       SCREEN 1 — CHARACTER SELECT
+    ════════════════════════════════ */
+    #charSelect {
+      padding: 28px 16px 20px;
+    }
+
+    .cs-title {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--gold-lt);
+      text-align: center;
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+    }
+    .cs-subtitle {
+      font-family: 'IM Fell English', serif;
+      font-style: italic;
+      font-size: 13px;
+      color: rgba(200,148,58,0.55);
+      text-align: center;
+      margin-bottom: 22px;
+    }
+
+    /* Tabs */
+    .cs-tabs {
+      display: flex;
+      border-bottom: 1px solid rgba(180,130,40,0.3);
+      margin-bottom: 16px;
+    }
+    .cs-tab {
+      flex: 1;
+      padding: 9px 4px;
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(200,148,58,0.45);
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      cursor: pointer;
+      text-align: center;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .cs-tab.active {
+      color: var(--gold-lt);
+      border-bottom-color: var(--gold);
+    }
+
+    .cs-panel { display: none; }
+    .cs-panel.active { display: block; }
+
+    /* ── Company tab ── */
+    .company-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow-y: auto;
+      max-height: calc(100dvh - 175px);
+    }
+
+    .char-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(20,10,2,0.85);
+      border: 1px solid rgba(180,130,40,0.3);
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: border-color 0.15s;
+      position: relative;
+    }
+    .char-card::before {
+      content: '';
+      position: absolute;
+      top: -1px; left: 0;
+      width: 10px; height: 10px;
+      border-top: 1px solid var(--gold);
+      border-left: 1px solid var(--gold);
+    }
+    .char-card::after {
+      content: '';
+      position: absolute;
+      top: -1px; right: 0;
+      width: 10px; height: 10px;
+      border-top: 1px solid var(--gold);
+      border-right: 1px solid var(--gold);
+    }
+    .char-card:active { border-color: var(--gold-lt); }
+
+    .char-thumb {
+      width: 52px;
+      height: 52px;
+      flex-shrink: 0;
+      background: rgba(180,130,40,0.08);
+      border: 1px solid rgba(180,130,40,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .char-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .char-thumb .silhouette {
+      font-size: 26px;
+      opacity: 0.35;
+      color: var(--gold);
+    }
+
+    .char-info { flex: 1; min-width: 0; }
+    .char-name {
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gold-lt);
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .char-cls {
+      font-family: 'IM Fell English', serif;
+      font-style: italic;
+      font-size: 11px;
+      color: rgba(200,148,58,0.65);
+    }
+    .char-arrow { color: rgba(200,148,58,0.4); font-size: 16px; }
+
+    /* ── Import tab ── */
+    .import-wrap { display: flex; flex-direction: column; gap: 12px; }
+    .field-label {
+      font-family: 'IM Fell English', serif;
+      font-style: italic;
+      font-size: 12px;
+      color: rgba(200,148,58,0.55);
+    }
+    .import-textarea {
+      width: 100%;
+      height: 190px;
+      background: rgba(20,10,2,0.85);
+      border: 1px solid rgba(180,130,40,0.3);
+      color: var(--gold-lt);
+      font-family: 'IM Fell English', serif;
+      font-style: italic;
+      font-size: 12px;
+      padding: 10px;
+      resize: none;
+      outline: none;
+      caret-color: var(--gold-lt);
+    }
+    .import-textarea:focus { border-color: rgba(180,130,40,0.55); }
+
+    /* ── Build tab ── */
+    .build-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow-y: auto;
+      max-height: calc(100dvh - 190px);
+      padding-bottom: 8px;
+    }
+    .build-row { display: flex; gap: 8px; }
+    .build-field { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+    .build-label {
+      font-size: 9px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(200,148,58,0.55);
+    }
+    .build-input {
+      background: rgba(20,10,2,0.85);
+      border: 1px solid rgba(180,130,40,0.3);
+      color: var(--gold-lt);
+      font-family: 'Cinzel', serif;
+      font-size: 12px;
+      padding: 7px 8px;
+      outline: none;
+      width: 100%;
+      caret-color: var(--gold-lt);
+    }
+    .build-input:focus { border-color: rgba(180,130,40,0.55); }
+    .build-input[type="number"] { text-align: center; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+    }
+
+    .flavor-textarea {
+      background: rgba(20,10,2,0.85);
+      border: 1px solid rgba(180,130,40,0.3);
+      color: var(--gold-lt);
+      font-family: 'IM Fell English', serif;
+      font-style: italic;
+      font-size: 12px;
+      padding: 7px 8px;
+      outline: none;
+      width: 100%;
+      resize: none;
+      height: 56px;
+      caret-color: var(--gold-lt);
+    }
+    .flavor-textarea:focus { border-color: rgba(180,130,40,0.55); }
+
+    /* Shared button */
+    .cs-btn {
+      background: none;
+      border: 1px solid var(--gold);
+      color: var(--gold-lt);
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 11px 16px;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.15s;
+    }
+    .cs-btn:active { background: rgba(200,148,58,0.08); }
+
+    /* ════════════════════════════════
+       SCREEN 2 — CHAT
+    ════════════════════════════════ */
+    #chatScreen {
+      position: relative;
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    /* Header */
+    .chat-header {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      height: 48px;
+      background: rgba(10,7,3,0.98);
+      border-bottom: 1px solid rgba(180,130,40,0.3);
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 10px;
+      z-index: 100;
+    }
+
+    .header-portrait {
+      width: 30px;
+      height: 30px;
+      flex-shrink: 0;
+      border: 1px solid rgba(180,130,40,0.35);
+      background: rgba(180,130,40,0.08);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .header-portrait img { width: 100%; height: 100%; object-fit: cover; }
+    .header-portrait .sil { font-size: 15px; opacity: 0.45; }
+
+    .header-name {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--gold-lt);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 90px;
+    }
+
+    .header-title {
+      flex: 1;
+      text-align: center;
+      font-family: 'Cinzel', serif;
+      font-size: 8px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(200,148,58,0.45);
+      white-space: nowrap;
+    }
+
+    .party-btn {
+      flex-shrink: 0;
+      background: none;
+      border: 1px solid rgba(180,130,40,0.35);
+      color: rgba(200,148,58,0.65);
+      font-size: 10px;
+      font-family: 'Cinzel', serif;
+      letter-spacing: 1px;
+      padding: 4px 8px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .party-btn:active { border-color: var(--gold); color: var(--gold); }
+
+    /* Message feed */
+    .chat-feed {
+      position: absolute;
+      top: 48px;
+      bottom: 64px;
+      left: 0;
+      right: 0;
+      overflow-y: auto;
+      padding: 12px 12px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    /* DM message */
+    .msg-dm {
+      background: rgba(20,10,2,0.85);
+      border: 1px solid rgba(180,130,40,0.22);
+      padding: 10px 12px;
+      position: relative;
+    }
+    .msg-dm::before {
+      content: '';
+      position: absolute;
+      top: -1px; left: 0;
+      width: 8px; height: 8px;
+      border-top: 1px solid rgba(200,148,58,0.55);
+      border-left: 1px solid rgba(200,148,58,0.55);
+    }
+    .msg-dm-label {
+      font-size: 8px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(200,148,58,0.45);
+      margin-bottom: 6px;
+    }
+    .msg-dm-text {
+      font-family: 'IM Fell English', serif;
+      font-style: italic;
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--gold-lt);
+    }
+
+    /* Player message */
+    .msg-player {
+      display: flex;
+      flex-direction: column;
+      max-width: 85%;
+    }
+    .msg-player.mine { align-self: flex-end; align-items: flex-end; }
+    .msg-player.theirs { align-self: flex-start; align-items: flex-start; }
+
+    .msg-player-name {
+      font-size: 8px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 3px;
+    }
+    .msg-player-bubble {
+      background: rgba(28,14,3,0.9);
+      border: 1px solid rgba(180,130,40,0.18);
+      padding: 7px 10px;
+      font-family: 'IM Fell English', serif;
+      font-size: 13px;
+      line-height: 1.5;
+      color: rgba(240,200,90,0.82);
+    }
+    .msg-player.mine .msg-player-bubble {
+      border-color: rgba(180,130,40,0.32);
+    }
+
+    /* Typing indicator */
+    .typing-indicator {
+      display: none;
+      align-items: center;
+      gap: 5px;
+      padding: 6px 2px;
+      font-family: 'IM Fell English', serif;
+      font-style: italic;
+      font-size: 12px;
+      color: rgba(200,148,58,0.45);
+    }
+    .typing-indicator.show { display: flex; }
+    .typing-dot {
+      width: 4px; height: 4px;
+      background: rgba(200,148,58,0.4);
+      border-radius: 50%;
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes pulse {
+      0%, 60%, 100% { opacity: 0.3; transform: scale(1); }
+      30% { opacity: 1; transform: scale(1.35); }
+    }
+
+    /* Input bar */
+    .chat-input-bar {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      height: 64px;
+      background: rgba(10,7,3,0.98);
+      border-top: 1px solid rgba(180,130,40,0.3);
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 8px;
+      z-index: 100;
+    }
+
+    .chat-input {
+      flex: 1;
+      background: rgba(20,10,2,0.85);
+      border: 1px solid rgba(180,130,40,0.3);
+      color: var(--gold-lt);
+      font-family: 'IM Fell English', serif;
+      font-style: italic;
+      font-size: 14px;
+      padding: 8px 10px;
+      outline: none;
+      height: 40px;
+      caret-color: var(--gold-lt);
+    }
+    .chat-input:focus { border-color: rgba(180,130,40,0.55); }
+    .chat-input::placeholder { color: rgba(200,148,58,0.3); }
+
+    .send-btn {
+      flex-shrink: 0;
+      background: none;
+      border: 1px solid var(--gold);
+      color: var(--gold-lt);
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: 1px;
+      padding: 0 14px;
+      height: 40px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .send-btn:active { background: rgba(200,148,58,0.08); }
+    .send-btn:disabled { opacity: 0.38; cursor: default; }
+
+    /* Party panel */
+    .party-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 199;
+      background: rgba(0,0,0,0.35);
+    }
+    .party-overlay.show { display: block; }
+
+    .party-panel {
+      position: fixed;
+      top: 0;
+      right: -240px;
+      width: 220px;
+      height: 100dvh;
+      background: rgba(10,7,3,0.99);
+      border-left: 1px solid rgba(180,130,40,0.3);
+      z-index: 200;
+      transition: right 0.28s ease;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+    }
+    .party-panel.open { right: 0; }
+
+    .party-panel-title {
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(200,148,58,0.55);
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(180,130,40,0.2);
+    }
+    .party-list {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .party-empty {
+      font-family: 'IM Fell English', serif;
+      font-style: italic;
+      font-size: 12px;
+      color: rgba(200,148,58,0.35);
+    }
+    .party-member { display: flex; align-items: flex-start; gap: 8px; }
+    .party-dot {
+      width: 6px; height: 6px;
+      background: #4a8840;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 4px;
+    }
+    .party-member-name {
+      font-size: 12px;
+      color: var(--gold-lt);
+      line-height: 1.3;
+    }
+    .party-member-cls {
+      font-family: 'IM Fell English', serif;
+      font-style: italic;
+      font-size: 10px;
+      color: rgba(200,148,58,0.5);
+    }
+    .party-close {
+      margin-top: 12px;
+      background: none;
+      border: 1px solid rgba(180,130,40,0.3);
+      color: rgba(200,148,58,0.55);
+      font-family: 'Cinzel', serif;
+      font-size: 10px;
+      letter-spacing: 1px;
+      padding: 8px;
+      cursor: pointer;
+      width: 100%;
+    }
+    .party-close:active { border-color: var(--gold); color: var(--gold); }
+  </style>
+</head>
+<body>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN 1 — CHARACTER SELECT
+═══════════════════════════════════════ -->
+<div class="screen active" id="charSelect">
+  <div class="cs-title">Choose Your Fate</div>
+  <div class="cs-subtitle">Who enters the dungeon?</div>
+
+  <div class="cs-tabs">
+    <button class="cs-tab active" data-tab="company">The Company</button>
+    <button class="cs-tab" data-tab="import">Import</button>
+    <button class="cs-tab" data-tab="build">Build</button>
+  </div>
+
+  <!-- The Company -->
+  <div class="cs-panel active" id="panel-company">
+    <div class="company-list" id="companyList"></div>
+  </div>
+
+  <!-- Import -->
+  <div class="cs-panel" id="panel-import">
+    <div class="import-wrap">
+      <div class="field-label">Paste your character JSON or plain-text stat block</div>
+      <textarea class="import-textarea" id="importText" placeholder='{"name":"Aragorn","cls":"Ranger","hp":50,"ac":16,"speed":30,"prof":3,"stats":{"STR":16,"DEX":14,"CON":14,"INT":12,"WIS":14,"CHA":12}}'></textarea>
+      <button class="cs-btn" onclick="doImport()">Import Character</button>
+    </div>
+  </div>
+
+  <!-- Build -->
+  <div class="cs-panel" id="panel-build">
+    <div class="build-form">
+      <div class="build-row">
+        <div class="build-field" style="flex:2">
+          <div class="build-label">Name</div>
+          <input class="build-input" id="bName" type="text" placeholder="Gundalf the Beige">
+        </div>
+        <div class="build-field" style="flex:2">
+          <div class="build-label">Class</div>
+          <input class="build-input" id="bCls" type="text" placeholder="Wizard">
+        </div>
+      </div>
+      <div class="build-row">
+        <div class="build-field">
+          <div class="build-label">HP</div>
+          <input class="build-input" id="bHp" type="number" value="30" min="1">
+        </div>
+        <div class="build-field">
+          <div class="build-label">AC</div>
+          <input class="build-input" id="bAc" type="number" value="12" min="1">
+        </div>
+        <div class="build-field">
+          <div class="build-label">Speed</div>
+          <input class="build-input" id="bSpd" type="number" value="30" min="1">
+        </div>
+        <div class="build-field">
+          <div class="build-label">Prof</div>
+          <input class="build-input" id="bProf" type="number" value="2" min="1">
+        </div>
+      </div>
+      <div class="build-label" style="margin-top:2px">Ability Scores</div>
+      <div class="stats-grid">
+        <div class="build-field">
+          <div class="build-label">STR</div>
+          <input class="build-input" id="bSTR" type="number" value="10" min="1" max="30">
+        </div>
+        <div class="build-field">
+          <div class="build-label">DEX</div>
+          <input class="build-input" id="bDEX" type="number" value="10" min="1" max="30">
+        </div>
+        <div class="build-field">
+          <div class="build-label">CON</div>
+          <input class="build-input" id="bCON" type="number" value="10" min="1" max="30">
+        </div>
+        <div class="build-field">
+          <div class="build-label">INT</div>
+          <input class="build-input" id="bINT" type="number" value="10" min="1" max="30">
+        </div>
+        <div class="build-field">
+          <div class="build-label">WIS</div>
+          <input class="build-input" id="bWIS" type="number" value="10" min="1" max="30">
+        </div>
+        <div class="build-field">
+          <div class="build-label">CHA</div>
+          <input class="build-input" id="bCHA" type="number" value="10" min="1" max="30">
+        </div>
+      </div>
+      <div class="build-field">
+        <div class="build-label">Describe your character in one sentence</div>
+        <textarea class="flavor-textarea" id="bFlavor" placeholder="A disgraced knight seeking redemption through reckless courage."></textarea>
+      </div>
+      <button class="cs-btn" onclick="doBuild()">Enter the Story</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     SCREEN 2 — CHAT
+═══════════════════════════════════════ -->
+<div class="screen" id="chatScreen">
+  <div class="chat-header">
+    <div class="header-portrait" id="headerPortrait">
+      <span class="sil">⚔</span>
+    </div>
+    <div class="header-name" id="headerName">Adventurer</div>
+    <div class="header-title">Lost Mines of Phandelver</div>
+    <button class="party-btn" onclick="openParty()">⚔ Party</button>
+  </div>
+
+  <div class="chat-feed" id="chatFeed">
+    <div class="typing-indicator" id="typingIndicator">
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <span style="margin-left:4px">The DM stirs...</span>
+    </div>
+  </div>
+
+  <div class="chat-input-bar">
+    <input class="chat-input" id="chatInput" type="text" placeholder="What do you do?" maxlength="300">
+    <button class="send-btn" id="sendBtn" onclick="sendMessage()">Act →</button>
+  </div>
+</div>
+
+<!-- Party panel -->
+<div class="party-overlay" id="partyOverlay" onclick="closeParty()"></div>
+<div class="party-panel" id="partyPanel">
+  <div class="party-panel-title">The Company</div>
+  <div class="party-list" id="partyList"></div>
+  <button class="party-close" onclick="closeParty()">Close</button>
+</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────────────────
+const firebaseConfig = {
+  apiKey: "AIzaSyBdY4AJuKGjlv0R-BBnJgHU-A-nsQzbEy0",
+  authDomain: "horrid-wake-firebase.firebaseapp.com",
+  databaseURL: "https://horrid-wake-firebase-default-rtdb.firebaseio.com",
+  projectId: "horrid-wake-firebase",
+  storageBucket: "horrid-wake-firebase.firebasestorage.app",
+  messagingSenderId: "503583894629",
+  appId: "1:503583894629:web:f3c0bc22d693649080aa8c"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// ── CHARACTERS ──────────────────────────────────────────────────────────────
+const CHARS = [
+  {
+    id: 'dennis', name: 'Dennis of House Reynolds',
+    cls: 'Sorcerer · Wild Magic',
+    hp: 32, ac: 13, speed: 30, prof: 3,
+    stats: { STR:8, DEX:14, CON:12, INT:12, WIS:10, CHA:18 },
+    flavor: 'His magic is chaotic and uncontrolled. He insists it is not.',
+  },
+  {
+    id: 'mac', name: 'Mac the Unbroken',
+    cls: 'Paladin · Oath of Conquest',
+    hp: 52, ac: 18, speed: 30, prof: 3,
+    stats: { STR:16, DEX:8, CON:14, INT:8, WIS:6, CHA:12 },
+    flavor: 'Sworn an oath he does not understand. Calls Divine Smite karate.',
+  },
+  {
+    id: 'charlie', name: 'Charlie of the Below',
+    cls: 'Druid · Circle of Spores',
+    hp: 44, ac: 13, speed: 30, prof: 3,
+    stats: { STR:10, DEX:12, CON:14, INT:4, WIS:18, CHA:8 },
+    flavor: 'Illiterate but knows every tunnel, rat, and secret in the region.',
+  },
+  {
+    id: 'dee', name: 'Dee the Unbroken Bird',
+    cls: 'Bard · College of Eloquence',
+    hp: 36, ac: 13, speed: 30, prof: 3,
+    stats: { STR:8, DEX:13, CON:10, INT:12, WIS:10, CHA:16 },
+    flavor: 'Classically trained enchantress whose delivery undermines her spells.',
+  },
+  {
+    id: 'frank', name: 'Frank the Undying',
+    cls: 'Barbarian · Path of the Beast',
+    hp: 65, ac: 13, speed: 30, prof: 3,
+    stats: { STR:16, DEX:8, CON:18, INT:6, WIS:3, CHA:10 },
+    flavor: 'Rage is his baseline state. No armor. Never armor.',
+  },
+];
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let myChar = null;
+let mySessionId = null;
+let dmDebounceTimer = null;
+let seenMsgKeys = new Set();
+let toastTimer = null;
+
+// ── BOOT ─────────────────────────────────────────────────────────────────────
+(function boot() {
+  const stored = sessionStorage.getItem('hw_char');
+  if (stored) {
+    try { myChar = JSON.parse(stored); showChat(); return; } catch(e) {}
+  }
+  showCharSelect();
+})();
+
+// ── SCREEN SWITCHING ──────────────────────────────────────────────────────────
+function showCharSelect() {
+  document.getElementById('charSelect').classList.add('active');
+  document.getElementById('chatScreen').classList.remove('active');
+  populateCompanyList();
+}
+
+function showChat() {
+  document.getElementById('charSelect').classList.remove('active');
+  document.getElementById('chatScreen').classList.add('active');
+  initChat();
+}
+
+// ── TABS ─────────────────────────────────────────────────────────────────────
+document.querySelectorAll('.cs-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.cs-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.cs-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+  });
+});
+
+// ── COMPANY LIST ──────────────────────────────────────────────────────────────
+function populateCompanyList() {
+  const list = document.getElementById('companyList');
+  list.innerHTML = '';
+  CHARS.forEach(c => {
+    const card = document.createElement('div');
+    card.className = 'char-card';
+    card.innerHTML = `
+      <div class="char-thumb" id="cthumb-${c.id}">
+        <span class="silhouette">⚔</span>
+      </div>
+      <div class="char-info">
+        <div class="char-name">${esc(c.name)}</div>
+        <div class="char-cls">${esc(c.cls)}</div>
+      </div>
+      <div class="char-arrow">›</div>
+    `;
+    card.addEventListener('click', () => selectChar(c));
+    list.appendChild(card);
+
+    db.ref('/characters/' + c.id + '/img').once('value').then(snap => {
+      const url = snap.val();
+      if (url) {
+        const el = document.getElementById('cthumb-' + c.id);
+        if (el) el.innerHTML = `<img src="${esc(url)}" alt="${esc(c.name)}">`;
+      }
+    }).catch(() => {});
+  });
+}
+
+function selectChar(c) {
+  myChar = Object.assign({}, c);
+  sessionStorage.setItem('hw_char', JSON.stringify(myChar));
+  showChat();
+}
+
+// ── IMPORT ────────────────────────────────────────────────────────────────────
+function doImport() {
+  const raw = document.getElementById('importText').value.trim();
+  if (!raw) { showToast('Paste something first'); return; }
+
+  let char = null;
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (parsed.name && parsed.cls) {
+      char = {
+        id: 'custom_' + Date.now(),
+        name: String(parsed.name).substring(0, 60),
+        cls: String(parsed.cls).substring(0, 60),
+        hp: parseInt(parsed.hp) || 30,
+        ac: parseInt(parsed.ac) || 12,
+        speed: parseInt(parsed.speed) || 30,
+        prof: parseInt(parsed.prof) || 2,
+        stats: parsed.stats || { STR:10, DEX:10, CON:10, INT:10, WIS:10, CHA:10 },
+        flavor: String(parsed.flavor || '').substring(0, 200),
+      };
+    }
+  } catch(e) {
+    char = parseStatBlock(raw);
+  }
+
+  if (!char || !char.name || !char.cls) {
+    showToast('Could not find name and class — check your format');
+    return;
+  }
+
+  myChar = char;
+  sessionStorage.setItem('hw_char', JSON.stringify(myChar));
+  showChat();
+}
+
+function parseStatBlock(text) {
+  const char = {
+    id: 'custom_' + Date.now(),
+    name: '', cls: '',
+    hp: 30, ac: 12, speed: 30, prof: 2,
+    stats: { STR:10, DEX:10, CON:10, INT:10, WIS:10, CHA:10 },
+    flavor: '',
+  };
+
+  const extract = (re) => { const m = text.match(re); return m ? m[1].trim() : null; };
+
+  const name = extract(/(?:^name|character name?)[\s:]+([A-Za-z][A-Za-z '\-]{1,50})/im);
+  if (name) char.name = name;
+
+  const cls = extract(/(?:class|cls)[\s:]+([A-Za-z][A-Za-z '\-·]{1,40})/im);
+  if (cls) char.cls = cls.split('\n')[0];
+
+  const hp = extract(/(?:hp|hit points?|health)[\s:]+(\d+)/i);
+  if (hp) char.hp = parseInt(hp);
+
+  const ac = extract(/(?:ac|armor class)[\s:]+(\d+)/i);
+  if (ac) char.ac = parseInt(ac);
+
+  const spd = extract(/(?:speed|spd)[\s:]+(\d+)/i);
+  if (spd) char.speed = parseInt(spd);
+
+  const prof = extract(/(?:proficiency bonus?|prof(?:iciency)?\s*\+?)[\s:]*(\d+)/i);
+  if (prof) char.prof = parseInt(prof);
+
+  ['STR','DEX','CON','INT','WIS','CHA'].forEach(s => {
+    const m = text.match(new RegExp(s + '\\s*[:\\s](\\d+)', 'i'));
+    if (m) char.stats[s] = parseInt(m[1]);
+  });
+
+  if (!char.name) {
+    const first = text.split('\n')[0].trim().replace(/[^A-Za-z '\-]/g, '');
+    if (first.length >= 2 && first.length <= 60) char.name = first;
+  }
+
+  return char;
+}
+
+// ── BUILD ─────────────────────────────────────────────────────────────────────
+function doBuild() {
+  const name = document.getElementById('bName').value.trim();
+  const cls  = document.getElementById('bCls').value.trim();
+  if (!name || !cls) { showToast('Name and Class are required'); return; }
+
+  const iv = id => parseInt(document.getElementById(id).value) || 10;
+
+  myChar = {
+    id: 'custom_' + Date.now(),
+    name: name.substring(0, 60),
+    cls: cls.substring(0, 60),
+    hp: parseInt(document.getElementById('bHp').value) || 30,
+    ac: parseInt(document.getElementById('bAc').value) || 12,
+    speed: parseInt(document.getElementById('bSpd').value) || 30,
+    prof: parseInt(document.getElementById('bProf').value) || 2,
+    stats: { STR:iv('bSTR'), DEX:iv('bDEX'), CON:iv('bCON'), INT:iv('bINT'), WIS:iv('bWIS'), CHA:iv('bCHA') },
+    flavor: document.getElementById('bFlavor').value.trim().substring(0, 200),
+  };
+
+  sessionStorage.setItem('hw_char', JSON.stringify(myChar));
+  showChat();
+}
+
+// ── CHAT INIT ─────────────────────────────────────────────────────────────────
+function initChat() {
+  document.getElementById('headerName').textContent = myChar.name;
+
+  // Portrait
+  const imgKey = myChar.imgKey || myChar.id;
+  if (imgKey && !imgKey.startsWith('custom_')) {
+    db.ref('/characters/' + imgKey + '/img').once('value').then(snap => {
+      const url = snap.val();
+      if (url) document.getElementById('headerPortrait').innerHTML = `<img src="${esc(url)}" alt="${esc(myChar.name)}">`;
+    }).catch(() => {});
+  }
+
+  // Session presence
+  mySessionId = sessionStorage.getItem('hw_sid') || randId();
+  sessionStorage.setItem('hw_sid', mySessionId);
+
+  const presRef = db.ref('/players/' + mySessionId);
+  presRef.set({
+    name: myChar.name,
+    charId: myChar.id,
+    lastSeen: firebase.database.ServerValue.TIMESTAMP,
+  }).catch(() => {});
+  presRef.onDisconnect().remove();
+
+  setInterval(() => {
+    presRef.update({ lastSeen: firebase.database.ServerValue.TIMESTAMP }).catch(() => {});
+  }, 30000);
+
+  // Party listener
+  db.ref('/players').on('value', snap => renderParty(snap.val() || {}));
+
+  // Messages
+  loadMessages();
+
+  // Enter key
+  document.getElementById('chatInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+}
+
+// ── MESSAGES ──────────────────────────────────────────────────────────────────
+function loadMessages() {
+  const msgRef = db.ref('/messages').limitToLast(50);
+
+  msgRef.once('value').then(snap => {
+    const data = snap.val();
+    const count = data ? Object.keys(data).length : 0;
+
+    if (count === 0) {
+      // Fire opening narration
+      setTyping(true);
+      callDM([{ role: 'user', content: 'Begin the adventure. Set the opening scene on the Triboar Trail.' }]).then(text => {
+        setTyping(false);
+        return writeDMMessage(text);
+      }).catch(() => {
+        setTyping(false);
+        showToast('The ravens are silent... try again');
+      });
+    }
+
+    // Listen for messages (catches existing + new)
+    msgRef.on('child_added', snap => {
+      if (seenMsgKeys.has(snap.key)) return;
+      seenMsgKeys.add(snap.key);
+      const msg = snap.val();
+      if (msg) appendMessage(msg);
+    });
+
+  }).catch(() => showToast('The ravens are silent... try again'));
+}
+
+function appendMessage(msg) {
+  const feed = document.getElementById('chatFeed');
+  const typing = document.getElementById('typingIndicator');
+  let el;
+
+  if (msg.type === 'dm') {
+    el = document.createElement('div');
+    el.className = 'msg-dm';
+    el.innerHTML = `<div class="msg-dm-label">⚄ Dungeon Master</div><div class="msg-dm-text">${esc(msg.text)}</div>`;
+  } else {
+    const isMine = (msg.charId === myChar.id) || (msg.author === myChar.name && msg.charId === myChar.id);
+    el = document.createElement('div');
+    el.className = 'msg-player ' + (isMine ? 'mine' : 'theirs');
+    el.innerHTML = `<div class="msg-player-name">${esc(msg.author)}</div><div class="msg-player-bubble">${esc(msg.text)}</div>`;
+  }
+
+  feed.insertBefore(el, typing);
+  scrollFeed();
+}
+
+function scrollFeed() {
+  const feed = document.getElementById('chatFeed');
+  requestAnimationFrame(() => { feed.scrollTop = feed.scrollHeight; });
+}
+
+// ── SEND ──────────────────────────────────────────────────────────────────────
+function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+
+  db.ref('/messages').push({
+    type: 'player',
+    author: myChar.name,
+    charId: myChar.id,
+    text: text,
+    timestamp: firebase.database.ServerValue.TIMESTAMP,
+  }).catch(() => showToast('The ravens are silent... try again'));
+
+  clearTimeout(dmDebounceTimer);
+  dmDebounceTimer = setTimeout(triggerDM, 4000);
+}
+
+// ── DM LOGIC ──────────────────────────────────────────────────────────────────
+async function triggerDM() {
+  const busySnap = await db.ref('/meta/dmBusy').once('value').catch(() => ({ val: () => false }));
+  if (busySnap.val() === true) return;
+
+  await db.ref('/meta/dmBusy').set(true).catch(() => {});
+  setTyping(true);
+
+  try {
+    const msgSnap = await db.ref('/messages').limitToLast(20).once('value');
+    const msgs = [];
+    msgSnap.forEach(c => msgs.push(c.val()));
+
+    const groqMsgs = msgs.map(m => ({
+      role: m.type === 'dm' ? 'assistant' : 'user',
+      content: m.type === 'dm' ? m.text : (m.author + ': ' + m.text),
+    }));
+    const text = await callDM(groqMsgs);
+    setTyping(false);
+    await writeDMMessage(text);
+    await db.ref('/meta').update({
+      dmBusy: false,
+      lastDMTimestamp: firebase.database.ServerValue.TIMESTAMP,
+    });
+  } catch(err) {
+    setTyping(false);
+    showToast('The ravens are silent... try again');
+    // Reset busy after 30s so future messages can try again
+    setTimeout(() => db.ref('/meta/dmBusy').set(false).catch(() => {}), 30000);
+  }
+}
+
+async function writeDMMessage(text) {
+  await db.ref('/messages').push({
+    type: 'dm',
+    author: 'Claude',
+    charId: 'dm',
+    text: text,
+    timestamp: firebase.database.ServerValue.TIMESTAMP,
+  });
+}
+
+// ── DM API ────────────────────────────────────────────────────────────────────
+async function callDM(messages) {
+  const res = await fetch('/api/dm', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messages }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'DM API error');
+  return data.text;
+}
+}
+
+// ── PARTY PANEL ───────────────────────────────────────────────────────────────
+function openParty() {
+  document.getElementById('partyPanel').classList.add('open');
+  document.getElementById('partyOverlay').classList.add('show');
+}
+
+function closeParty() {
+  document.getElementById('partyPanel').classList.remove('open');
+  document.getElementById('partyOverlay').classList.remove('show');
+}
+
+function renderParty(players) {
+  const list = document.getElementById('partyList');
+  list.innerHTML = '';
+  const entries = Object.values(players);
+  if (!entries.length) {
+    list.innerHTML = '<div class="party-empty">No one else has arrived...</div>';
+    return;
+  }
+  entries.forEach(p => {
+    const charDef = CHARS.find(c => c.id === p.charId);
+    const el = document.createElement('div');
+    el.className = 'party-member';
+    el.innerHTML = `
+      <div class="party-dot"></div>
+      <div>
+        <div class="party-member-name">${esc(p.name)}</div>
+        ${charDef ? `<div class="party-member-cls">${esc(charDef.cls)}</div>` : ''}
+      </div>
+    `;
+    list.appendChild(el);
+  });
+}
+
+// ── TYPING ────────────────────────────────────────────────────────────────────
+function setTyping(show) {
+  document.getElementById('typingIndicator').classList.toggle('show', show);
+  if (show) scrollFeed();
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function randId() {
+  return Math.random().toString(36).substring(2, 10);
+}
+
+function esc(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3200);
+}
+</script>
+</body>
+</html>

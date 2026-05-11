@@ -1262,10 +1262,10 @@ function closeDetail(){
 }
 
 function enterDungeon(){
-  const nameEl = document.getElementById('dName');
   const c = CHARS.find(x=>x.id===activeId);
-  if(c) c.name = nameEl.textContent.trim();
-  openSheet(activeId);
+  if(c) c.name = document.getElementById('dName').textContent.trim();
+  sessionStorage.setItem('hw_char', JSON.stringify(c));
+  window.location.href = 'adventure.html';
 }
 
 // ═══════════════════════════════════════
