@@ -175,7 +175,7 @@ RULES:
 
   async function callApi(userMessage) {
     conversationHistory.push({ role: 'user', content: userMessage });
-    const res = await fetch('/api/chat', {
+    const res = await fetch('/api/dm', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

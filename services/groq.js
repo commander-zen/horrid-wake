@@ -1,7 +1,7 @@
 import { CHARS, SHEETS } from './characters.js';
 
 export async function callChatApi(systemPrompt, messages) {
-  const response = await fetch('/api/chat', {
+  const response = await fetch('/api/dm', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
