@@ -21,6 +21,7 @@
 
   .sc-page { display: flex; flex-direction: column; height: 100dvh; }
 
+  /* ── Topbar ── */
   .sc-topbar {
     display: flex; align-items: center; gap: 10px;
     padding: 10px 14px;
@@ -34,9 +35,7 @@
     padding: 5px 10px; cursor: pointer; border-radius: 2px;
   }
   .sc-back-btn:hover { border-color: var(--gold); }
-  .sc-topbar-title {
-    flex: 1; display: flex; align-items: baseline; gap: 10px;
-  }
+  .sc-topbar-title { flex: 1; display: flex; align-items: baseline; gap: 10px; }
   .sc-char-name {
     font-family: 'Cinzel', serif; font-size: 16px; font-weight: 700;
     color: var(--gold); letter-spacing: 0.05em;
@@ -51,34 +50,73 @@
     color: var(--text-dim); text-transform: uppercase; margin-left: auto;
   }
 
+  /* ── Chat log ── */
   .sc-log {
-    flex: 1; overflow-y: auto; padding: 16px 14px;
-    display: flex; flex-direction: column; gap: 12px;
+    flex: 1; overflow-y: auto; padding: 12px 14px;
+    display: flex; flex-direction: column; gap: 6px;
   }
   .sc-log::-webkit-scrollbar { width: 4px; }
   .sc-log::-webkit-scrollbar-track { background: transparent; }
   .sc-log::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 2px; }
 
-  .sc-msg { max-width: 92%; line-height: 1.6; font-size: 15px; }
-  .sc-msg.dm {
-    color: var(--text);
-    border-left: 2px solid var(--gold);
-    padding-left: 12px;
-    align-self: flex-start;
+  /* ── Message blocks ── */
+  .chat-msg {
+    display: flex; flex-direction: column;
+    max-width: 82%; word-break: break-word;
+    margin: 2px 0;
   }
-  .sc-msg.player {
-    color: #8db4d4; font-style: italic;
-    align-self: flex-end; text-align: right;
-    border-right: 2px solid #3d6f9e;
-    padding-right: 12px;
+  .chat-msg.dm-msg   { align-self: flex-start; }
+  .chat-msg.p-self   { align-self: flex-end; }
+  .chat-msg.p-other  { align-self: flex-start; }
+
+  .msg-sender {
+    font-family: 'Cinzel', serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.08em; margin-bottom: 3px;
   }
-  .sc-msg.system {
-    color: var(--text-dim);
-    font-family: 'Josefin Sans', sans-serif; font-size: 11px;
-    letter-spacing: 0.12em; text-transform: uppercase;
-    align-self: center; text-align: center;
+  .p-self .msg-sender { text-align: right; }
+
+  .msg-bubble {
+    font-family: 'IM Fell English', serif; font-size: 15px; line-height: 1.6;
+    padding: 8px 12px;
   }
 
+  /* DM: gold left border, subtle warm bg */
+  .dm-msg .msg-bubble {
+    border-left: 3px solid var(--gold);
+    background: rgba(201,168,76,0.07);
+    color: var(--text);
+    border-radius: 0 4px 4px 0;
+  }
+
+  /* Other player: left border in their color */
+  .p-other .msg-bubble {
+    border-left: 3px solid;
+    background: rgba(255,255,255,0.03);
+    color: var(--text);
+    font-style: italic;
+    border-radius: 0 4px 4px 0;
+  }
+
+  /* Self: right border in their color */
+  .p-self .msg-bubble {
+    border-right: 3px solid;
+    background: rgba(255,255,255,0.05);
+    color: var(--text);
+    font-style: italic;
+    text-align: right;
+    border-radius: 4px 0 0 4px;
+  }
+
+  /* System / status */
+  .msg-system {
+    align-self: center; text-align: center;
+    color: rgba(180,130,40,0.5);
+    font-family: 'Josefin Sans', sans-serif; font-size: 11px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 6px 0;
+  }
+
+  /* ── Typing indicator ── */
   .sc-typing {
     padding: 4px 26px 8px;
     font-family: 'Josefin Sans', sans-serif; font-size: 11px;
@@ -86,6 +124,7 @@
     background: var(--bg); flex-shrink: 0;
   }
 
+  /* ── Input bar ── */
   .sc-input-row {
     display: flex; gap: 8px; padding: 12px 14px;
     background: var(--bg2); border-top: 1px solid var(--border);
@@ -107,8 +146,6 @@
   }
   .sc-send-btn:hover { background: rgba(201,168,76,0.08); }
   .sc-send-btn:disabled { opacity: 0.4; cursor: default; }
-
-  .msg-system { text-align:center; color: rgba(180,130,40,0.5); font-family:'IM Fell English',serif; font-style:italic; font-size:12px; padding:8px 0; }
 </style>
 </head>
 <body>
@@ -124,7 +161,7 @@
   <div class="sc-log" id="scLog"></div>
   <div class="sc-typing" id="scTyping" style="display:none">The DM is writing…</div>
   <div class="sc-input-row">
-    <input class="sc-input" id="scInput" type="text" placeholder="What do you do?" autocomplete="off" />
+    <input class="sc-input" id="scInput" type="text" placeholder="Say something…" autocomplete="off" />
     <button class="sc-send-btn" id="scSendBtn" onclick="sendMessage()">SEND</button>
   </div>
 </div>
@@ -135,6 +172,15 @@
   import { CHARS } from './services/characters.js';
   import { initFirebase } from './services/firebase.js';
 
+  const CHAR_COLORS = {
+    dennis: '#9b59b6',
+    mac:    '#e67e22',
+    charlie:'#27ae60',
+    dee:    '#e91e8c',
+    frank:  '#c0392b',
+    dm:     '#c9a84c',
+  };
+
   const params = new URLSearchParams(location.search);
   const charId = params.get('character');
   const char = CHARS.find(c => c.id === charId) || CHARS[0];
@@ -142,51 +188,85 @@
   document.getElementById('scCharName').textContent = char.name;
   document.title = char.name + ' — Summer Camp';
 
-  const log = document.getElementById('scLog');
+  const log      = document.getElementById('scLog');
   const typingEl = document.getElementById('scTyping');
-  const input = document.getElementById('scInput');
-  const sendBtn = document.getElementById('scSendBtn');
+  const input    = document.getElementById('scInput');
+  const sendBtn  = document.getElementById('scSendBtn');
 
   function renderMsg(msg) {
-    const el = document.createElement('div');
-    if (msg.type === 'dm') {
-      el.className = 'sc-msg dm';
-      el.textContent = msg.text;
-    } else if (msg.type === 'system') {
-      el.className = 'msg msg-system';
+    if (msg.type === 'system') {
+      const el = document.createElement('div');
+      el.className = 'msg-system';
       el.innerHTML = '<em>' + msg.text + '</em>';
-    } else {
-      el.className = 'sc-msg player';
-      el.textContent = msg.characterName + ': ' + msg.text;
+      log.appendChild(el);
+      log.scrollTop = log.scrollHeight;
+      return;
     }
-    log.appendChild(el);
+
+    if (msg.type === 'dm') {
+      const wrap = document.createElement('div');
+      wrap.className = 'chat-msg dm-msg';
+
+      const sender = document.createElement('div');
+      sender.className = 'msg-sender';
+      sender.textContent = 'DM';
+      sender.style.color = CHAR_COLORS.dm;
+
+      const bubble = document.createElement('div');
+      bubble.className = 'msg-bubble';
+      bubble.textContent = msg.text;
+
+      wrap.appendChild(sender);
+      wrap.appendChild(bubble);
+      log.appendChild(wrap);
+      log.scrollTop = log.scrollHeight;
+      return;
+    }
+
+    // Player message
+    const isSelf = msg.characterId === char.id;
+    const color  = CHAR_COLORS[msg.characterId] || '#c9a84c';
+
+    const wrap = document.createElement('div');
+    wrap.className = 'chat-msg ' + (isSelf ? 'p-self' : 'p-other');
+
+    const sender = document.createElement('div');
+    sender.className = 'msg-sender';
+    sender.textContent = msg.characterName;
+    sender.style.color = color;
+
+    const bubble = document.createElement('div');
+    bubble.className = 'msg-bubble';
+    bubble.textContent = msg.text;
+    bubble.style.borderColor = color;
+
+    wrap.appendChild(sender);
+    wrap.appendChild(bubble);
+    log.appendChild(wrap);
     log.scrollTop = log.scrollHeight;
   }
 
   function setBusy(busy) {
     sendBtn.disabled = busy;
-    input.disabled = busy;
+    input.disabled   = busy;
   }
 
   initFirebase();
   const db = window.firebaseDb;
 
-  // Firebase unavailable — show error and disable input
   if (!db) {
     renderMsg({ type: 'system', text: '⚠ Connection unavailable. Reload to try again.' });
     sendBtn.disabled = true;
-    input.disabled = true;
+    input.disabled   = true;
     input.placeholder = 'Connection unavailable';
   } else {
-    const chatRef = db.ref('/sessions/lostmines/chat');
+    const chatRef  = db.ref('/sessions/lostmines/chat');
     const stateRef = db.ref('/sessions/lostmines/state');
 
-    // Re-render log from Firebase on every change
     chatRef.on('value', snapshot => {
       log.innerHTML = '';
       const msgs = snapshot.val();
       if (!msgs) {
-        // No messages yet — show placeholder while init() fetches the opening scene
         renderMsg({ type: 'system', text: 'Entering the dungeon…' });
         return;
       }
@@ -195,7 +275,6 @@
         .forEach(renderMsg);
     });
 
-    // Drive typing indicator from Firebase state
     stateRef.on('value', snapshot => {
       typingEl.style.display = snapshot.val()?.thinking ? '' : 'none';
     });
@@ -207,8 +286,8 @@
       return Object.values(msgs)
         .sort((a, b) => a.timestamp - b.timestamp)
         .map(msg => ({
-          role: msg.type === 'dm' ? 'assistant' : 'user',
-          content: msg.type === 'player' ? msg.characterName + ': ' + msg.text : msg.text
+          role:    msg.type === 'dm' ? 'assistant' : 'user',
+          content: msg.type === 'player' ? msg.characterName + ': ' + msg.text : msg.text,
         }));
     }
 
@@ -221,7 +300,7 @@
         const res = await fetch('/api/dm', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages: history })
+          body: JSON.stringify({ messages: history }),
         });
         if (!res.ok) throw new Error('API ' + res.status);
         const data = await res.json();
@@ -240,11 +319,11 @@
       input.value = '';
       setBusy(true);
       await chatRef.push({
-        type: 'player',
-        characterId: char.id,
+        type:          'player',
+        characterId:   char.id,
         characterName: char.name,
         text,
-        timestamp: Date.now()
+        timestamp:     Date.now(),
       });
       await triggerDM();
       setBusy(false);
@@ -256,7 +335,7 @@
     async function init() {
       db.ref('/sessions/lostmines/presence').child(char.id).set({
         characterName: char.name,
-        joined: Date.now()
+        joined: Date.now(),
       });
 
       const snap = await chatRef.once('value');
@@ -265,18 +344,17 @@
         return;
       }
 
-      // Fresh session — open the scene directly (no player message in log)
       const stateSnap = await stateRef.once('value');
       if (stateSnap.val()?.thinking) { input.focus(); return; }
 
       setBusy(true);
       await stateRef.set({ thinking: true });
       try {
-        const openingPrompt = 'The adventure begins. Set the opening scene on the Triboar Trail — the ambush. Dead horses, goblin arrows. Be brief and cinematic.';
+        const openingPrompt = 'The adventure begins. Set the opening scene on the Triboar Trail — the ambush. Dead horses, goblin arrows. Be brief and punchy. Talk to the whole group.';
         const res = await fetch('/api/dm', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages: [{ role: 'user', content: openingPrompt }] })
+          body: JSON.stringify({ messages: [{ role: 'user', content: openingPrompt }] }),
         });
         if (!res.ok) throw new Error('API ' + res.status);
         const data = await res.json();
