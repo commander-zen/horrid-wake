@@ -9,6 +9,11 @@
 <link rel="stylesheet" href="styles/cards.css">
 <link rel="stylesheet" href="styles/detail.css">
 <link rel="stylesheet" href="styles/summerCamp.css">
+<style>
+.d-btn-chat{width:100%;padding:9px 11px;background:rgba(10,18,30,.5);border:1px solid rgba(40,70,110,.55);color:rgba(100,145,195,.8);font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;text-align:left;}
+.d-btn-chat:active{background:rgba(18,30,50,.65);border-color:rgba(60,100,155,.7);color:rgba(130,175,230,.9);}
+.d-btn-sub--chat{color:rgba(100,145,195,.55);}
+</style>
 </head>
 <body>
 <canvas id="ec"></canvas>
@@ -65,6 +70,10 @@
         <div class="d-cta-wrap">
           <button class="d-btn-camp" onclick="window.location.href='summer-camp.html?character='+activeId">&#127957; SUMMER CAMP</button>
           <div class="d-btn-sub d-btn-sub--camp">Play through Lost Mines of Phandelver with the gang, Levels 1&ndash;5.</div>
+        </div>
+        <div class="d-cta-wrap">
+          <button class="d-btn-chat" onclick="enterGroupChat()">&#9876; GROUP CHAT</button>
+          <div class="d-btn-sub d-btn-sub--chat">Async session &mdash; the DM responds to every message.</div>
         </div>
       </div>
     </div>

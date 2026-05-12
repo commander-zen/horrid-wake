@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Horrid Wake — The Session</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html { height: 100%; }
+body {
+  font-family: 'Cinzel', serif;
+  background: #1a0e05;
+  color: #c8943a;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  height: 100vh; /* fallback */
+  overflow: hidden;
+}
+
+/* Film grain */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+  opacity: .04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ── TOP BAR ── */
+#topBar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  background: #120a03;
+  border-bottom: 1px solid rgba(200,148,58,0.22);
+  gap: 0;
+  z-index: 10;
+  min-height: 56px;
+}
+
+#playerInfo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.portrait-sm {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;
+  border: 1.5px solid #c8943a;
+  flex-shrink: 0;
+  background: #1e1006;
+}
+
+#myCharName {
+  font-size: 10px;
+  color: #f0c85a;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
+}
+
+#sessionTitle {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 13px;
+  color: #c8943a;
+  text-align: center;
+  letter-spacing: 0.1em;
+  flex-shrink: 0;
+  /* centered between the two flex: 1 sides */
+}
+
+.topbar-spacer { flex: 1; }
+
+/* ── CHAT LOG ── */
+#chatLog {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 14px 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+#chatLog::-webkit-scrollbar { width: 3px; }
+#chatLog::-webkit-scrollbar-track { background: transparent; }
+#chatLog::-webkit-scrollbar-thumb { background: rgba(200,148,58,0.18); border-radius: 2px; }
+
+/* ── PLAYER MESSAGES ── */
+.msg-wrap {
+  display: flex;
+  flex-direction: column;
+  max-width: 80%;
+}
+
+.msg-wrap.self {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.msg-wrap.other {
+  align-self: flex-start;
+  align-items: flex-start;
+}
+
+.msg-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 4px;
+}
+
+.msg-portrait {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;
+  border: 1px solid rgba(200,148,58,0.35);
+  background: #1e1006;
+  flex-shrink: 0;
+}
+
+.msg-char-name {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: rgba(200,148,58,0.65);
+  text-transform: uppercase;
+}
+
+.msg-bubble {
+  padding: 9px 13px;
+  border-radius: 12px;
+  font-family: 'IM Fell English', serif;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #d4b483;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.msg-wrap.self .msg-bubble {
+  background: #3d2208;
+  border: 1px solid rgba(200,148,58,0.18);
+  border-bottom-right-radius: 3px;
+}
+
+.msg-wrap.other .msg-bubble {
+  background: #1c0e04;
+  border: 1px solid rgba(200,148,58,0.1);
+  border-bottom-left-radius: 3px;
+}
+
+/* ── DM MESSAGES ── */
+.dm-wrap {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 4px 2px;
+}
+
+.dm-divider {
+  font-size: 11px;
+  color: rgba(200,148,58,0.4);
+  letter-spacing: 0.2em;
+  user-select: none;
+}
+
+.dm-text {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 16px;
+  line-height: 1.7;
+  color: #f0c85a;
+  text-align: center;
+  padding: 0 8px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ── TYPING INDICATOR ── */
+.typing-wrap {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 4px;
+}
+
+.typing-dots {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  height: 18px;
+}
+
+.typing-dots span {
+  display: block;
+  width: 7px;
+  height: 7px;
+  background: #c8943a;
+  border-radius: 50%;
+  animation: dmPulse 1.3s ease-in-out infinite;
+  opacity: 0.5;
+}
+.typing-dots span:nth-child(2) { animation-delay: 0.22s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.44s; }
+
+@keyframes dmPulse {
+  0%, 80%, 100% { transform: scale(0.75); opacity: 0.35; }
+  40%           { transform: scale(1.2);  opacity: 0.9; }
+}
+
+/* ── INPUT BAR ── */
+#inputBar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  background: #120a03;
+  border-top: 1px solid rgba(200,148,58,0.18);
+}
+
+#msgInput {
+  flex: 1;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(200,148,58,0.22);
+  border-radius: 22px;
+  padding: 10px 16px;
+  font-family: 'IM Fell English', serif;
+  font-size: 15px;
+  color: #d4b483;
+  outline: none;
+  caret-color: #c8943a;
+  -webkit-appearance: none;
+}
+
+#msgInput::placeholder { color: rgba(200,148,58,0.28); }
+#msgInput:focus        { border-color: rgba(200,148,58,0.45); }
+#msgInput:disabled     { opacity: 0.4; }
+
+#sendBtn {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #c8943a;
+  border: none;
+  cursor: pointer;
+  font-size: 17px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1a0e05;
+  flex-shrink: 0;
+  transition: background 0.12s, transform 0.1s;
+  -webkit-appearance: none;
+}
+#sendBtn:active  { background: #f0c85a; transform: scale(0.93); }
+#sendBtn:disabled { opacity: 0.4; cursor: default; }
+
+/* ── NO PLAYER GATE ── */
+#noPlayerGate {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: #1a0e05;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 32px;
+  text-align: center;
+}
+#noPlayerGate.show { display: flex; }
+#noPlayerGate p {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  color: #d4b483;
+  font-size: 17px;
+  line-height: 1.6;
+}
+#noPlayerGate a {
+  display: inline-block;
+  border: 1px solid #c8943a;
+  color: #f0c85a;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 11px 22px;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+#noPlayerGate a:hover { background: rgba(200,148,58,0.12); }
+
+/* ── EMPTY STATE ── */
+#emptyState {
+  align-self: center;
+  margin: auto;
+  text-align: center;
+  opacity: 0.35;
+  pointer-events: none;
+}
+#emptyState .empty-divider {
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  color: #c8943a;
+  margin-bottom: 10px;
+}
+#emptyState p {
+  font-family: 'IM Fell English', serif;
+  font-style: italic;
+  font-size: 14px;
+  color: #c8943a;
+}
+</style>
+</head>
+<body>
+
+<!-- No-player gate -->
+<div id="noPlayerGate">
+  <p>No adventurer chosen.<br>The dungeon awaits your champion.</p>
+  <a href="/">Choose Your Champion</a>
+</div>
+
+<!-- Top bar -->
+<div id="topBar">
+  <div id="playerInfo">
+    <img id="myPortrait" class="portrait-sm" src="" alt="">
+    <span id="myCharName"></span>
+  </div>
+  <div id="sessionTitle">Horrid Wake</div>
+  <div class="topbar-spacer"></div>
+</div>
+
+<!-- Chat log -->
+<div id="chatLog">
+  <div id="emptyState">
+    <div class="empty-divider">⚔ ═══ ⚔</div>
+    <p>The session begins when someone speaks.</p>
+  </div>
+</div>
+
+<!-- Input bar -->
+<div id="inputBar">
+  <input type="text" id="msgInput" placeholder="Speak your action…" autocomplete="off" autocorrect="off" autocapitalize="sentences" disabled>
+  <button id="sendBtn" disabled>⚔</button>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+<script>
+'use strict';
+
+// ── Firebase ──────────────────────────────────────────────────────────
+firebase.initializeApp({
+  apiKey:            'AIzaSyAQ82FwdF4IbD6jIAKN5frnUacI3PTc2Ow',
+  authDomain:        'horrid-wake.firebaseapp.com',
+  projectId:         'horrid-wake',
+  storageBucket:     'horrid-wake.firebasestorage.app',
+  messagingSenderId: '683459567',
+  appId:             '1:683459567:web:a5840999d85ad4aac0ec1a'
+});
+
+const db = firebase.firestore();
+const MSGS = db.collection('sessions').doc('bachelor-party').collection('messages');
+
+// ── Player identity ───────────────────────────────────────────────────
+let player = null;
+
+function loadPlayer() {
+  try {
+    const raw = localStorage.getItem('horrid-wake-player');
+    if (raw) player = JSON.parse(raw);
+  } catch (_) {}
+}
+
+function portraitSrc(key) {
+  return 'images/' + key + '.webp';
+}
+
+// ── DOM refs ──────────────────────────────────────────────────────────
+const chatLog    = document.getElementById('chatLog');
+const msgInput   = document.getElementById('msgInput');
+const sendBtn    = document.getElementById('sendBtn');
+const emptyState = document.getElementById('emptyState');
+
+let typingEl    = null;
+let dmPending   = false;
+let sending     = false;
+const rendered  = new Set();
+
+// ── Helpers ───────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function scrollBottom(smooth) {
+  chatLog.scrollTo({ top: chatLog.scrollHeight, behavior: smooth ? 'smooth' : 'instant' });
+}
+
+// ── Render a single Firestore doc ─────────────────────────────────────
+function renderMsg(doc) {
+  const id   = doc.id;
+  const data = doc.data();
+
+  if (rendered.has(id)) return;
+  rendered.add(id);
+
+  // hide empty state on first message
+  if (emptyState) emptyState.style.display = 'none';
+
+  // insert before typing indicator if present
+  const anchor = typingEl || null;
+
+  if (data.type === 'dm') {
+    const wrap = document.createElement('div');
+    wrap.className = 'dm-wrap';
+    wrap.id = 'msg-' + id;
+    wrap.innerHTML =
+      '<div class="dm-divider">⚔ ═══ ⚔</div>' +
+      '<div class="dm-text">' + esc(data.text) + '</div>';
+    chatLog.insertBefore(wrap, anchor);
+
+  } else {
+    const isSelf = player && data.playerId === player.playerId;
+    const wrap   = document.createElement('div');
+    wrap.className = 'msg-wrap ' + (isSelf ? 'self' : 'other');
+    wrap.id = 'msg-' + id;
+
+    // header row
+    const header = document.createElement('div');
+    header.className = 'msg-header';
+
+    if (!isSelf) {
+      const img = document.createElement('img');
+      img.className = 'msg-portrait';
+      img.src = portraitSrc(data.portraitKey || data.characterId || 'dennis');
+      img.alt = data.characterName || '';
+      header.appendChild(img);
+    }
+
+    const name = document.createElement('div');
+    name.className = 'msg-char-name';
+    name.textContent = data.characterName || 'Adventurer';
+    header.appendChild(name);
+
+    const bubble = document.createElement('div');
+    bubble.className = 'msg-bubble';
+    bubble.textContent = data.text;
+
+    wrap.appendChild(header);
+    wrap.appendChild(bubble);
+    chatLog.insertBefore(wrap, anchor);
+  }
+
+  scrollBottom(false);
+}
+
+// ── Typing indicator ──────────────────────────────────────────────────
+function showTyping() {
+  if (typingEl) return;
+  typingEl = document.createElement('div');
+  typingEl.className = 'typing-wrap';
+  typingEl.innerHTML =
+    '<div class="dm-divider">⚔ ═══ ⚔</div>' +
+    '<div class="typing-dots"><span></span><span></span><span></span></div>';
+  chatLog.appendChild(typingEl);
+  scrollBottom(true);
+}
+
+function hideTyping() {
+  if (!typingEl) return;
+  typingEl.remove();
+  typingEl = null;
+}
+
+// ── Firestore real-time listener ──────────────────────────────────────
+function listenMessages() {
+  MSGS
+    .orderBy('timestamp', 'asc')
+    .limitToLast(100)
+    .onSnapshot(snap => {
+      snap.docChanges().forEach(change => {
+        if (change.type === 'added') {
+          if (change.doc.data().type === 'dm') hideTyping();
+          renderMsg(change.doc);
+        }
+      });
+    }, err => {
+      console.error('[chat] snapshot error', err);
+    });
+}
+
+// ── DM auto-response ──────────────────────────────────────────────────
+async function triggerDM() {
+  if (dmPending) return;
+  dmPending = true;
+  showTyping();
+
+  try {
+    const snap = await MSGS
+      .orderBy('timestamp', 'asc')
+      .limitToLast(20)
+      .get();
+
+    const messages = [];
+    snap.forEach(doc => {
+      const d = doc.data();
+      if (d.type === 'player') {
+        messages.push({ role: 'user', content: '[' + (d.characterName || 'Player') + ']: ' + d.text });
+      } else if (d.type === 'dm') {
+        messages.push({ role: 'assistant', content: d.text });
+      }
+    });
+
+    const res = await fetch('/api/dm', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages, max_tokens: 300 })
+    });
+
+    if (!res.ok) throw new Error('DM API ' + res.status);
+
+    const json = await res.json();
+    const text = json.content?.[0]?.text || 'The dungeon holds its breath.';
+
+    await MSGS.add({
+      type:      'dm',
+      text,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch (err) {
+    console.error('[chat] DM error:', err.message);
+    hideTyping();
+  } finally {
+    dmPending = false;
+  }
+}
+
+// ── Send message ──────────────────────────────────────────────────────
+async function sendMessage() {
+  if (sending || !player) return;
+  const text = msgInput.value.trim();
+  if (!text) return;
+
+  sending = true;
+  msgInput.value = '';
+  msgInput.focus();
+
+  try {
+    await MSGS.add({
+      playerId:      player.playerId,
+      characterName: player.characterName,
+      portraitKey:   player.portraitKey,
+      text,
+      timestamp:     firebase.firestore.FieldValue.serverTimestamp(),
+      type:          'player'
+    });
+
+    // Small delay so Firestore write settles before we fetch context
+    setTimeout(triggerDM, 300);
+  } catch (err) {
+    console.error('[chat] send error:', err.message);
+    msgInput.value = text; // restore on failure
+  } finally {
+    sending = false;
+  }
+}
+
+// ── Input handlers ────────────────────────────────────────────────────
+sendBtn.addEventListener('click', sendMessage);
+msgInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+// ── Boot ──────────────────────────────────────────────────────────────
+loadPlayer();
+
+if (!player) {
+  document.getElementById('noPlayerGate').classList.add('show');
+} else {
+  document.getElementById('myPortrait').src = portraitSrc(player.portraitKey);
+  document.getElementById('myPortrait').alt = player.characterName;
+  document.getElementById('myCharName').textContent = player.characterName;
+
+  msgInput.disabled = false;
+  sendBtn.disabled  = false;
+
+  listenMessages();
+}
+</script>
+</body>
+</html>

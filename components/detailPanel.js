@@ -55,8 +55,32 @@ export function enterDungeon() {
   openSheet(activeId);
 }
 
+export function enterGroupChat() {
+  const nameEl = document.getElementById('dName');
+  const c = CHARS.find(x=>x.id===activeId);
+  if (!c) return;
+
+  const characterName = nameEl.textContent.trim() || c.name;
+
+  let playerId = localStorage.getItem('horrid-wake-pid');
+  if (!playerId) {
+    playerId = crypto.randomUUID();
+    localStorage.setItem('horrid-wake-pid', playerId);
+  }
+
+  localStorage.setItem('horrid-wake-player', JSON.stringify({
+    playerId,
+    characterId:   c.id,
+    characterName,
+    portraitKey:   c.imgKey
+  }));
+
+  window.location.href = 'chat.html';
+}
+
 export function initDetailPanel() {
-  window.closeDetail = closeDetail;
-  window.enterDungeon = enterDungeon;
+  window.closeDetail    = closeDetail;
+  window.enterDungeon   = enterDungeon;
   window.openSummerCamp = openSummerCamp;
+  window.enterGroupChat = enterGroupChat;
 }
