@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Summer Camp — Horrid Wake</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&family=Josefin+Sans:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-dim: #7a6230;
+    --bg: #0d0c0b;
+    --bg2: #141210;
+    --surface: #1a1714;
+    --border: rgba(201,168,76,0.25);
+    --text: #d4c9b0;
+    --text-dim: #7a7060;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: 'IM Fell English', serif; }
+
+  .sc-page { display: flex; flex-direction: column; height: 100vh; }
+
+  .sc-topbar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .sc-back-btn {
+    background: none; border: 1px solid var(--gold-dim); color: var(--gold);
+    font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 0.1em;
+    padding: 5px 10px; cursor: pointer; border-radius: 2px;
+  }
+  .sc-back-btn:hover { border-color: var(--gold); }
+  .sc-topbar-title {
+    flex: 1; display: flex; align-items: baseline; gap: 10px;
+  }
+  .sc-char-name {
+    font-family: 'Cinzel', serif; font-size: 16px; font-weight: 700;
+    color: var(--gold); letter-spacing: 0.05em;
+  }
+  .sc-lvl-badge {
+    font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.12em;
+    color: var(--text-dim); border: 1px solid var(--gold-dim);
+    padding: 1px 6px; border-radius: 2px;
+  }
+  .sc-module-tag {
+    font-family: 'Josefin Sans', sans-serif; font-size: 10px; letter-spacing: 0.15em;
+    color: var(--text-dim); text-transform: uppercase; margin-left: auto;
+  }
+
+  .sc-log {
+    flex: 1; overflow-y: auto; padding: 16px 14px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .sc-log::-webkit-scrollbar { width: 4px; }
+  .sc-log::-webkit-scrollbar-track { background: transparent; }
+  .sc-log::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 2px; }
+
+  .sc-msg { max-width: 92%; line-height: 1.6; font-size: 15px; }
+  .sc-msg.dm {
+    color: var(--text);
+    border-left: 2px solid var(--gold);
+    padding-left: 12px;
+    align-self: flex-start;
+  }
+  .sc-msg.player {
+    color: #8db4d4; font-style: italic;
+    align-self: flex-end; text-align: right;
+    border-right: 2px solid #3d6f9e;
+    padding-right: 12px;
+  }
+  .sc-msg.system {
+    color: var(--text-dim);
+    font-family: 'Josefin Sans', sans-serif; font-size: 11px;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    align-self: center; text-align: center;
+  }
+  .sc-msg.typing { color: var(--text-dim); font-style: italic; }
+
+  .sc-input-row {
+    display: flex; gap: 8px; padding: 12px 14px;
+    background: var(--bg2); border-top: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .sc-input {
+    flex: 1;
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text); font-family: 'IM Fell English', serif; font-size: 15px;
+    padding: 10px 12px; border-radius: 2px; outline: none;
+  }
+  .sc-input:focus { border-color: var(--gold); }
+  .sc-input::placeholder { color: var(--text-dim); }
+  .sc-send-btn {
+    background: none; border: 1px solid var(--gold);
+    color: var(--gold); font-family: 'Cinzel', serif; font-size: 12px;
+    letter-spacing: 0.12em; padding: 0 18px; cursor: pointer; border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .sc-send-btn:hover { background: rgba(201,168,76,0.08); }
+  .sc-send-btn:disabled { opacity: 0.4; cursor: default; }
+</style>
+</head>
+<body>
+<div class="sc-page">
+  <div class="sc-topbar">
+    <button class="sc-back-btn" onclick="history.back()">&#8592; BACK</button>
+    <div class="sc-topbar-title">
+      <span class="sc-char-name" id="scCharName"></span>
+      <span class="sc-lvl-badge">LVL 1</span>
+    </div>
+    <span class="sc-module-tag">Lost Mines of Phandelver</span>
+  </div>
+  <div class="sc-log" id="scLog"></div>
+  <div class="sc-input-row">
+    <input class="sc-input" id="scInput" type="text" placeholder="What do you do?" autocomplete="off" />
+    <button class="sc-send-btn" id="scSendBtn" onclick="sendMessage()">SEND</button>
+  </div>
+</div>
+
+<script type="module">
+  import { CHARS, SHEETS } from './services/characters.js';
+
+  const params = new URLSearchParams(location.search);
+  const charId = params.get('character');
+  const char = CHARS.find(c => c.id === charId) || CHARS[0];
+  const sheet = SHEETS[char.id]?.level1 || {};
+
+  document.getElementById('scCharName').textContent = char.name;
+  document.title = char.name + ' — Summer Camp';
+
+  const conversationHistory = [];
+  const log = document.getElementById('scLog');
+  const input = document.getElementById('scInput');
+  const sendBtn = document.getElementById('scSendBtn');
+
+  function appendMsg(text, role) {
+    const el = document.createElement('div');
+    el.className = 'sc-msg ' + role;
+    el.textContent = text;
+    log.appendChild(el);
+    log.scrollTop = log.scrollHeight;
+    return el;
+  }
+
+  function buildSystemPrompt() {
+    const mod = v => { const m = Math.floor((v - 10) / 2); return (m >= 0 ? '+' : '') + m; };
+    return `You are a third-person narrator running Lost Mines of Phandelver as an interactive story. You have no personality of your own. Your prose is terse, vivid, and cinematic — like a dark fantasy novel.
+
+THE PLAYER'S CHARACTER:
+Name: ${char.name}
+Class: ${sheet.class || 'Adventurer'}${sheet.subclass ? ' (' + sheet.subclass + ')' : ''}
+Level: 1
+HP: ${sheet.hp || 10} / ${sheet.hp || 10}
+AC: ${sheet.ac || 12}
+STR ${sheet.str} DEX ${sheet.dex} CON ${sheet.con} INT ${sheet.int} WIS ${sheet.wis} CHA ${sheet.cha}
+Equipment: ${sheet.equipment?.join(', ') || 'basic gear'}
+Features: ${sheet.features?.join(', ') || 'none'}
+
+CURRENT LOCATION:
+Module: Lost Mines of Phandelver
+Chapter 1: Goblin Arrows
+Setting: The Triboar Trail, east of Neverwinter. A rutted dirt road through dense forest. The party has been hired to escort a wagon to Phandalin.
+
+RULES:
+- Write in third person. Never say "you" — use the character's name or class title.
+- Teach mechanics through narrative. Resolve all dice rolls yourself invisibly. Never ask players to roll anything.
+- Keep responses under 80 words. Every sentence earns its place.
+- End every response with an open moment — action pending, danger present, decision implied.
+- Never break the narrative voice. No apologies, no clarifications, no fourth wall.
+- Monster HP is never revealed as a number. Describe condition through appearance only.`;
+  }
+
+  async function callApi(userMessage) {
+    conversationHistory.push({ role: 'user', content: userMessage });
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        systemPrompt: buildSystemPrompt(),
+        messages: conversationHistory
+      })
+    });
+    if (!res.ok) throw new Error('API error ' + res.status);
+    const data = await res.json();
+    const text = data.content?.[0]?.text || 'The trail falls silent.';
+    conversationHistory.push({ role: 'assistant', content: text });
+    return text;
+  }
+
+  async function sendMessage() {
+    const text = input.value.trim();
+    if (!text || sendBtn.disabled) return;
+    input.value = '';
+    appendMsg(text, 'player');
+    setBusy(true);
+    const typing = appendMsg('…', 'typing');
+    try {
+      const reply = await callApi(text);
+      typing.remove();
+      appendMsg(reply, 'dm');
+    } catch (err) {
+      typing.remove();
+      appendMsg('The trail falls silent.', 'system');
+      console.error('[summer-camp]', err);
+    }
+    setBusy(false);
+  }
+
+  function setBusy(busy) {
+    sendBtn.disabled = busy;
+    input.disabled = busy;
+  }
+
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+  window.sendMessage = sendMessage;
+
+  async function init() {
+    appendMsg('Chapter 1: Goblin Arrows', 'system');
+    setBusy(true);
+    const typing = appendMsg('…', 'typing');
+    try {
+      const openingPrompt = `The adventure begins on the Triboar Trail. The wagon has stopped. Dead horses block the road — black-feathered goblin arrows jutting from their flanks. Set the scene. Address ${char.name} directly. Be brief and cinematic.`;
+      const reply = await callApi(openingPrompt);
+      typing.remove();
+      appendMsg(reply, 'dm');
+    } catch (err) {
+      typing.remove();
+      appendMsg('The Triboar Trail stretches into shadow. Something moves in the trees.', 'dm');
+      console.error('[summer-camp] opening scene:', err);
+    }
+    setBusy(false);
+    input.focus();
+  }
+
+  init();
+</script>
+</body>
+</html>

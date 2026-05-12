@@ -7,7 +7,7 @@ export async function callChatApi(systemPrompt, messages) {
     body: JSON.stringify({
       model: 'llama-3.3-70b-versatile',
       max_tokens: 1000,
-      system: systemPrompt,
+      systemPrompt: systemPrompt,
       messages
     })
   });

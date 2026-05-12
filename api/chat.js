@@ -3,16 +3,16 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const apiKey = process.env.GROQ_API_KEY;
+  const apiKey = process.env.GROQ_KEY;
   if (!apiKey) {
     return res.status(500).json({ error: 'API key not configured' });
   }
 
   try {
-    const { messages, system, max_tokens } = req.body;
+    const { messages, systemPrompt, max_tokens } = req.body;
 
     const groqMessages = [];
-    if (system) groqMessages.push({ role: 'system', content: system });
+    if (systemPrompt) groqMessages.push({ role: 'system', content: systemPrompt });
     messages.forEach(m => groqMessages.push({ role: m.role, content: m.content }));
 
     console.log('[api/chat] Calling Groq. Key present:', !!apiKey, '| Messages:', groqMessages.length);
