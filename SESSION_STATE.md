@@ -89,7 +89,7 @@ Full CHARS + SHEETS arrays live in `services/characters.js` and `index.html`.
 ## Firebase Config
 
 - Project: `horrid-wake`
-- Database URL: `https://horrid-wake-default-rtdb.firebaseio.com`
+- Database URL: `https://horrid-wake-firebase-default-rtdb.firebaseio.com`
 - Config lives in: `services/firebase.js` (hardcoded, recovered from git history)
 - Rules: open read/write until Nov 1 2026
 - SDK: Firebase compat 10.12.0 via CDN in `index.html`
