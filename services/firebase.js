@@ -1,12 +1,12 @@
 export function initFirebase() {
   const firebaseConfig = {
-    apiKey: "YOUR_API_KEY_HERE",
-    authDomain: "YOUR_API_KEY_HERE",
-    databaseURL: "YOUR_API_KEY_HERE",
-    projectId: "YOUR_API_KEY_HERE",
-    storageBucket: "YOUR_API_KEY_HERE",
-    messagingSenderId: "YOUR_API_KEY_HERE",
-    appId: "YOUR_API_KEY_HERE"
+    apiKey: "AIzaSyAQ82FwdF4IbD6jIAKN5frnUacI3PTc2Ow",
+    authDomain: "horrid-wake.firebaseapp.com",
+    databaseURL: "https://horrid-wake-default-rtdb.firebaseio.com",
+    projectId: "horrid-wake",
+    storageBucket: "horrid-wake.firebasestorage.app",
+    messagingSenderId: "683459567",
+    appId: "1:683459567:web:a5840999d85ad4aac0ec1a"
   };
 
   try {
