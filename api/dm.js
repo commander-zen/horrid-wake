@@ -9,9 +9,9 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { messages, max_tokens } = req.body;
+    const { messages, max_tokens, combatContext } = req.body;
 
-    const systemPrompt = `You are a DM in a group D&D text chat with 5 friends at a bachelor party.
+    let systemPrompt = `You are a DM in a group D&D text chat with 5 friends at a bachelor party.
 
 RULES — read these carefully:
 - 2 sentences MAX. That's it.
@@ -26,25 +26,33 @@ Good example: 'The goblin trips, scrambles up, and bolts into the trees.'
 
 You are a hype man with a dice bag, not an author.`;
 
+    if (combatContext) {
+      systemPrompt += `\n\nCOMBAT MODE: You have been given the mechanical result of what just happened (who attacked, roll total, hit or miss, damage dealt). Narrate ONLY that result in 1-2 sentences. Do not invent additional actions. Do not write player dialogue. Just describe what the dice already decided.`;
+    }
+
     const groqMessages = [
       { role: 'system', content: systemPrompt },
-      ...messages.map(m => ({ role: m.role, content: m.content }))
+      ...messages.map(m => ({ role: m.role, content: m.content })),
     ];
 
-    console.log('[api/dm] Calling Groq. Messages:', groqMessages.length);
+    if (combatContext) {
+      groqMessages.push({ role: 'user', content: combatContext });
+    }
+
+    console.log('[api/dm] Calling Groq. Messages:', groqMessages.length, combatContext ? '(combat)' : '');
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
+        'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
         max_tokens: max_tokens || 300,
         temperature: 0.9,
-        messages: groqMessages
-      })
+        messages: groqMessages,
+      }),
     });
 
     const data = await response.json();
@@ -57,7 +65,7 @@ You are a hype man with a dice bag, not an author.`;
 
     const text = data.choices?.[0]?.message?.content || 'The dungeon falls silent.';
     return res.status(200).json({
-      content: [{ type: 'text', text }]
+      content: [{ type: 'text', text }],
     });
 
   } catch (err) {

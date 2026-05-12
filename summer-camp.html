@@ -15,6 +15,8 @@
     --border: rgba(201,168,76,0.25);
     --text: #d4c9b0;
     --text-dim: #7a7060;
+    --red: #c0392b;
+    --green: #27ae60;
   }
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: 'IM Fell English', serif; }
@@ -50,6 +52,61 @@
     color: var(--text-dim); text-transform: uppercase; margin-left: auto;
   }
 
+  /* ── Initiative tracker strip ── */
+  .combat-tracker {
+    background: #100f0e;
+    border-bottom: 1px solid rgba(201,168,76,0.4);
+    padding: 8px 10px;
+    flex-shrink: 0;
+  }
+  .combat-tracker-header {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 6px;
+  }
+  .combat-round-label {
+    font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.18em; color: var(--gold); text-transform: uppercase;
+  }
+  .combat-end-btn {
+    margin-left: auto;
+    background: none; border: 1px solid var(--red); color: var(--red);
+    font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.1em;
+    padding: 2px 8px; cursor: pointer; border-radius: 2px;
+  }
+  .combat-order {
+    display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px;
+  }
+  .combat-order::-webkit-scrollbar { display: none; }
+  .combatant-chip {
+    flex-shrink: 0;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 3px; padding: 4px 8px; min-width: 64px;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    transition: border-color 0.15s;
+  }
+  .combatant-chip.current-turn {
+    border-color: var(--gold);
+    background: rgba(201,168,76,0.1);
+  }
+  .combatant-chip.dead { opacity: 0.35; }
+  .combatant-chip-name {
+    font-family: 'Cinzel', serif; font-size: 9px; font-weight: 600;
+    letter-spacing: 0.06em; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    max-width: 72px;
+  }
+  .combatant-chip.current-turn .combatant-chip-name { color: var(--gold); }
+  .combatant-chip.dead .combatant-chip-name { text-decoration: line-through; }
+  .hp-bar-track {
+    width: 100%; height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px;
+  }
+  .hp-bar-fill {
+    height: 100%; border-radius: 2px; transition: width 0.3s;
+    background: var(--green);
+  }
+  .hp-bar-fill.low  { background: var(--gold); }
+  .hp-bar-fill.crit { background: var(--red); }
+
   /* ── Chat log ── */
   .sc-log {
     flex: 1; overflow-y: auto; padding: 12px 14px;
@@ -65,9 +122,10 @@
     max-width: 82%; word-break: break-word;
     margin: 2px 0;
   }
-  .chat-msg.dm-msg   { align-self: flex-start; }
-  .chat-msg.p-self   { align-self: flex-end; }
-  .chat-msg.p-other  { align-self: flex-start; }
+  .chat-msg.dm-msg  { align-self: flex-start; }
+  .chat-msg.p-self  { align-self: flex-end; }
+  .chat-msg.p-other { align-self: flex-start; }
+  .chat-msg.combat-msg { align-self: center; max-width: 95%; }
 
   .msg-sender {
     font-family: 'Cinzel', serif; font-size: 11px; font-weight: 600;
@@ -79,35 +137,38 @@
     font-family: 'IM Fell English', serif; font-size: 15px; line-height: 1.6;
     padding: 8px 12px;
   }
-
-  /* DM: gold left border, subtle warm bg */
   .dm-msg .msg-bubble {
     border-left: 3px solid var(--gold);
     background: rgba(201,168,76,0.07);
     color: var(--text);
     border-radius: 0 4px 4px 0;
   }
-
-  /* Other player: left border in their color */
   .p-other .msg-bubble {
     border-left: 3px solid;
     background: rgba(255,255,255,0.03);
-    color: var(--text);
-    font-style: italic;
+    color: var(--text); font-style: italic;
     border-radius: 0 4px 4px 0;
   }
-
-  /* Self: right border in their color */
   .p-self .msg-bubble {
     border-right: 3px solid;
     background: rgba(255,255,255,0.05);
-    color: var(--text);
-    font-style: italic;
+    color: var(--text); font-style: italic;
     text-align: right;
     border-radius: 4px 0 0 4px;
   }
 
-  /* System / status */
+  /* Combat log entries */
+  .combat-msg .msg-bubble {
+    border: none; border-radius: 3px; text-align: center;
+    font-family: 'Josefin Sans', sans-serif; font-size: 12px;
+    letter-spacing: 0.08em; font-style: normal;
+    padding: 5px 14px;
+  }
+  .combat-msg.hit   .msg-bubble { background: rgba(192,57,43,0.18); color: #e07060; }
+  .combat-msg.miss  .msg-bubble { background: rgba(255,255,255,0.05); color: var(--text-dim); }
+  .combat-msg.crit  .msg-bubble { background: rgba(201,168,76,0.2); color: var(--gold); }
+  .combat-msg.heal  .msg-bubble { background: rgba(39,174,96,0.15); color: #60c080; }
+
   .msg-system {
     align-self: center; text-align: center;
     color: rgba(180,130,40,0.5);
@@ -124,7 +185,7 @@
     background: var(--bg); flex-shrink: 0;
   }
 
-  /* ── Input bar ── */
+  /* ── Input bar (exploration mode) ── */
   .sc-input-row {
     display: flex; gap: 8px; padding: 12px 14px;
     background: var(--bg2); border-top: 1px solid var(--border);
@@ -146,6 +207,59 @@
   }
   .sc-send-btn:hover { background: rgba(201,168,76,0.08); }
   .sc-send-btn:disabled { opacity: 0.4; cursor: default; }
+
+  /* ── Combat action bar ── */
+  .combat-input-row {
+    background: var(--bg2); border-top: 1px solid var(--border);
+    padding: 10px 14px; flex-shrink: 0;
+  }
+  .combat-waiting-label {
+    font-family: 'Josefin Sans', sans-serif; font-size: 12px;
+    letter-spacing: 0.12em; color: var(--text-dim);
+    text-align: center; padding: 10px 0; text-transform: uppercase;
+  }
+  .action-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px;
+  }
+  .action-btn {
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text); font-family: 'Cinzel', serif; font-size: 11px;
+    letter-spacing: 0.08em; padding: 9px 6px; cursor: pointer;
+    border-radius: 2px; text-align: center; transition: border-color 0.1s, background 0.1s;
+  }
+  .action-btn:hover { border-color: var(--gold); background: rgba(201,168,76,0.06); }
+  .action-btn:disabled { opacity: 0.35; cursor: default; }
+  .action-btn.special { border-color: var(--gold-dim); color: var(--gold); }
+  .action-bonus {
+    display: block; font-family: 'Josefin Sans', sans-serif;
+    font-size: 10px; color: var(--text-dim); margin-top: 1px;
+  }
+
+  /* ── d20 roll overlay ── */
+  .roll-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100;
+  }
+  .d20-frame {
+    background: var(--bg2); border: 2px solid var(--gold);
+    border-radius: 4px; padding: 28px 48px;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+  }
+  .d20-label {
+    font-family: 'Josefin Sans', sans-serif; font-size: 11px;
+    letter-spacing: 0.18em; color: var(--text-dim); text-transform: uppercase;
+  }
+  .d20-number {
+    font-family: 'Cinzel Decorative', serif; font-size: 56px; font-weight: 900;
+    color: var(--gold); line-height: 1; min-width: 80px; text-align: center;
+  }
+  .d20-number.crit { color: #ffe066; }
+  .d20-number.fumble { color: var(--red); }
+  .d20-result-line {
+    font-family: 'Josefin Sans', sans-serif; font-size: 12px;
+    letter-spacing: 0.1em; color: var(--text-dim); text-transform: uppercase;
+  }
 </style>
 </head>
 <body>
@@ -158,11 +272,38 @@
     </div>
     <span class="sc-module-tag">Lost Mines of Phandelver</span>
   </div>
+
+  <!-- Initiative tracker (combat only) -->
+  <div class="combat-tracker" id="combatTracker" style="display:none">
+    <div class="combat-tracker-header">
+      <span class="combat-round-label" id="combatRoundLabel">Round 1</span>
+      <button class="combat-end-btn" id="combatEndBtn">END COMBAT</button>
+    </div>
+    <div class="combat-order" id="combatOrder"></div>
+  </div>
+
   <div class="sc-log" id="scLog"></div>
   <div class="sc-typing" id="scTyping" style="display:none">The DM is writing…</div>
-  <div class="sc-input-row">
+
+  <!-- Exploration input (hidden during combat) -->
+  <div class="sc-input-row" id="explorationInput">
     <input class="sc-input" id="scInput" type="text" placeholder="Say something…" autocomplete="off" />
     <button class="sc-send-btn" id="scSendBtn" onclick="sendMessage()">SEND</button>
+  </div>
+
+  <!-- Combat action bar (shown during combat) -->
+  <div class="combat-input-row" id="combatInput" style="display:none">
+    <div class="combat-waiting-label" id="combatWaiting" style="display:none"></div>
+    <div class="action-grid" id="actionGrid" style="display:none"></div>
+  </div>
+</div>
+
+<!-- d20 roll overlay -->
+<div class="roll-overlay" id="rollOverlay" style="display:none">
+  <div class="d20-frame">
+    <div class="d20-label">Rolling…</div>
+    <div class="d20-number" id="d20Number">?</div>
+    <div class="d20-result-line" id="d20ResultLine"></div>
   </div>
 </div>
 
@@ -171,14 +312,32 @@
 <script type="module">
   import { CHARS } from './services/characters.js';
   import { initFirebase } from './services/firebase.js';
+  import * as Combat from './services/combat.js';
+  import { rollAttack, rollDamage, checkHit } from './services/dice.js';
 
+  // ── Character setup ──────────────────────────────────────────────
   const CHAR_COLORS = {
-    dennis: '#9b59b6',
-    mac:    '#e67e22',
-    charlie:'#27ae60',
-    dee:    '#e91e8c',
-    frank:  '#c0392b',
-    dm:     '#c9a84c',
+    dennis: '#9b59b6', mac: '#e67e22', charlie: '#27ae60',
+    dee: '#e91e8c', frank: '#c0392b', dm: '#c9a84c',
+  };
+
+  // Attack bonus per character (proficiency 2 + primary mod at level 1)
+  const ATTACK_BONUS = {
+    dennis: 5,  // CHA +3 + prof +2 (spell attack)
+    mac:    5,  // STR +3 + prof +2
+    charlie: 4, // WIS +4 + prof +2, but level 1 WIS is +4... wait +6 but sheets show level1 WIS 18 → actually use +4 for spell, melee with Shillelagh +6
+    dee:    4,  // DEX +2 + prof +2
+    frank:  5,  // STR +3 + prof +2
+  };
+  // Correct charlie — Shillelagh makes it WIS: 18 → +4, prof +2 = +6... use +4 conservatively at level 1
+  ATTACK_BONUS.charlie = 6;
+
+  const DAMAGE_DICE = {
+    dennis: { dice: '1d6', mod: 3 },  // cantrip
+    mac:    { dice: '1d8', mod: 3 },  // longsword
+    charlie:{ dice: '1d6', mod: 4 },  // shillelagh
+    dee:    { dice: '1d8', mod: 2 },  // rapier
+    frank:  { dice: '1d12', mod: 3 }, // greataxe
   };
 
   const params = new URLSearchParams(location.search);
@@ -188,11 +347,23 @@
   document.getElementById('scCharName').textContent = char.name;
   document.title = char.name + ' — Summer Camp';
 
-  const log      = document.getElementById('scLog');
-  const typingEl = document.getElementById('scTyping');
-  const input    = document.getElementById('scInput');
-  const sendBtn  = document.getElementById('scSendBtn');
+  // ── DOM refs ─────────────────────────────────────────────────────
+  const log            = document.getElementById('scLog');
+  const typingEl       = document.getElementById('scTyping');
+  const input          = document.getElementById('scInput');
+  const sendBtn        = document.getElementById('scSendBtn');
+  const explorationEl  = document.getElementById('explorationInput');
+  const combatInputEl  = document.getElementById('combatInput');
+  const combatTrackerEl= document.getElementById('combatTracker');
+  const combatOrderEl  = document.getElementById('combatOrder');
+  const combatRoundEl  = document.getElementById('combatRoundLabel');
+  const actionGridEl   = document.getElementById('actionGrid');
+  const combatWaitEl   = document.getElementById('combatWaiting');
+  const rollOverlay    = document.getElementById('rollOverlay');
+  const d20NumberEl    = document.getElementById('d20Number');
+  const d20ResultEl    = document.getElementById('d20ResultLine');
 
+  // ── Message rendering ─────────────────────────────────────────────
   function renderMsg(msg) {
     if (msg.type === 'system') {
       const el = document.createElement('div');
@@ -206,17 +377,26 @@
     if (msg.type === 'dm') {
       const wrap = document.createElement('div');
       wrap.className = 'chat-msg dm-msg';
-
       const sender = document.createElement('div');
       sender.className = 'msg-sender';
       sender.textContent = 'DM';
       sender.style.color = CHAR_COLORS.dm;
-
       const bubble = document.createElement('div');
       bubble.className = 'msg-bubble';
       bubble.textContent = msg.text;
-
       wrap.appendChild(sender);
+      wrap.appendChild(bubble);
+      log.appendChild(wrap);
+      log.scrollTop = log.scrollHeight;
+      return;
+    }
+
+    if (msg.type === 'combat') {
+      const wrap = document.createElement('div');
+      wrap.className = 'chat-msg combat-msg ' + (msg.subtype || '');
+      const bubble = document.createElement('div');
+      bubble.className = 'msg-bubble';
+      bubble.textContent = msg.text;
       wrap.appendChild(bubble);
       log.appendChild(wrap);
       log.scrollTop = log.scrollHeight;
@@ -226,31 +406,336 @@
     // Player message
     const isSelf = msg.characterId === char.id;
     const color  = CHAR_COLORS[msg.characterId] || '#c9a84c';
-
-    const wrap = document.createElement('div');
+    const wrap   = document.createElement('div');
     wrap.className = 'chat-msg ' + (isSelf ? 'p-self' : 'p-other');
-
     const sender = document.createElement('div');
     sender.className = 'msg-sender';
     sender.textContent = msg.characterName;
     sender.style.color = color;
-
     const bubble = document.createElement('div');
     bubble.className = 'msg-bubble';
     bubble.textContent = msg.text;
     bubble.style.borderColor = color;
-
     wrap.appendChild(sender);
     wrap.appendChild(bubble);
     log.appendChild(wrap);
     log.scrollTop = log.scrollHeight;
   }
 
+  // ── Initiative tracker rendering ──────────────────────────────────
+  function renderTracker(state) {
+    if (!state?.active) {
+      combatTrackerEl.style.display = 'none';
+      return;
+    }
+    combatTrackerEl.style.display = '';
+    combatRoundEl.textContent = 'Round ' + state.round;
+    combatOrderEl.innerHTML = '';
+    state.initiativeOrder.forEach((c, i) => {
+      const chip = document.createElement('div');
+      const pct  = c.maxHp > 0 ? c.hp / c.maxHp : 0;
+      const dead = c.hp <= 0;
+      chip.className = 'combatant-chip'
+        + (i === state.currentTurnIndex && !dead ? ' current-turn' : '')
+        + (dead ? ' dead' : '');
+
+      const nameEl = document.createElement('div');
+      nameEl.className = 'combatant-chip-name';
+      nameEl.textContent = c.name.split(' ')[0]; // first word only for space
+
+      const track = document.createElement('div');
+      track.className = 'hp-bar-track';
+      const fill = document.createElement('div');
+      fill.className = 'hp-bar-fill' + (pct <= 0.25 ? ' crit' : pct <= 0.5 ? ' low' : '');
+      fill.style.width = Math.round(pct * 100) + '%';
+      track.appendChild(fill);
+
+      chip.appendChild(nameEl);
+      chip.appendChild(track);
+      combatOrderEl.appendChild(chip);
+    });
+  }
+
+  // ── Combat action bar rendering ───────────────────────────────────
+  function renderActionBar(state) {
+    if (!state?.active) {
+      combatInputEl.style.display   = 'none';
+      explorationEl.style.display   = '';
+      return;
+    }
+    explorationEl.style.display  = 'none';
+    combatInputEl.style.display  = '';
+
+    const currentTurn = state.initiativeOrder[state.currentTurnIndex];
+    const myTurn = currentTurn && currentTurn.id === char.id && currentTurn.hp > 0;
+
+    if (!myTurn) {
+      combatWaitEl.style.display  = '';
+      actionGridEl.style.display  = 'none';
+      const whose = currentTurn ? currentTurn.name.split(' ')[0] : '…';
+      combatWaitEl.textContent = 'Waiting for ' + whose + '…';
+
+      // If it's an enemy turn and we're the "host" (first living player), trigger enemy action
+      if (currentTurn?.type === 'enemy' && currentTurn.hp > 0) {
+        const livingPlayers = state.initiativeOrder.filter(c => c.type === 'player' && c.hp > 0);
+        if (livingPlayers.length && livingPlayers[0].id === char.id) {
+          triggerEnemyTurn(currentTurn.id);
+        }
+      }
+      return;
+    }
+
+    combatWaitEl.style.display  = 'none';
+    actionGridEl.style.display  = '';
+    buildActionButtons(state);
+  }
+
+  function buildActionButtons(state) {
+    const livingEnemies = state.initiativeOrder.filter(c => c.type === 'enemy' && c.hp > 0);
+    actionGridEl.innerHTML = '';
+
+    const actions = [
+      {
+        label: 'Attack',
+        bonus: '+' + ATTACK_BONUS[char.id],
+        handler: () => handleAttack(livingEnemies, state),
+        disabled: !livingEnemies.length,
+      },
+      {
+        label: 'Dodge',
+        bonus: 'no roll',
+        handler: () => handleSimpleAction('dodges, bracing for the next hit.', 'Dodge'),
+      },
+      {
+        label: 'Dash',
+        bonus: 'move ×2',
+        handler: () => handleSimpleAction('sprints across the battlefield.', 'Dash'),
+      },
+      {
+        label: 'Help',
+        bonus: 'ally adv.',
+        handler: () => handleSimpleAction('moves to assist, setting up an ally\'s next strike.', 'Help'),
+      },
+    ];
+
+    // Character-specific special action
+    const specials = {
+      dennis: { label: 'Wild Magic Surge', bonus: 'chaos', handler: handleWildMagic },
+      mac:    { label: 'Divine Smite', bonus: '+ 2d8 rad.', handler: () => handleSmite(livingEnemies, state) },
+      charlie:{ label: 'Spore Cloud', bonus: 'CON save', handler: handleSporeCloud },
+      dee:    { label: 'Bardic Inspire', bonus: 'd8 bonus', handler: handleBardicInspiration },
+      frank:  { label: 'Reckless Atk', bonus: 'adv./adv.', handler: () => handleRecklessAttack(livingEnemies, state) },
+    };
+    if (specials[char.id]) actions.push({ ...specials[char.id], special: true });
+
+    for (const action of actions) {
+      const btn = document.createElement('button');
+      btn.className = 'action-btn' + (action.special ? ' special' : '');
+      btn.disabled  = action.disabled || false;
+      btn.innerHTML = action.label + '<span class="action-bonus">' + action.bonus + '</span>';
+      btn.addEventListener('click', action.handler);
+      actionGridEl.appendChild(btn);
+    }
+  }
+
+  // ── d20 roll animation ─────────────────────────────────────────────
+  function animateRoll(finalRoll) {
+    return new Promise(resolve => {
+      rollOverlay.style.display = 'flex';
+      d20NumberEl.className = 'd20-number';
+      d20ResultEl.textContent = '';
+      let ticks = 0;
+      const interval = setInterval(() => {
+        d20NumberEl.textContent = Math.floor(Math.random() * 20) + 1;
+        ticks++;
+        if (ticks >= 12) {
+          clearInterval(interval);
+          d20NumberEl.textContent = finalRoll;
+          if (finalRoll === 20) { d20NumberEl.className = 'd20-number crit'; d20ResultEl.textContent = 'CRITICAL HIT'; }
+          else if (finalRoll === 1) { d20NumberEl.className = 'd20-number fumble'; d20ResultEl.textContent = 'FUMBLE'; }
+          setTimeout(() => { rollOverlay.style.display = 'none'; resolve(); }, 700);
+        }
+      }, 40);
+    });
+  }
+
+  // ── DM narration helper ───────────────────────────────────────────
+  async function callDM(combatContext) {
+    const snap = await chatRef.once('value');
+    const msgs = snap.val();
+    const history = msgs ? Object.values(msgs).sort((a, b) => a.timestamp - b.timestamp).map(m => ({
+      role: m.type === 'dm' ? 'assistant' : 'user',
+      content: m.type === 'player' ? m.characterName + ': ' + m.text : m.text,
+    })) : [];
+
+    const stateSnap = await stateRef.once('value');
+    if (stateSnap.val()?.thinking) return;
+    await stateRef.set({ thinking: true });
+    try {
+      const res = await fetch('/api/dm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: history, combatContext }),
+      });
+      if (!res.ok) throw new Error('API ' + res.status);
+      const data = await res.json();
+      const text = data.content?.[0]?.text || 'The dungeon falls silent.';
+      await chatRef.push({ type: 'dm', characterId: 'dm', characterName: 'DM', text, timestamp: Date.now() });
+    } catch (err) {
+      console.error('[summer-camp] DM narration error:', err);
+    } finally {
+      await stateRef.set({ thinking: false });
+    }
+  }
+
+  function disableActions() {
+    actionGridEl.querySelectorAll('button').forEach(b => b.disabled = true);
+  }
+
+  // ── Attack handler ────────────────────────────────────────────────
+  async function handleAttack(livingEnemies, _state, extraDice) {
+    if (!livingEnemies.length) return;
+    disableActions();
+    const target = livingEnemies[0];
+    const attackResult = rollAttack(ATTACK_BONUS[char.id]);
+    await animateRoll(attackResult.roll);
+
+    const hit   = checkHit(attackResult.total, target.ac);
+    const dmgCfg= DAMAGE_DICE[char.id];
+    let damage  = 0;
+    let subtype = 'miss';
+    let combatText = '';
+
+    if (hit) {
+      const extraDmg = extraDice ? rollDamage(extraDice, 0).total : 0;
+      const dmgResult= rollDamage(dmgCfg.dice, dmgCfg.mod);
+      damage = dmgResult.total + extraDmg;
+      subtype = attackResult.isCrit ? 'crit' : 'hit';
+      await Combat.applyDamage(target.id, damage);
+      combatText = `${char.name} attacks ${target.name} — roll ${attackResult.total} vs AC ${target.ac}. Hit! ${damage} damage${extraDice ? ' (includes smite)' : ''}.`;
+    } else {
+      combatText = `${char.name} attacks ${target.name} — roll ${attackResult.total} vs AC ${target.ac}. Miss.`;
+    }
+
+    await chatRef.push({ type: 'combat', subtype, characterId: char.id, text: combatText, timestamp: Date.now() });
+    await Combat.advanceTurn();
+    await callDM(combatText);
+  }
+
+  async function handleSmite(livingEnemies, state) {
+    await handleAttack(livingEnemies, state, '2d8');
+  }
+
+  async function handleRecklessAttack(livingEnemies, state) {
+    // Reckless: we get advantage (roll twice, take higher), enemies have advantage back
+    // For simplicity: roll twice and post both
+    if (!livingEnemies.length) return;
+    disableActions();
+    const target = livingEnemies[0];
+    const r1 = rollAttack(ATTACK_BONUS[char.id]);
+    const r2 = rollAttack(ATTACK_BONUS[char.id]);
+    const best = r1.total >= r2.total ? r1 : r2;
+    await animateRoll(best.roll);
+
+    const hit     = checkHit(best.total, target.ac);
+    const dmgCfg  = DAMAGE_DICE[char.id];
+    let damage    = 0;
+    let subtype   = 'miss';
+    let combatText = '';
+
+    if (hit) {
+      const dmgResult = rollDamage(dmgCfg.dice, dmgCfg.mod);
+      damage = dmgResult.total;
+      subtype = best.isCrit ? 'crit' : 'hit';
+      await Combat.applyDamage(target.id, damage);
+      combatText = `${char.name} attacks recklessly — roll ${best.total} vs AC ${target.ac}. Hit! ${damage} damage. (Enemies now have advantage on attacks against ${char.name.split(' ')[0]}.)`;
+    } else {
+      combatText = `${char.name} reckless attacks ${target.name} — roll ${best.total} vs AC ${target.ac}. Miss. (Enemies still have advantage against ${char.name.split(' ')[0]}.)`;
+    }
+
+    await chatRef.push({ type: 'combat', subtype, characterId: char.id, text: combatText, timestamp: Date.now() });
+    await Combat.advanceTurn();
+    await callDM(combatText);
+  }
+
+  // ── Simple (no-roll) action handler ──────────────────────────────
+  async function handleSimpleAction(flavorText, actionName) {
+    disableActions();
+    const text = `${char.name} ${flavorText}`;
+    await chatRef.push({ type: 'player', characterId: char.id, characterName: char.name, text, timestamp: Date.now() });
+    await Combat.advanceTurn();
+    await callDM(text);
+  }
+
+  // ── Special action handlers ───────────────────────────────────────
+  async function handleWildMagic() {
+    disableActions();
+    const surgeRoll = Math.floor(Math.random() * 20) + 1;
+    const effects = [
+      'a random fireball erupts centered on Dennis',
+      'Dennis turns invisible until he attacks',
+      'Dennis and the nearest creature swap positions',
+      'flower petals rain from the sky — no game effect',
+      'Dennis grows 1 foot taller',
+      'a third eye opens on Dennis\'s forehead',
+      'all doors within 60ft slam shut simultaneously',
+      'Dennis\'s hair turns bright blue',
+      'a spectral hand slaps the nearest enemy',
+      'everyone in 30ft is deafened for 1 minute',
+    ];
+    const effect = effects[surgeRoll % effects.length];
+    const text = `WILD MAGIC SURGE (d20: ${surgeRoll}): ${effect}.`;
+    await chatRef.push({ type: 'combat', subtype: 'crit', characterId: char.id, text, timestamp: Date.now() });
+    await Combat.advanceTurn();
+    await callDM(text);
+  }
+
+  async function handleSporeCloud() {
+    disableActions();
+    const text = `${char.name} releases a 15-foot spore cloud. All creatures in range must make a DC 13 CON save or become poisoned until the end of their next turn.`;
+    await chatRef.push({ type: 'combat', subtype: 'hit', characterId: char.id, text, timestamp: Date.now() });
+    await Combat.advanceTurn();
+    await callDM(text);
+  }
+
+  async function handleBardicInspiration() {
+    disableActions();
+    const allies = ['Mac', 'Dennis', 'Charlie', 'Dee', 'Frank'].filter(n => n.toLowerCase() !== char.id);
+    const target = allies[Math.floor(Math.random() * allies.length)];
+    const text = `${char.name} grants Bardic Inspiration to ${target} — add a d8 to your next attack roll or saving throw.`;
+    await chatRef.push({ type: 'combat', subtype: 'heal', characterId: char.id, text, timestamp: Date.now() });
+    await Combat.advanceTurn();
+    await callDM(text);
+  }
+
+  // ── Enemy turn trigger ────────────────────────────────────────────
+  let enemyTurnInProgress = false;
+  async function triggerEnemyTurn(enemyId) {
+    if (enemyTurnInProgress) return;
+    enemyTurnInProgress = true;
+    try {
+      const result = await Combat.getEnemyAction(enemyId);
+      if (!result) return;
+
+      const subtype = result.hit ? (result.isCrit ? 'crit' : 'hit') : 'miss';
+      const text = result.hit
+        ? `${result.attacker} attacks ${result.target} — roll ${result.total}. Hit! ${result.damage} damage.`
+        : `${result.attacker} attacks ${result.target} — roll ${result.total} vs AC. Miss.`;
+
+      await chatRef.push({ type: 'combat', subtype, characterId: 'dm', text, timestamp: Date.now() });
+      await callDM(text);
+    } finally {
+      enemyTurnInProgress = false;
+    }
+  }
+
+  // ── Exploration mode send ─────────────────────────────────────────
   function setBusy(busy) {
     sendBtn.disabled = busy;
     input.disabled   = busy;
   }
 
+  // ── Firebase init ─────────────────────────────────────────────────
   initFirebase();
   const db = window.firebaseDb;
 
@@ -260,9 +745,11 @@
     input.disabled   = true;
     input.placeholder = 'Connection unavailable';
   } else {
-    const chatRef  = db.ref('/sessions/lostmines/chat');
-    const stateRef = db.ref('/sessions/lostmines/state');
+    const chatRef   = db.ref('/sessions/lostmines/chat');
+    const stateRef  = db.ref('/sessions/lostmines/state');
+    const combatRef = db.ref('/sessions/lostmines/combat');
 
+    // Chat log
     chatRef.on('value', snapshot => {
       log.innerHTML = '';
       const msgs = snapshot.val();
@@ -270,25 +757,36 @@
         renderMsg({ type: 'system', text: 'Entering the dungeon…' });
         return;
       }
-      Object.values(msgs)
-        .sort((a, b) => a.timestamp - b.timestamp)
-        .forEach(renderMsg);
+      Object.values(msgs).sort((a, b) => a.timestamp - b.timestamp).forEach(renderMsg);
     });
 
+    // Typing indicator
     stateRef.on('value', snapshot => {
       typingEl.style.display = snapshot.val()?.thinking ? '' : 'none';
     });
 
+    // Combat state
+    combatRef.on('value', snapshot => {
+      const state = snapshot.val();
+      renderTracker(state);
+      renderActionBar(state);
+    });
+
+    // End combat button
+    document.getElementById('combatEndBtn').addEventListener('click', async () => {
+      await Combat.endCombat();
+      await chatRef.push({ type: 'system', text: 'Combat ended.', timestamp: Date.now() });
+    });
+
+    // ── Exploration mode send ───────────────────────────────────────
     async function getHistory() {
       const snap = await chatRef.once('value');
       const msgs = snap.val();
       if (!msgs) return [];
-      return Object.values(msgs)
-        .sort((a, b) => a.timestamp - b.timestamp)
-        .map(msg => ({
-          role:    msg.type === 'dm' ? 'assistant' : 'user',
-          content: msg.type === 'player' ? msg.characterName + ': ' + msg.text : msg.text,
-        }));
+      return Object.values(msgs).sort((a, b) => a.timestamp - b.timestamp).map(m => ({
+        role:    m.type === 'dm' ? 'assistant' : 'user',
+        content: m.type === 'player' ? m.characterName + ': ' + m.text : m.text,
+      }));
     }
 
     async function triggerDM() {
@@ -319,11 +817,8 @@
       input.value = '';
       setBusy(true);
       await chatRef.push({
-        type:          'player',
-        characterId:   char.id,
-        characterName: char.name,
-        text,
-        timestamp:     Date.now(),
+        type: 'player', characterId: char.id, characterName: char.name,
+        text, timestamp: Date.now(),
       });
       await triggerDM();
       setBusy(false);
@@ -332,17 +827,14 @@
     input.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
     window.sendMessage = sendMessage;
 
+    // ── Session init ────────────────────────────────────────────────
     async function init() {
       db.ref('/sessions/lostmines/presence').child(char.id).set({
-        characterName: char.name,
-        joined: Date.now(),
+        characterName: char.name, joined: Date.now(),
       });
 
       const snap = await chatRef.once('value');
-      if (snap.val()) {
-        input.focus();
-        return;
-      }
+      if (snap.val()) { input.focus(); return; }
 
       const stateSnap = await stateRef.once('value');
       if (stateSnap.val()?.thinking) { input.focus(); return; }
