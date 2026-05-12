@@ -13,7 +13,7 @@ module.exports = async (req, res) => {
 
     const systemPrompt = `You are the Dungeon Master for an async group chat D&D session. The players send messages in character and you respond to advance the story.
 
-Adventure: Lost Mines of Phandelver. The party is level 5.
+Adventure: Lost Mines of Phandelver. The party is level 1.
 
 Party:
 - Dennis (Wild Magic Sorcerer, CHA 18) — chaos gremlin, magic always misfires spectacularly
