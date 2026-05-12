@@ -2,7 +2,7 @@ export function initFirebase() {
   const firebaseConfig = {
     apiKey: "AIzaSyAQ82FwdF4IbD6jIAKN5frnUacI3PTc2Ow",
     authDomain: "horrid-wake.firebaseapp.com",
-    databaseURL: "https://horrid-wake-default-rtdb.firebaseio.com",
+    databaseURL: "https://horrid-wake-firebase-default-rtdb.firebaseio.com",
     projectId: "horrid-wake",
     storageBucket: "horrid-wake.firebasestorage.app",
     messagingSenderId: "683459567",
