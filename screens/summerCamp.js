@@ -164,6 +164,7 @@ function renderSummerCamp() {
 
 // ── BATTLE STATE ──────────────────────────────────────────────
 const BattleState = {
+  phase: 'exploration',
   entities: {},
   turnOrder: [],
   currentTurn: 0,
@@ -211,7 +212,8 @@ export async function startOrResumeAdventure(id) {
 }
 
 function openAdventureView(id, state) {
-  initBattleMat(id, state);
+  BattleState.phase = 'exploration';
+  document.getElementById('adventureView').dataset.phase = 'exploration';
   renderActionBar(id);
   updatePartyHpBar();
 
@@ -330,6 +332,19 @@ function renderActionBar(id) {
   const bar = document.getElementById('advActionBar');
   const sheet = SHEETS[id]?.level1;
   if (!sheet) return;
+
+  if (BattleState.phase === 'exploration') {
+    bar.innerHTML = `
+      <input class="adv-chat-input" id="advChatInput" type="text"
+        placeholder="What do you do?"
+        autocomplete="off"
+        onkeydown="if(event.key==='Enter')window.submitChatInput()">
+      <button class="adv-chat-send" onclick="window.submitChatInput()">SEND</button>
+    `;
+    setTimeout(() => document.getElementById('advChatInput')?.focus(), 50);
+    return;
+  }
+
   const actions = getCharacterActions(id, sheet);
   bar.innerHTML = actions.map(a => `
     <button
@@ -389,6 +404,15 @@ export async function handleAction(actionId, charId) {
   }
 }
 
+// ── EXPLORATION CHAT INPUT ────────────────────────────────────
+function submitChatInput() {
+  const input = document.getElementById('advChatInput');
+  const text = input?.value?.trim();
+  if (!text) return;
+  input.value = '';
+  submitAction(window.activeAdventureId, text);
+}
+
 // ── FREE INPUT ────────────────────────────────────────────────
 export function showFreeInput() {
   document.getElementById('advFreeInputOverlay').classList.add('visible');
@@ -421,9 +445,17 @@ async function submitAction(charId, actionText) {
     state.conversationHistory = conversation.map(m => ({ role: m.role, content: m.content }));
     const systemPrompt = buildSystemPrompt(charId, state);
 
-    const reply = await callChatApi(systemPrompt, state.conversationHistory) || 'The dungeon stirs.';
+    const rawReply = await callChatApi(systemPrompt, state.conversationHistory) || 'The dungeon stirs.';
+    const reply = rawReply.replace('<COMBAT_START>', '').trim();
     removeTypingIndicator();
     await window.PartyState.pushDMMessage(reply);
+
+    if (rawReply.includes('<COMBAT_START>') && BattleState.phase === 'exploration') {
+      BattleState.phase = 'combat';
+      document.getElementById('adventureView').dataset.phase = 'combat';
+      initBattleMat(charId, state);
+      renderActionBar(charId);
+    }
 
     const charFirstName = char?.name?.split(' ')[0]?.toLowerCase();
     const replyLower = reply.toLowerCase();
@@ -547,6 +579,7 @@ async function renderOpeningScene(id, state) {
 // ── INIT: expose globals needed by inline HTML onclick handlers ──
 export function initSummerCamp() {
   window.startOrResumeAdventure = startOrResumeAdventure;
+  window.submitChatInput = submitChatInput;
   window.handleAction = handleAction;
   window.closeAdventure = closeAdventure;
   window.openSheetFromAdventure = openSheetFromAdventure;
