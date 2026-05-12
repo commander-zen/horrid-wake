@@ -11,7 +11,21 @@ export async function callChatApi(systemPrompt, messages) {
       messages
     })
   });
-  const data = await response.json();
+
+  const rawText = await response.text();
+  console.log('[groq] /api/chat raw response:', rawText);
+
+  let data;
+  try {
+    data = JSON.parse(rawText);
+  } catch (e) {
+    throw new Error(`/api/chat returned non-JSON (status ${response.status}): ${rawText.slice(0, 200)}`);
+  }
+
+  if (!response.ok) {
+    throw new Error(`/api/chat error ${response.status}: ${JSON.stringify(data)}`);
+  }
+
   return data.content?.[0]?.text || null;
 }
 

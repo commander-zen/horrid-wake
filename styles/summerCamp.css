@@ -331,6 +331,7 @@
   background: #0a0703;
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
 #adventureView[data-phase="exploration"] .adv-mat-inner {
   display: none;
@@ -339,9 +340,14 @@
   position: static;
   max-height: none;
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   border-top: none;
-  padding-top: 20px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  bottom: auto;
 }
 #adventureView[data-phase="exploration"] .adv-narration-toggle {
   display: none;
