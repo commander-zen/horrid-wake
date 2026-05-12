@@ -78,7 +78,13 @@
     letter-spacing: 0.12em; text-transform: uppercase;
     align-self: center; text-align: center;
   }
-  .sc-msg.typing { color: var(--text-dim); font-style: italic; }
+
+  .sc-typing {
+    padding: 4px 26px 8px;
+    font-family: 'Josefin Sans', sans-serif; font-size: 11px;
+    color: var(--text-dim); letter-spacing: 0.08em; font-style: italic;
+    background: var(--bg); flex-shrink: 0;
+  }
 
   .sc-input-row {
     display: flex; gap: 8px; padding: 12px 14px;
@@ -114,99 +120,62 @@
     <span class="sc-module-tag">Lost Mines of Phandelver</span>
   </div>
   <div class="sc-log" id="scLog"></div>
+  <div class="sc-typing" id="scTyping" style="display:none">The DM is writing…</div>
   <div class="sc-input-row">
     <input class="sc-input" id="scInput" type="text" placeholder="What do you do?" autocomplete="off" />
     <button class="sc-send-btn" id="scSendBtn" onclick="sendMessage()">SEND</button>
   </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script type="module">
-  import { CHARS, SHEETS } from './services/characters.js';
+  import { CHARS } from './services/characters.js';
+  import { initFirebase } from './services/firebase.js';
 
   const params = new URLSearchParams(location.search);
   const charId = params.get('character');
   const char = CHARS.find(c => c.id === charId) || CHARS[0];
-  const sheet = SHEETS[char.id]?.level1 || {};
 
   document.getElementById('scCharName').textContent = char.name;
   document.title = char.name + ' — Summer Camp';
 
-  const conversationHistory = [];
   const log = document.getElementById('scLog');
+  const typingEl = document.getElementById('scTyping');
   const input = document.getElementById('scInput');
   const sendBtn = document.getElementById('scSendBtn');
 
-  function appendMsg(text, role) {
-    const el = document.createElement('div');
-    el.className = 'sc-msg ' + role;
-    el.textContent = text;
-    log.appendChild(el);
+  initFirebase();
+  const db = window.firebaseDb;
+  const chatRef = db.ref('/sessions/lostmines/chat');
+  const stateRef = db.ref('/sessions/lostmines/state');
+
+  // Re-render log from Firebase on every change
+  chatRef.on('value', snapshot => {
+    log.innerHTML = '';
+    const msgs = snapshot.val();
+    if (!msgs) return;
+    Object.values(msgs)
+      .sort((a, b) => a.timestamp - b.timestamp)
+      .forEach(renderMsg);
     log.scrollTop = log.scrollHeight;
-    return el;
-  }
+  });
 
-  function buildSystemPrompt() {
-    const mod = v => { const m = Math.floor((v - 10) / 2); return (m >= 0 ? '+' : '') + m; };
-    return `You are a third-person narrator running Lost Mines of Phandelver as an interactive story. You have no personality of your own. Your prose is terse, vivid, and cinematic — like a dark fantasy novel.
+  // Drive typing indicator from Firebase state
+  stateRef.on('value', snapshot => {
+    typingEl.style.display = snapshot.val()?.thinking ? '' : 'none';
+  });
 
-THE PLAYER'S CHARACTER:
-Name: ${char.name}
-Class: ${sheet.class || 'Adventurer'}${sheet.subclass ? ' (' + sheet.subclass + ')' : ''}
-Level: 1
-HP: ${sheet.hp || 10} / ${sheet.hp || 10}
-AC: ${sheet.ac || 12}
-STR ${sheet.str} DEX ${sheet.dex} CON ${sheet.con} INT ${sheet.int} WIS ${sheet.wis} CHA ${sheet.cha}
-Equipment: ${sheet.equipment?.join(', ') || 'basic gear'}
-Features: ${sheet.features?.join(', ') || 'none'}
-
-CURRENT LOCATION:
-Module: Lost Mines of Phandelver
-Chapter 1: Goblin Arrows
-Setting: The Triboar Trail, east of Neverwinter. A rutted dirt road through dense forest. The party has been hired to escort a wagon to Phandalin.
-
-RULES:
-- Write in third person. Never say "you" — use the character's name or class title.
-- Teach mechanics through narrative. Resolve all dice rolls yourself invisibly. Never ask players to roll anything.
-- Keep responses under 80 words. Every sentence earns its place.
-- End every response with an open moment — action pending, danger present, decision implied.
-- Never break the narrative voice. No apologies, no clarifications, no fourth wall.
-- Monster HP is never revealed as a number. Describe condition through appearance only.`;
-  }
-
-  async function callApi(userMessage) {
-    conversationHistory.push({ role: 'user', content: userMessage });
-    const res = await fetch('/api/dm', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        systemPrompt: buildSystemPrompt(),
-        messages: conversationHistory
-      })
-    });
-    if (!res.ok) throw new Error('API error ' + res.status);
-    const data = await res.json();
-    const text = data.content?.[0]?.text || 'The trail falls silent.';
-    conversationHistory.push({ role: 'assistant', content: text });
-    return text;
-  }
-
-  async function sendMessage() {
-    const text = input.value.trim();
-    if (!text || sendBtn.disabled) return;
-    input.value = '';
-    appendMsg(text, 'player');
-    setBusy(true);
-    const typing = appendMsg('…', 'typing');
-    try {
-      const reply = await callApi(text);
-      typing.remove();
-      appendMsg(reply, 'dm');
-    } catch (err) {
-      typing.remove();
-      appendMsg('The trail falls silent.', 'system');
-      console.error('[summer-camp]', err);
+  function renderMsg(msg) {
+    const el = document.createElement('div');
+    if (msg.type === 'dm') {
+      el.className = 'sc-msg dm';
+      el.textContent = msg.text;
+    } else {
+      el.className = 'sc-msg player';
+      el.textContent = msg.characterName + ': ' + msg.text;
     }
-    setBusy(false);
+    log.appendChild(el);
   }
 
   function setBusy(busy) {
@@ -214,22 +183,93 @@ RULES:
     input.disabled = busy;
   }
 
+  async function getHistory() {
+    const snap = await chatRef.once('value');
+    const msgs = snap.val();
+    if (!msgs) return [];
+    return Object.values(msgs)
+      .sort((a, b) => a.timestamp - b.timestamp)
+      .map(msg => ({
+        role: msg.type === 'dm' ? 'assistant' : 'user',
+        content: msg.type === 'player' ? msg.characterName + ': ' + msg.text : msg.text
+      }));
+  }
+
+  async function triggerDM() {
+    const stateSnap = await stateRef.once('value');
+    if (stateSnap.val()?.thinking) return;
+    await stateRef.set({ thinking: true });
+    try {
+      const history = await getHistory();
+      const res = await fetch('/api/dm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: history })
+      });
+      if (!res.ok) throw new Error('API ' + res.status);
+      const data = await res.json();
+      const text = data.content?.[0]?.text || 'The trail falls silent.';
+      await chatRef.push({ type: 'dm', characterId: 'dm', characterName: 'DM', text, timestamp: Date.now() });
+    } catch (err) {
+      console.error('[summer-camp] DM error:', err);
+    } finally {
+      await stateRef.set({ thinking: false });
+    }
+  }
+
+  async function sendMessage() {
+    const text = input.value.trim();
+    if (!text || sendBtn.disabled) return;
+    input.value = '';
+    setBusy(true);
+    await chatRef.push({
+      type: 'player',
+      characterId: char.id,
+      characterName: char.name,
+      text,
+      timestamp: Date.now()
+    });
+    await triggerDM();
+    setBusy(false);
+  }
+
   input.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
   window.sendMessage = sendMessage;
 
   async function init() {
-    appendMsg('Chapter 1: Goblin Arrows', 'system');
+    db.ref('/sessions/lostmines/presence').child(char.id).set({
+      characterName: char.name,
+      joined: Date.now()
+    });
+
+    const snap = await chatRef.once('value');
+    if (snap.val()) {
+      input.focus();
+      return;
+    }
+
+    // Fresh session — open the scene directly (no player message in log)
+    const stateSnap = await stateRef.once('value');
+    if (stateSnap.val()?.thinking) { input.focus(); return; }
+
     setBusy(true);
-    const typing = appendMsg('…', 'typing');
+    await stateRef.set({ thinking: true });
     try {
-      const openingPrompt = `The adventure begins on the Triboar Trail. The wagon has stopped. Dead horses block the road — black-feathered goblin arrows jutting from their flanks. Set the scene. Address ${char.name} directly. Be brief and cinematic.`;
-      const reply = await callApi(openingPrompt);
-      typing.remove();
-      appendMsg(reply, 'dm');
+      const openingPrompt = 'The adventure begins. Set the opening scene on the Triboar Trail — the ambush. Dead horses, goblin arrows. Be brief and cinematic.';
+      const res = await fetch('/api/dm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: [{ role: 'user', content: openingPrompt }] })
+      });
+      if (!res.ok) throw new Error('API ' + res.status);
+      const data = await res.json();
+      const text = data.content?.[0]?.text || 'The Triboar Trail stretches into shadow.';
+      await chatRef.push({ type: 'dm', characterId: 'dm', characterName: 'DM', text, timestamp: Date.now() });
     } catch (err) {
-      typing.remove();
-      appendMsg('The Triboar Trail stretches into shadow. Something moves in the trees.', 'dm');
+      await chatRef.push({ type: 'dm', characterId: 'dm', characterName: 'DM', text: 'The Triboar Trail stretches into shadow. Something moves in the trees.', timestamp: Date.now() });
       console.error('[summer-camp] opening scene:', err);
+    } finally {
+      await stateRef.set({ thinking: false });
     }
     setBusy(false);
     input.focus();

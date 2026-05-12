@@ -9,13 +9,25 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { messages, systemPrompt, max_tokens } = req.body;
+    const { messages, max_tokens } = req.body;
 
-    const groqMessages = [];
-    if (systemPrompt) groqMessages.push({ role: 'system', content: systemPrompt });
-    messages.forEach(m => groqMessages.push({ role: m.role, content: m.content }));
+    const systemPrompt = `You are the Dungeon Master running Lost Mines of Phandelver. Respond in 2-3 sentences maximum. Terse, vivid, cinematic — think Matt Mercer on a deadline. No flowery prose. No re-describing what the player just did. Set the scene, raise the stakes, end with a choice or consequence. Always end with "What do you do?" on its own line.
 
-    console.log('[api/chat] Calling Groq. Key present:', !!apiKey, '| Messages:', groqMessages.length);
+The party are five friends new to D&D playing as Always Sunny characters at level 1:
+- Dennis (Wild Magic Sorcerer, CHA 18) — chaos gremlin
+- Mac (Paladin Oath of Conquest, STR 16) — divine karate
+- Charlie (Circle of Spores Druid, WIS 18) — illiterate, wisest
+- Dee (College of Eloquence Bard, CHA 16) — thinks she's better
+- Frank (Path of the Beast Barbarian, CON 18) — already feral
+
+Current adventure: Lost Mines of Phandelver, level 1, Triboar Trail ambush. Goblins in the brush. Two dead horses.`;
+
+    const groqMessages = [
+      { role: 'system', content: systemPrompt },
+      ...messages.map(m => ({ role: m.role, content: m.content }))
+    ];
+
+    console.log('[api/dm] Calling Groq. Messages:', groqMessages.length);
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -25,17 +37,17 @@ module.exports = async (req, res) => {
       },
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
-        max_tokens: max_tokens || 1000,
+        max_tokens: max_tokens || 300,
         temperature: 0.9,
         messages: groqMessages
       })
     });
 
     const data = await response.json();
-    console.log('[api/chat] Groq status:', response.status, '| Response keys:', Object.keys(data));
+    console.log('[api/dm] Groq status:', response.status);
 
     if (!response.ok) {
-      console.error('[api/chat] Groq error:', JSON.stringify(data));
+      console.error('[api/dm] Groq error:', JSON.stringify(data));
       return res.status(500).json({ error: 'Groq API error', detail: data });
     }
 
@@ -45,7 +57,7 @@ module.exports = async (req, res) => {
     });
 
   } catch (err) {
-    console.error('[api/chat] Exception:', err.message);
+    console.error('[api/dm] Exception:', err.message);
     return res.status(500).json({ error: 'Upstream API error', detail: err.message });
   }
-}
+};
