@@ -107,6 +107,8 @@
   }
   .sc-send-btn:hover { background: rgba(201,168,76,0.08); }
   .sc-send-btn:disabled { opacity: 0.4; cursor: default; }
+
+  .msg-system { text-align:center; color: rgba(180,130,40,0.5); font-family:'IM Fell English',serif; font-style:italic; font-size:12px; padding:8px 0; }
 </style>
 </head>
 <body>
@@ -145,37 +147,20 @@
   const input = document.getElementById('scInput');
   const sendBtn = document.getElementById('scSendBtn');
 
-  initFirebase();
-  const db = window.firebaseDb;
-  const chatRef = db.ref('/sessions/lostmines/chat');
-  const stateRef = db.ref('/sessions/lostmines/state');
-
-  // Re-render log from Firebase on every change
-  chatRef.on('value', snapshot => {
-    log.innerHTML = '';
-    const msgs = snapshot.val();
-    if (!msgs) return;
-    Object.values(msgs)
-      .sort((a, b) => a.timestamp - b.timestamp)
-      .forEach(renderMsg);
-    log.scrollTop = log.scrollHeight;
-  });
-
-  // Drive typing indicator from Firebase state
-  stateRef.on('value', snapshot => {
-    typingEl.style.display = snapshot.val()?.thinking ? '' : 'none';
-  });
-
   function renderMsg(msg) {
     const el = document.createElement('div');
     if (msg.type === 'dm') {
       el.className = 'sc-msg dm';
       el.textContent = msg.text;
+    } else if (msg.type === 'system') {
+      el.className = 'msg msg-system';
+      el.innerHTML = '<em>' + msg.text + '</em>';
     } else {
       el.className = 'sc-msg player';
       el.textContent = msg.characterName + ': ' + msg.text;
     }
     log.appendChild(el);
+    log.scrollTop = log.scrollHeight;
   }
 
   function setBusy(busy) {
@@ -183,99 +168,132 @@
     input.disabled = busy;
   }
 
-  async function getHistory() {
-    const snap = await chatRef.once('value');
-    const msgs = snap.val();
-    if (!msgs) return [];
-    return Object.values(msgs)
-      .sort((a, b) => a.timestamp - b.timestamp)
-      .map(msg => ({
-        role: msg.type === 'dm' ? 'assistant' : 'user',
-        content: msg.type === 'player' ? msg.characterName + ': ' + msg.text : msg.text
-      }));
-  }
+  initFirebase();
+  const db = window.firebaseDb;
 
-  async function triggerDM() {
-    const stateSnap = await stateRef.once('value');
-    if (stateSnap.val()?.thinking) return;
-    await stateRef.set({ thinking: true });
-    try {
-      const history = await getHistory();
-      const res = await fetch('/api/dm', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: history })
-      });
-      if (!res.ok) throw new Error('API ' + res.status);
-      const data = await res.json();
-      const text = data.content?.[0]?.text || 'The trail falls silent.';
-      await chatRef.push({ type: 'dm', characterId: 'dm', characterName: 'DM', text, timestamp: Date.now() });
-    } catch (err) {
-      console.error('[summer-camp] DM error:', err);
-    } finally {
-      await stateRef.set({ thinking: false });
+  // Firebase unavailable — show error and disable input
+  if (!db) {
+    renderMsg({ type: 'system', text: '⚠ Connection unavailable. Reload to try again.' });
+    sendBtn.disabled = true;
+    input.disabled = true;
+    input.placeholder = 'Connection unavailable';
+  } else {
+    const chatRef = db.ref('/sessions/lostmines/chat');
+    const stateRef = db.ref('/sessions/lostmines/state');
+
+    // Re-render log from Firebase on every change
+    chatRef.on('value', snapshot => {
+      log.innerHTML = '';
+      const msgs = snapshot.val();
+      if (!msgs) {
+        // No messages yet — show placeholder while init() fetches the opening scene
+        renderMsg({ type: 'system', text: 'Entering the dungeon…' });
+        return;
+      }
+      Object.values(msgs)
+        .sort((a, b) => a.timestamp - b.timestamp)
+        .forEach(renderMsg);
+    });
+
+    // Drive typing indicator from Firebase state
+    stateRef.on('value', snapshot => {
+      typingEl.style.display = snapshot.val()?.thinking ? '' : 'none';
+    });
+
+    async function getHistory() {
+      const snap = await chatRef.once('value');
+      const msgs = snap.val();
+      if (!msgs) return [];
+      return Object.values(msgs)
+        .sort((a, b) => a.timestamp - b.timestamp)
+        .map(msg => ({
+          role: msg.type === 'dm' ? 'assistant' : 'user',
+          content: msg.type === 'player' ? msg.characterName + ': ' + msg.text : msg.text
+        }));
     }
-  }
 
-  async function sendMessage() {
-    const text = input.value.trim();
-    if (!text || sendBtn.disabled) return;
-    input.value = '';
-    setBusy(true);
-    await chatRef.push({
-      type: 'player',
-      characterId: char.id,
-      characterName: char.name,
-      text,
-      timestamp: Date.now()
-    });
-    await triggerDM();
-    setBusy(false);
-  }
+    async function triggerDM() {
+      const stateSnap = await stateRef.once('value');
+      if (stateSnap.val()?.thinking) return;
+      await stateRef.set({ thinking: true });
+      try {
+        const history = await getHistory();
+        const res = await fetch('/api/dm', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: history })
+        });
+        if (!res.ok) throw new Error('API ' + res.status);
+        const data = await res.json();
+        const text = data.content?.[0]?.text || 'The trail falls silent.';
+        await chatRef.push({ type: 'dm', characterId: 'dm', characterName: 'DM', text, timestamp: Date.now() });
+      } catch (err) {
+        console.error('[summer-camp] DM error:', err);
+      } finally {
+        await stateRef.set({ thinking: false });
+      }
+    }
 
-  input.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
-  window.sendMessage = sendMessage;
+    async function sendMessage() {
+      const text = input.value.trim();
+      if (!text || sendBtn.disabled) return;
+      input.value = '';
+      setBusy(true);
+      await chatRef.push({
+        type: 'player',
+        characterId: char.id,
+        characterName: char.name,
+        text,
+        timestamp: Date.now()
+      });
+      await triggerDM();
+      setBusy(false);
+    }
 
-  async function init() {
-    db.ref('/sessions/lostmines/presence').child(char.id).set({
-      characterName: char.name,
-      joined: Date.now()
-    });
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
+    window.sendMessage = sendMessage;
 
-    const snap = await chatRef.once('value');
-    if (snap.val()) {
+    async function init() {
+      db.ref('/sessions/lostmines/presence').child(char.id).set({
+        characterName: char.name,
+        joined: Date.now()
+      });
+
+      const snap = await chatRef.once('value');
+      if (snap.val()) {
+        input.focus();
+        return;
+      }
+
+      // Fresh session — open the scene directly (no player message in log)
+      const stateSnap = await stateRef.once('value');
+      if (stateSnap.val()?.thinking) { input.focus(); return; }
+
+      setBusy(true);
+      await stateRef.set({ thinking: true });
+      try {
+        const openingPrompt = 'The adventure begins. Set the opening scene on the Triboar Trail — the ambush. Dead horses, goblin arrows. Be brief and cinematic.';
+        const res = await fetch('/api/dm', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: [{ role: 'user', content: openingPrompt }] })
+        });
+        if (!res.ok) throw new Error('API ' + res.status);
+        const data = await res.json();
+        const text = data.content?.[0]?.text || 'The Triboar Trail stretches into shadow.';
+        await chatRef.push({ type: 'dm', characterId: 'dm', characterName: 'DM', text, timestamp: Date.now() });
+      } catch (err) {
+        await chatRef.push({ type: 'dm', characterId: 'dm', characterName: 'DM', text: 'The Triboar Trail stretches into shadow. Something moves in the trees.', timestamp: Date.now() });
+        console.error('[summer-camp] opening scene:', err);
+      } finally {
+        await stateRef.set({ thinking: false });
+      }
+      setBusy(false);
       input.focus();
-      return;
     }
 
-    // Fresh session — open the scene directly (no player message in log)
-    const stateSnap = await stateRef.once('value');
-    if (stateSnap.val()?.thinking) { input.focus(); return; }
-
-    setBusy(true);
-    await stateRef.set({ thinking: true });
-    try {
-      const openingPrompt = 'The adventure begins. Set the opening scene on the Triboar Trail — the ambush. Dead horses, goblin arrows. Be brief and cinematic.';
-      const res = await fetch('/api/dm', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [{ role: 'user', content: openingPrompt }] })
-      });
-      if (!res.ok) throw new Error('API ' + res.status);
-      const data = await res.json();
-      const text = data.content?.[0]?.text || 'The Triboar Trail stretches into shadow.';
-      await chatRef.push({ type: 'dm', characterId: 'dm', characterName: 'DM', text, timestamp: Date.now() });
-    } catch (err) {
-      await chatRef.push({ type: 'dm', characterId: 'dm', characterName: 'DM', text: 'The Triboar Trail stretches into shadow. Something moves in the trees.', timestamp: Date.now() });
-      console.error('[summer-camp] opening scene:', err);
-    } finally {
-      await stateRef.set({ thinking: false });
-    }
-    setBusy(false);
-    input.focus();
+    init();
   }
-
-  init();
 </script>
 </body>
 </html>
