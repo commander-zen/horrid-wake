@@ -363,6 +363,9 @@
   const d20NumberEl    = document.getElementById('d20Number');
   const d20ResultEl    = document.getElementById('d20ResultLine');
 
+  // Firebase refs — assigned inside the else block after initFirebase()
+  let chatRef, stateRef, combatRef;
+
   // ── Message rendering ─────────────────────────────────────────────
   function renderMsg(msg) {
     if (msg.type === 'system') {
@@ -559,30 +562,52 @@
     });
   }
 
-  // ── DM narration helper ───────────────────────────────────────────
+  // ── DM call — handles narration, auto combat trigger, and combat end ──
   async function callDM(combatContext) {
-    const snap = await chatRef.once('value');
-    const msgs = snap.val();
-    const history = msgs ? Object.values(msgs).sort((a, b) => a.timestamp - b.timestamp).map(m => ({
-      role: m.type === 'dm' ? 'assistant' : 'user',
-      content: m.type === 'player' ? m.characterName + ': ' + m.text : m.text,
-    })) : [];
-
     const stateSnap = await stateRef.once('value');
     if (stateSnap.val()?.thinking) return;
+
+    const combatSnap  = await combatRef.once('value');
+    const combatActive = combatSnap.val()?.active || false;
+
     await stateRef.set({ thinking: true });
     try {
+      const snap = await chatRef.once('value');
+      const msgs = snap.val();
+      const history = msgs ? Object.values(msgs).sort((a, b) => a.timestamp - b.timestamp).map(m => ({
+        role:    m.type === 'dm' ? 'assistant' : 'user',
+        content: m.type === 'player' ? m.characterName + ': ' + m.text : m.text,
+      })) : [];
+
       const res = await fetch('/api/dm', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: history, combatContext }),
+        body: JSON.stringify({ messages: history, combatContext: combatContext || null, combatActive }),
       });
       if (!res.ok) throw new Error('API ' + res.status);
       const data = await res.json();
-      const text = data.content?.[0]?.text || 'The dungeon falls silent.';
-      await chatRef.push({ type: 'dm', characterId: 'dm', characterName: 'DM', text, timestamp: Date.now() });
+
+      // 1. Post narration
+      const narration = data.narration || 'The dungeon falls silent.';
+      await chatRef.push({ type: 'dm', characterId: 'dm', characterName: 'DM', text: narration, timestamp: Date.now() });
+
+      // 2. Auto-start combat if model signals it and combat isn't already running
+      if (data.combatTrigger && !combatActive && data.combatTrigger.enemies?.length) {
+        const presenceSnap = await db.ref('/sessions/lostmines/presence').once('value');
+        const playerIds = Object.keys(presenceSnap.val() || {});
+        if (playerIds.length) {
+          await Combat.startCombat(playerIds, data.combatTrigger.enemies);
+        }
+        await chatRef.push({ type: 'system', text: '⚔️ Roll for initiative.', timestamp: Date.now() });
+      }
+
+      // 3. Auto-end combat if model signals all enemies are down/fled
+      if (data.combatEnd && combatActive) {
+        await Combat.endCombat();
+        await chatRef.push({ type: 'system', text: '✓ Combat ended.', timestamp: Date.now() });
+      }
     } catch (err) {
-      console.error('[summer-camp] DM narration error:', err);
+      console.error('[summer-camp] DM error:', err);
     } finally {
       await stateRef.set({ thinking: false });
     }
@@ -745,9 +770,9 @@
     input.disabled   = true;
     input.placeholder = 'Connection unavailable';
   } else {
-    const chatRef   = db.ref('/sessions/lostmines/chat');
-    const stateRef  = db.ref('/sessions/lostmines/state');
-    const combatRef = db.ref('/sessions/lostmines/combat');
+    chatRef   = db.ref('/sessions/lostmines/chat');
+    stateRef  = db.ref('/sessions/lostmines/state');
+    combatRef = db.ref('/sessions/lostmines/combat');
 
     // Chat log
     chatRef.on('value', snapshot => {
@@ -779,36 +804,8 @@
     });
 
     // ── Exploration mode send ───────────────────────────────────────
-    async function getHistory() {
-      const snap = await chatRef.once('value');
-      const msgs = snap.val();
-      if (!msgs) return [];
-      return Object.values(msgs).sort((a, b) => a.timestamp - b.timestamp).map(m => ({
-        role:    m.type === 'dm' ? 'assistant' : 'user',
-        content: m.type === 'player' ? m.characterName + ': ' + m.text : m.text,
-      }));
-    }
-
     async function triggerDM() {
-      const stateSnap = await stateRef.once('value');
-      if (stateSnap.val()?.thinking) return;
-      await stateRef.set({ thinking: true });
-      try {
-        const history = await getHistory();
-        const res = await fetch('/api/dm', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ messages: history }),
-        });
-        if (!res.ok) throw new Error('API ' + res.status);
-        const data = await res.json();
-        const text = data.content?.[0]?.text || 'The trail falls silent.';
-        await chatRef.push({ type: 'dm', characterId: 'dm', characterName: 'DM', text, timestamp: Date.now() });
-      } catch (err) {
-        console.error('[summer-camp] DM error:', err);
-      } finally {
-        await stateRef.set({ thinking: false });
-      }
+      await callDM(null);
     }
 
     async function sendMessage() {
@@ -850,7 +847,7 @@
         });
         if (!res.ok) throw new Error('API ' + res.status);
         const data = await res.json();
-        const text = data.content?.[0]?.text || 'The Triboar Trail stretches into shadow.';
+        const text = data.narration || 'The Triboar Trail stretches into shadow.';
         await chatRef.push({ type: 'dm', characterId: 'dm', characterName: 'DM', text, timestamp: Date.now() });
       } catch (err) {
         await chatRef.push({ type: 'dm', characterId: 'dm', characterName: 'DM', text: 'The Triboar Trail stretches into shadow. Something moves in the trees.', timestamp: Date.now() });

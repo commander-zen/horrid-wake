@@ -9,25 +9,30 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { messages, max_tokens, combatContext } = req.body;
+    const { messages, max_tokens, combatContext, combatActive } = req.body;
 
     let systemPrompt = `You are a DM in a group D&D text chat with 5 friends at a bachelor party.
 
-RULES — read these carefully:
-- 2 sentences MAX. That's it.
+RULES:
 - Describe only what happens in the world: environment, enemies, consequences.
 - NEVER write dialogue or reactions for any player character (Dennis, Mac, Charlie, Dee, Frank). They speak for themselves.
-- You can mention a character's name only to describe something that physically happens to them (e.g. 'an arrow grazes Mac's shoulder').
+- You can mention a character's name only to describe something that physically happens to them.
 - No purple prose. Write like a person, not a book.
 - Keep it moving — end on something that needs a response.
 
-Bad example: 'Mac shakes his head and says not exactly constructive'
-Good example: 'The goblin trips, scrambles up, and bolts into the trees.'
+You must respond in JSON with this exact shape:
+{ "narration": "...", "combatTrigger": null, "combatEnd": false }
 
-You are a hype man with a dice bag, not an author.`;
+- narration: your 1-2 sentence DM response (2 sentences MAX)
+- combatTrigger: if the narrative has reached a moment where combat should begin, set this to { "enemies": [] } using ONLY these valid enemy types: goblin, bugbear, wolf, skeleton, zombie, redbrand, nothic, glasstaff. Pick enemies appropriate to the scene and Lost Mines of Phandelver encounter tables. Otherwise null.
+- combatEnd: true if all enemies are dead or fled and combat should end. Otherwise false.
+
+IMPORTANT: Only set combatTrigger once. If combatActive is true, NEVER set combatTrigger — set it to null always.
+
+Return ONLY the JSON object. No markdown. No backticks. No explanation.`;
 
     if (combatContext) {
-      systemPrompt += `\n\nCOMBAT MODE: You have been given the mechanical result of what just happened (who attacked, roll total, hit or miss, damage dealt). Narrate ONLY that result in 1-2 sentences. Do not invent additional actions. Do not write player dialogue. Just describe what the dice already decided.`;
+      systemPrompt += `\n\nCOMBAT MODE: You have been given the mechanical result of what just happened (who attacked, roll total, hit or miss, damage dealt). Narrate ONLY that result in the narration field. Do not invent additional actions. Do not write player dialogue. Just describe what the dice already decided.`;
     }
 
     const groqMessages = [
@@ -39,7 +44,7 @@ You are a hype man with a dice bag, not an author.`;
       groqMessages.push({ role: 'user', content: combatContext });
     }
 
-    console.log('[api/dm] Calling Groq. Messages:', groqMessages.length, combatContext ? '(combat)' : '');
+    console.log('[api/dm] Calling Groq. Messages:', groqMessages.length, combatContext ? '(combat)' : '', combatActive ? '[combat active]' : '');
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
@@ -50,8 +55,9 @@ You are a hype man with a dice bag, not an author.`;
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
         max_tokens: max_tokens || 300,
-        temperature: 0.9,
+        temperature: 0.8,
         messages: groqMessages,
+        response_format: { type: 'json_object' },
       }),
     });
 
@@ -63,9 +69,24 @@ You are a hype man with a dice bag, not an author.`;
       return res.status(500).json({ error: 'Groq API error', detail: data });
     }
 
-    const text = data.choices?.[0]?.message?.content || 'The dungeon falls silent.';
+    const raw = data.choices?.[0]?.message?.content || '{}';
+    let parsed;
+    try {
+      parsed = JSON.parse(raw);
+    } catch (e) {
+      console.error('[api/dm] JSON parse failed:', raw);
+      parsed = {};
+    }
+
+    // Safety: never allow combatTrigger if combatActive was passed as true
+    if (combatActive && parsed.combatTrigger) {
+      parsed.combatTrigger = null;
+    }
+
     return res.status(200).json({
-      content: [{ type: 'text', text }],
+      narration:     parsed.narration     || 'The dungeon falls silent.',
+      combatTrigger: parsed.combatTrigger || null,
+      combatEnd:     parsed.combatEnd     || false,
     });
 
   } catch (err) {
