@@ -1,5 +1,5 @@
 import { CHARS, IDENTITY } from '../services/characters.js';
-import { openSheet, openSummerCamp } from '../screens/summerCamp.js';
+import { openSummerCamp } from '../screens/summerCamp.js';
 
 let activeId = null;
 
@@ -48,13 +48,6 @@ export function closeDetail() {
   document.getElementById('tapHint').style.opacity='';
 }
 
-export function enterDungeon() {
-  const nameEl = document.getElementById('dName');
-  const c = CHARS.find(x=>x.id===activeId);
-  if(c) c.name = nameEl.textContent.trim();
-  openSheet(activeId);
-}
-
 export function enterGroupChat() {
   const nameEl = document.getElementById('dName');
   const c = CHARS.find(x=>x.id===activeId);
@@ -80,7 +73,6 @@ export function enterGroupChat() {
 
 export function initDetailPanel() {
   window.closeDetail    = closeDetail;
-  window.enterDungeon   = enterDungeon;
   window.openSummerCamp = openSummerCamp;
   window.enterGroupChat = enterGroupChat;
 }
