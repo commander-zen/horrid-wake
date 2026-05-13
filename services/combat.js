@@ -13,33 +13,32 @@ function dexMod(charId) {
   return c ? statMod(c.stats.DEX) : 0;
 }
 
-function playerAC(charId) {
+function buildPlayerCombatant(charId) {
   const c = CHARS.find(c => c.id === charId);
-  return c ? c.ac : 10;
+  if (!c) return null;
+  return {
+    id: charId,
+    name: c.name,
+    initiative: rollInitiative(dexMod(charId)),
+    hp: c.hp,
+    maxHp: c.hp,
+    ac: c.ac,
+    type: 'player',
+    characterId: charId,
+    conditions: [],
+  };
 }
 
-function playerMaxHp(charId) {
-  const c = CHARS.find(c => c.id === charId);
-  return c ? c.hp : 10;
-}
+// Reads present players from Firebase presence, adds all to initiative alongside enemies
+export async function startCombat(enemyList) {
+  const presenceSnap = await db().ref('/sessions/lostmines/presence').once('value');
+  const presence = presenceSnap.val() || {};
+  const playerIds = Object.keys(presence);
 
-export async function startCombat(playerIds, enemyList) {
   const combatants = [];
-
   for (const charId of playerIds) {
-    const c = CHARS.find(c => c.id === charId);
-    if (!c) continue;
-    combatants.push({
-      id: charId,
-      name: c.name,
-      initiative: rollInitiative(dexMod(charId)),
-      hp: c.hp,
-      maxHp: c.hp,
-      ac: c.ac,
-      type: 'player',
-      characterId: charId,
-      conditions: [],
-    });
+    const combatant = buildPlayerCombatant(charId);
+    if (combatant) combatants.push(combatant);
   }
 
   const enemyInstances = {};
@@ -49,7 +48,7 @@ export async function startCombat(playerIds, enemyList) {
     if (!template) continue;
     enemyCounts[enemyType] = (enemyCounts[enemyType] || 0) + 1;
     const instanceId = `${enemyType}_${enemyCounts[enemyType]}`;
-    const instance = {
+    combatants.push({
       id: instanceId,
       name: enemyCounts[enemyType] > 1 ? `${template.name} ${enemyCounts[enemyType]}` : template.name,
       initiative: rollInitiative(template.initiativeMod),
@@ -59,8 +58,7 @@ export async function startCombat(playerIds, enemyList) {
       type: 'enemy',
       enemyType,
       conditions: [],
-    };
-    combatants.push(instance);
+    });
     enemyInstances[instanceId] = {
       type: enemyType,
       hp: template.hp,
@@ -82,6 +80,30 @@ export async function startCombat(playerIds, enemyList) {
     enemies: enemyInstances,
     log: [],
   });
+}
+
+// Adds a late-joining player into the correct initiative slot
+export async function addPlayerToCombat(characterId) {
+  const snap = await db().ref(PATH).once('value');
+  const state = snap.val();
+  if (!state || !state.active) return;
+
+  if (state.initiativeOrder.find(c => c.id === characterId)) return;
+
+  const combatant = buildPlayerCombatant(characterId);
+  if (!combatant) return;
+
+  const order = [...state.initiativeOrder];
+  let insertIdx = order.findIndex(c => c.initiative < combatant.initiative);
+  if (insertIdx === -1) insertIdx = order.length;
+  order.splice(insertIdx, 0, combatant);
+
+  // Shift currentTurnIndex if we inserted before it
+  const currentTurnIndex = insertIdx <= state.currentTurnIndex
+    ? state.currentTurnIndex + 1
+    : state.currentTurnIndex;
+
+  await db().ref(PATH).update({ initiativeOrder: order, currentTurnIndex });
 }
 
 export async function endCombat() {
@@ -147,6 +169,7 @@ export async function applyHealing(targetId, amount) {
   await db().ref(PATH + '/initiativeOrder').set(order);
 }
 
+// Returns { attacker, target, attacks: [{ target, roll, total, isCrit, hit, damage }] }
 export async function getEnemyAction(enemyId) {
   const snap = await db().ref(PATH).once('value');
   const state = snap.val();
@@ -158,29 +181,39 @@ export async function getEnemyAction(enemyId) {
   const attacker = state.initiativeOrder.find(c => c.id === enemyId);
   if (!attacker || attacker.hp <= 0) return null;
 
-  const livingPlayers = state.initiativeOrder.filter(c => c.type === 'player' && c.hp > 0);
-  if (!livingPlayers.length) return null;
+  const template = ENEMIES[enemyData.type];
+  const attacksPerTurn = template?.attacksPerTurn || 1;
+  const attacks = [];
 
-  const target = livingPlayers[Math.floor(Math.random() * livingPlayers.length)];
-  const attackResult = rollAttack(enemyData.attackBonus);
-  const hit = checkHit(attackResult.total, target.ac);
+  for (let i = 0; i < attacksPerTurn; i++) {
+    // Re-read initiative order so HP reflects prior attacks in this loop
+    const currentSnap = await db().ref(PATH + '/initiativeOrder').once('value');
+    const currentOrder = currentSnap.val() || state.initiativeOrder;
+    const livingPlayers = currentOrder.filter(c => c.type === 'player' && c.hp > 0);
+    if (!livingPlayers.length) break;
 
-  let damage = 0;
-  if (hit) {
-    const dmgResult = rollDamage(enemyData.damageDice, enemyData.damageMod);
-    damage = dmgResult.total;
-    await applyDamage(target.id, damage);
+    const target = livingPlayers[Math.floor(Math.random() * livingPlayers.length)];
+    const attackResult = rollAttack(enemyData.attackBonus);
+    const hit = checkHit(attackResult.total, target.ac);
+    let damage = 0;
+
+    if (hit) {
+      const dmgResult = rollDamage(enemyData.damageDice, enemyData.damageMod);
+      damage = dmgResult.total;
+      await applyDamage(target.id, damage);
+    }
+
+    attacks.push({
+      target: target.name,
+      roll: attackResult.roll,
+      total: attackResult.total,
+      isCrit: attackResult.isCrit,
+      hit,
+      damage,
+    });
   }
 
   await advanceTurn();
 
-  return {
-    attacker: attacker.name,
-    target: target.name,
-    roll: attackResult.roll,
-    total: attackResult.total,
-    isCrit: attackResult.isCrit,
-    hit,
-    damage,
-  };
+  return { attacker: attacker.name, attacks };
 }
