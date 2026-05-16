@@ -1,5 +1,5 @@
 # SESSION_STATE.md — horrid-wake
-_Last updated: 2026-05-15 (session 2)_
+_Last updated: 2026-05-15 (session 3)_
 
 ---
 
@@ -144,6 +144,8 @@ Full CHARS + SHEETS arrays live in `services/characters.js` and `index.html`.
 - ✅ `max_tokens: 700` (structured JSON needs room)
 - ✅ Structured JSON output: `narrative`, `sentences[]`, `mechanicalEvents[]`, `combatTrigger`, `combatEnd`
 - ✅ System prompt instructs model to surface all HP changes, spell slots, status conditions, resources, death saves in `mechanicalEvents`; explain die rolls per sentence in `mechanic` field; no D&D jargon in narrative prose
+- ✅ Damage breakdown rule: multi-source hits (Divine Smite, Sneak Attack, Symbiotic Entity spores, Wild Magic surge, etc.) emit a separate `hp_change` entry per source + final summary entry
+- ✅ Pronouns locked in system prompt: Dennis he/him, Mac he/him, Charlie he/him, Dee she/her, Frank he/him
 
 ---
 
