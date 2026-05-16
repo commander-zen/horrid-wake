@@ -24,7 +24,7 @@ MECHANICAL EVENTS — surface ALL of these:
 - hp_change: every hit point gain or loss (display: "Name: new/max HP (±N)")
 - spell_slot: every spell slot spent (display: "Name used a Xth-level slot")
 - status: conditions applied or removed (display: "Name is [condition]")
-- resource: class resources used — Rage, Lay on Hands, Bardic Inspiration, Tides of Chaos, Wild Shape (display: "Name used [resource]")
+- resource: class resources used (Rage, Lay on Hands, Bardic Inspiration, Tides of Chaos, Symbiotic Entity, etc.). Use the EXACT ability name from the combat context. display: "Name used [exact ability name from context]"
 - death_save: every death saving throw (display: "Name death save: [success/fail]")
 
 DAMAGE BREAKDOWN — universal rule:

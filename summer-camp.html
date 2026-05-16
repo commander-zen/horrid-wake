@@ -648,6 +648,7 @@
       { name: 'Shield',        type: '1st lvl' },
     ],
     charlie: [
+      { name: 'Shillelagh',   type: 'cantrip' },
       { name: 'Thorn Spray',  type: 'cantrip' },
       { name: 'Entangle',     type: '1st lvl' },
       { name: 'Cure Wounds',  type: '1st lvl', heals: true, healDice: '1d8', healMod: 4 },
@@ -885,6 +886,7 @@
 
     // ── BONUS ACTION section ──
     const bonusRow = makeSection(actionSectionsEl, 'Bonus Action');
+    bonusRow.id = 'ba-row';
     const bonusActions = {
       dennis:  { label: 'Wild Magic',      bonus: 'chaos',       handler: handleWildMagic },
       mac:     { label: 'Divine Smite',    bonus: '+2d8 rad.',   handler: () => handleSmite(livingEnemies) },
@@ -912,6 +914,7 @@
     addBtn(otherRow, 'Help',     'ally adv.',      () => handleSimpleAction('moves to assist, setting up an ally\'s next strike.'));
     addBtn(otherRow, 'Dodge',    'until next turn', () => handleSimpleAction('dodges, bracing for the next hit.'));
     addBtn(otherRow, 'Use Item', 'misc.',           () => handleSimpleAction('uses an item.'));
+    addBtn(otherRow, 'End Turn', 'pass action',     () => handlePassTurn());
   }
 
   function makeSection(parent, label) {
@@ -943,6 +946,10 @@
 
   function disableActions() {
     actionSectionsEl.querySelectorAll('button').forEach(b => b.disabled = true);
+  }
+
+  function disableBonusBtn() {
+    document.getElementById('ba-row')?.querySelectorAll('button').forEach(b => b.disabled = true);
   }
 
   // ── Spell sub-menu ────────────────────────────────────────────────
@@ -1056,6 +1063,14 @@
     await callDM(text);
   }
 
+  async function handlePassTurn() {
+    disableActions();
+    const text = `${char.name} holds position, waiting.`;
+    await chatRef.push({ type: 'combat', subtype: 'miss', characterId: char.id, text, timestamp: Date.now() });
+    await Combat.advanceTurn();
+    await callDM(text);
+  }
+
   // ── Bonus actions ─────────────────────────────────────────────────
   function handleRecklessToggle(btn) {
     if (bonusActionUsed) return;
@@ -1073,7 +1088,7 @@
   async function handleWildMagic() {
     if (bonusActionUsed) return;
     bonusActionUsed = true;
-    disableActions();
+    disableBonusBtn();
     const r = Math.floor(Math.random() * 20) + 1;
     const effects = [
       'a random fireball erupts centered on Dennis',
@@ -1095,7 +1110,7 @@
   async function handleSymbioticEntity() {
     if (bonusActionUsed) return;
     bonusActionUsed = true;
-    disableActions();
+    disableBonusBtn();
     const text = `${char.name} activates Symbiotic Entity — spores coat their body, dealing 4d6 necrotic on hit until short rest.`;
     await chatRef.push({ type: 'combat', subtype: 'hit', characterId: char.id, text, timestamp: Date.now() });
     await callDM(text);
@@ -1104,7 +1119,7 @@
   async function handleBardicInspiration() {
     if (bonusActionUsed) return;
     bonusActionUsed = true;
-    disableActions();
+    disableBonusBtn();
     const allies = ['Mac', 'Dennis', 'Charlie', 'Dee', 'Frank'].filter(n => n.toLowerCase() !== char.id);
     const target = allies[Math.floor(Math.random() * allies.length)];
     const text = `${char.name} grants Bardic Inspiration to ${target} — add a d8 to your next roll.`;

@@ -1,5 +1,13 @@
-import { CHARS, IDENTITY } from '../services/characters.js';
+import { CHARS } from '../services/characters.js';
 import { openSummerCamp } from '../screens/summerCamp.js';
+
+const BIO = {
+  dennis:  "Chaotic magic user who bends minds and bends luck.",
+  mac:     "Holy warrior built to absorb punishment and dish it back.",
+  charlie: "Nature's wrath channeled through rot and regrowth.",
+  dee:     "Silver-tongued manipulator who wins fights before they start.",
+  frank:   "Feral berserker who gets more dangerous the more he bleeds.",
+};
 
 let activeId = null;
 
@@ -22,20 +30,8 @@ export function openDetail(id) {
 
   document.getElementById('dName').textContent = c.name;
   document.getElementById('dCls').textContent = c.cls;
-  document.getElementById('dTag').textContent = c.tag;
-
-  const ident = IDENTITY[c.id];
-  document.getElementById('dIdentity').innerHTML = `
-    <div class="d-identity-row">
-      <div class="d-identity-label">${ident.doesLabel}</div>
-      <div class="d-identity-text">${ident.does}</div>
-    </div>
-    <div class="d-identity-spacer"></div>
-    <div class="d-identity-row">
-      <div class="d-identity-label">FOR THE PLAYER WHO:</div>
-      <div class="d-identity-text">${ident.forPlayer}</div>
-    </div>
-  `;
+  document.getElementById('dTag').textContent = BIO[c.id] || '';
+  document.getElementById('dIdentity').innerHTML = '';
 
   document.getElementById('detailPanel').classList.add('open');
 }
