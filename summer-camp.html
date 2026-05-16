@@ -260,6 +260,38 @@
     letter-spacing: 0.1em; color: var(--text-dim); text-transform: uppercase;
   }
 
+  /* ── DM structured message format ── */
+  .dm-sentence { display: inline; }
+  .dm-info-btn {
+    display: inline; background: none; border: none;
+    color: var(--gold); font-family: 'Cinzel', serif; font-size: 11px;
+    cursor: pointer; padding: 0 3px; vertical-align: baseline;
+    opacity: 0.65; line-height: 1;
+  }
+  .dm-info-btn:hover { opacity: 1; }
+  .dm-mechanic {
+    display: block; margin: 4px 0 6px; padding: 5px 8px;
+    background: rgba(201,168,76,0.06); border-left: 2px solid var(--gold-dim);
+    font-family: 'Josefin Sans', sans-serif; font-size: 11px;
+    letter-spacing: 0.03em; color: var(--text-dim); line-height: 1.55;
+    border-radius: 0 2px 2px 0;
+  }
+  .dm-events {
+    margin-top: 5px; border-left: 3px solid var(--gold);
+    padding: 5px 8px; background: rgba(201,168,76,0.04);
+    display: flex; flex-direction: column; gap: 3px;
+    border-radius: 0 3px 3px 0;
+  }
+  .dm-event {
+    font-family: 'Josefin Sans', sans-serif; font-size: 11px;
+    letter-spacing: 0.05em; color: var(--text-dim);
+  }
+  .dm-event--hp_change  { color: #e07060; }
+  .dm-event--spell_slot { color: rgba(140,110,220,0.9); }
+  .dm-event--death_save { color: var(--red); }
+  .dm-event--status     { color: rgba(90,170,110,0.9); }
+  .dm-event--resource   { color: var(--gold); }
+
   /* ── Character sheet drawer ── */
   .cs-sheet-btn {
     background: none; border: 1px solid var(--gold-dim); color: var(--gold);
@@ -658,6 +690,20 @@
   let bonusActionUsed = false;
 
   // ── Message rendering ─────────────────────────────────────────────
+  let activeMechanic = null;
+
+  function toggleMechanic(div) {
+    if (activeMechanic && activeMechanic !== div) {
+      activeMechanic.style.display = 'none';
+    }
+    const isOpen = div.style.display !== 'none';
+    div.style.display = isOpen ? 'none' : '';
+    activeMechanic = isOpen ? null : div;
+    log.scrollTop = log.scrollHeight;
+  }
+
+  const EVENT_ICON = { hp_change:'🗡️', spell_slot:'✨', death_save:'💀', status:'🌀', resource:'⚡' };
+
   function renderMsg(msg) {
     if (msg.type === 'system') {
       const el = document.createElement('div');
@@ -674,11 +720,58 @@
       sender.className = 'msg-sender';
       sender.textContent = 'DM';
       sender.style.color = CHAR_COLORS.dm;
+      wrap.appendChild(sender);
+
       const bubble = document.createElement('div');
       bubble.className = 'msg-bubble';
-      bubble.textContent = msg.text;
-      wrap.appendChild(sender);
+
+      // Firebase converts arrays to numeric-keyed objects — handle both
+      const sentences = Array.isArray(msg.sentences)
+        ? msg.sentences : Object.values(msg.sentences || {});
+      const events = Array.isArray(msg.mechanicalEvents)
+        ? msg.mechanicalEvents : Object.values(msg.mechanicalEvents || {});
+
+      if (sentences.length) {
+        sentences.forEach(s => {
+          const sentWrap = document.createElement('span');
+          sentWrap.className = 'dm-sentence';
+          sentWrap.textContent = s.text + ' ';
+          if (s.mechanic) {
+            const btn = document.createElement('button');
+            btn.className = 'dm-info-btn';
+            btn.textContent = 'ⓘ';
+            const mechDiv = document.createElement('div');
+            mechDiv.className = 'dm-mechanic';
+            mechDiv.style.display = 'none';
+            mechDiv.textContent = s.mechanic;
+            btn.addEventListener('click', () => toggleMechanic(mechDiv));
+            sentWrap.appendChild(btn);
+            sentWrap.appendChild(mechDiv);
+          }
+          bubble.appendChild(sentWrap);
+        });
+      } else {
+        bubble.textContent = msg.text;
+      }
+
       wrap.appendChild(bubble);
+
+      if (events.length) {
+        const evStrip = document.createElement('div');
+        evStrip.className = 'dm-events';
+        events.forEach(ev => {
+          const evEl = document.createElement('div');
+          evEl.className = 'dm-event dm-event--' + (ev.type || '');
+          evEl.textContent = (EVENT_ICON[ev.type] || '·') + ' ' + ev.display;
+          if (ev.detail) {
+            evEl.title = ev.detail;
+            evEl.style.cursor = 'help';
+          }
+          evStrip.appendChild(evEl);
+        });
+        wrap.appendChild(evStrip);
+      }
+
       log.appendChild(wrap);
       log.scrollTop = log.scrollHeight;
       return;
@@ -1068,8 +1161,11 @@
       if (!res.ok) throw new Error('API ' + res.status);
       const data = await res.json();
 
-      const narration = data.narration || 'The dungeon falls silent.';
-      await chatRef.push({ type: 'dm', characterId: 'dm', characterName: 'DM', text: narration, timestamp: Date.now() });
+      const narration = data.narrative || data.narration || 'The dungeon falls silent.';
+      const dmMsg = { type: 'dm', characterId: 'dm', characterName: 'DM', text: narration, timestamp: Date.now() };
+      if (data.sentences?.length)        dmMsg.sentences        = data.sentences;
+      if (data.mechanicalEvents?.length) dmMsg.mechanicalEvents = data.mechanicalEvents;
+      await chatRef.push(dmMsg);
 
       if (data.combatTrigger && !combatActive && data.combatTrigger.enemies?.length) {
         await Combat.startCombat(data.combatTrigger.enemies);
@@ -1171,8 +1267,11 @@
         });
         if (!res.ok) throw new Error('API ' + res.status);
         const data = await res.json();
-        const text = data.narration || 'The Triboar Trail stretches into shadow.';
-        await chatRef.push({ type: 'dm', characterId: 'dm', characterName: 'DM', text, timestamp: Date.now() });
+        const text = data.narrative || data.narration || 'The Triboar Trail stretches into shadow.';
+        const openMsg = { type: 'dm', characterId: 'dm', characterName: 'DM', text, timestamp: Date.now() };
+        if (data.sentences?.length)        openMsg.sentences        = data.sentences;
+        if (data.mechanicalEvents?.length) openMsg.mechanicalEvents = data.mechanicalEvents;
+        await chatRef.push(openMsg);
       } catch (err) {
         await chatRef.push({ type: 'dm', characterId: 'dm', characterName: 'DM', text: 'The Triboar Trail stretches into shadow. Something moves in the trees.', timestamp: Date.now() });
         console.error('[summer-camp] opening scene:', err);

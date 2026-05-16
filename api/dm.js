@@ -11,29 +11,50 @@ module.exports = async (req, res) => {
   try {
     const { messages, max_tokens, combatContext, combatActive } = req.body;
 
-    let systemPrompt = `You are a DM in a group D&D text chat with 5 friends at a bachelor party.
+    const systemPrompt = `You are the Dungeon Master for a D&D 5e campaign: Lost Mines of Phandelver, level 1. The party is the Always Sunny gang — Dennis (Wild Magic Sorcerer, CHA 16), Mac (Paladin, STR 16), Charlie (Druid, WIS 18), Dee (Bard, CHA 16), Frank (Barbarian, CON 14). Level 1 proficiency bonus is +2.
 
-RULES:
-- Describe only what happens in the world: environment, enemies, consequences.
-- NEVER write dialogue or reactions for any player character (Dennis, Mac, Charlie, Dee, Frank). They speak for themselves.
-- You can mention a character's name only to describe something that physically happens to them.
-- No purple prose. Write like a person, not a book.
-- Keep it moving — end on something that needs a response.
+VOICE:
+- Punchy, atmospheric, immersive. No purple prose. No "you take X damage" in narrative.
+- NEVER write dialogue or reactions for any PC. They speak for themselves.
+- Maximum 3 sentences of narrative. End on something that demands response.
+- All numbers live in mechanicalEvents and sentence.mechanic — never in narrative prose.
 
-You must respond in JSON with this exact shape:
-{ "narration": "...", "combatTrigger": null, "combatEnd": false }
+MECHANICAL EVENTS — surface ALL of these:
+- hp_change: every hit point gain or loss (display: "Name: new/max HP (±N)")
+- spell_slot: every spell slot spent (display: "Name used a Xth-level slot")
+- status: conditions applied or removed (display: "Name is [condition]")
+- resource: class resources used — Rage, Lay on Hands, Bardic Inspiration, Tides of Chaos, Wild Shape (display: "Name used [resource]")
+- death_save: every death saving throw (display: "Name death save: [success/fail]")
 
-- narration: your 1-2 sentence DM response (2 sentences MAX)
-- combatTrigger: if the narrative has reached a moment where combat should begin, set this to { "enemies": [] } using ONLY these valid enemy types: goblin, bugbear, wolf, skeleton, zombie, redbrand, nothic, glasstaff. Pick enemies appropriate to the scene and Lost Mines of Phandelver encounter tables. Otherwise null.
-- combatEnd: true if all enemies are dead or fled and combat should end. Otherwise false.
+SENTENCE MECHANICS — for each sentence that involves a die roll, explain it plainly:
+- Include: what die was rolled, the raw result, all modifiers, the total, what it was compared against, and the outcome.
+- Example: "Dennis rolled a 12 on the d20, plus his +5 spell attack bonus, for a 17 — beating the goblin's AC 13 by 4."
+- If no roll was involved, mechanic is null.
 
-IMPORTANT: Only set combatTrigger once. If combatActive is true, NEVER set combatTrigger — set it to null always.
+COMBAT:
+- combatTrigger: if combat begins, set to { "enemies": [...] } using ONLY: goblin, bugbear, wolf, skeleton, zombie, redbrand, nothic, glasstaff. Otherwise null.
+- combatEnd: true if all enemies are dead or fled. Otherwise false.
+- If combatActive is true, NEVER set combatTrigger — always null.${combatContext ? '\n\nCOMBAT MODE: The mechanical result (attacker, roll, hit/miss, damage) is given. Narrate ONLY that result. Do not invent additional actions or player dialogue.' : ''}
 
-Return ONLY the JSON object. No markdown. No backticks. No explanation.`;
+Respond with ONLY this JSON. No markdown. No backticks. No explanation outside the JSON.
 
-    if (combatContext) {
-      systemPrompt += `\n\nCOMBAT MODE: You have been given the mechanical result of what just happened (who attacked, roll total, hit or miss, damage dealt). Narrate ONLY that result in the narration field. Do not invent additional actions. Do not write player dialogue. Just describe what the dice already decided.`;
+{
+  "narrative": "Full narrative prose as a single string for display.",
+  "mechanicalEvents": [
+    {
+      "type": "hp_change",
+      "character": "Mac",
+      "display": "Mac: 44/52 HP (−8)",
+      "detail": "Goblin shortsword attack rolled 14 + 4 = 18 vs AC 18 — barely hit for 8 piercing damage."
     }
+  ],
+  "sentences": [
+    { "text": "The goblin's blade finds a gap in Mac's armor.", "mechanic": "Goblin rolled 14 + 4 attack = 18, exactly matching Mac's AC 18 — a hit for 1d6+2 = 8 damage." },
+    { "text": "Frank roars and charges.", "mechanic": null }
+  ],
+  "combatTrigger": null,
+  "combatEnd": false
+}`;
 
     const groqMessages = [
       { role: 'system', content: systemPrompt },
@@ -54,7 +75,7 @@ Return ONLY the JSON object. No markdown. No backticks. No explanation.`;
       },
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
-        max_tokens: max_tokens || 300,
+        max_tokens: max_tokens || 700,
         temperature: 0.8,
         messages: groqMessages,
         response_format: { type: 'json_object' },
@@ -78,15 +99,18 @@ Return ONLY the JSON object. No markdown. No backticks. No explanation.`;
       parsed = {};
     }
 
-    // Safety: never allow combatTrigger if combatActive was passed as true
     if (combatActive && parsed.combatTrigger) {
       parsed.combatTrigger = null;
     }
 
+    const narrative = parsed.narrative || parsed.narration || 'The dungeon falls silent.';
+
     return res.status(200).json({
-      narration:     parsed.narration     || 'The dungeon falls silent.',
-      combatTrigger: parsed.combatTrigger || null,
-      combatEnd:     parsed.combatEnd     || false,
+      narrative:        narrative,
+      sentences:        Array.isArray(parsed.sentences) ? parsed.sentences : [],
+      mechanicalEvents: Array.isArray(parsed.mechanicalEvents) ? parsed.mechanicalEvents : [],
+      combatTrigger:    parsed.combatTrigger || null,
+      combatEnd:        parsed.combatEnd     || false,
     });
 
   } catch (err) {
