@@ -1,5 +1,5 @@
 # SESSION_STATE.md — horrid-wake
-_Last updated: 2026-05-12_
+_Last updated: 2026-05-15_
 
 ---
 
@@ -134,6 +134,7 @@ Full CHARS + SHEETS arrays live in `services/characters.js` and `index.html`.
 - ✅ Player can type and receive DM responses
 - ✅ Firebase multiplayer — `onValue` listener on `/sessions/lostmines/chat` syncs all players
 - ✅ Layout gap fixed — messages fill screen, input bar pinned to bottom
+- ✅ Character sheet drawer — portrait icon (top-right topbar), slides in from right, 4 swipeable panels: Ability Scores & Skills / Combat / Character / Spells. Dot indicators, swipe + edge-tap navigation. Frank and Mac show "No spells" state. Pulls from SHEETS level1 data + SHEET_EXTRA supplemental (race, background, alignment, personality, attacks).
 
 ### `api/dm.js` — Groq Serverless Function
 - ✅ CommonJS format (`module.exports`)
@@ -154,7 +155,7 @@ Full CHARS + SHEETS arrays live in `services/characters.js` and `index.html`.
    - DM resolves narratively, no grid
    - Triggered by `<COMBAT_START>` tag in Groq response
 3. **Dice roller** — toggleable floating d20, tray with all dice types, animated roll
-4. **SHEET button** — slides up full character sheet overlay with all stats explained for new players
+4. ~~**SHEET button** — slides up full character sheet overlay with all stats explained for new players~~ ✅ Done (2026-05-15)
 5. **6th character slot** — guided builder: pick race/class, roll stats, name, saves to Firebase, locks in like others
 6. **Progression gating** — key story beats require minimum N players to post before DM advances plot; casual chat flows freely
 
