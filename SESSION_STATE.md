@@ -1,5 +1,5 @@
 # SESSION_STATE.md — horrid-wake
-_Last updated: 2026-05-15_
+_Last updated: 2026-05-15 (session 2)_
 
 ---
 
@@ -135,13 +135,15 @@ Full CHARS + SHEETS arrays live in `services/characters.js` and `index.html`.
 - ✅ Firebase multiplayer — `onValue` listener on `/sessions/lostmines/chat` syncs all players
 - ✅ Layout gap fixed — messages fill screen, input bar pinned to bottom
 - ✅ Character sheet drawer — portrait icon (top-right topbar), slides in from right, 4 swipeable panels: Ability Scores & Skills / Combat / Character / Spells. Dot indicators, swipe + edge-tap navigation. Frank and Mac show "No spells" state. Pulls from SHEETS level1 data + SHEET_EXTRA supplemental (race, background, alignment, personality, attacks).
+- ✅ Structured DM rendering — DM messages rendered sentence-by-sentence. Gold ⓘ button after sentences with die roll math; clicking toggles inline mechanic expansion (one open at a time). `mechanicalEvents` render as a grimdark strip below the bubble (🗡️ damage, ✨ spell, 💀 death save, 🌀 status, ⚡ resource). Firebase array→object round-trip handled with `Object.values()`.
 
 ### `api/dm.js` — Groq Serverless Function
 - ✅ CommonJS format (`module.exports`)
 - ✅ Uses `GROQ_API_KEY` env var
 - ✅ Hardcoded system prompt server-side
-- ✅ `max_tokens: 300` (enforces 2–3 sentence DM responses)
-- System prompt persona: Matt Mercer on a deadline — terse, narrative, Always Sunny party bios, Lost Mines level 1, Triboar Trail opening
+- ✅ `max_tokens: 700` (structured JSON needs room)
+- ✅ Structured JSON output: `narrative`, `sentences[]`, `mechanicalEvents[]`, `combatTrigger`, `combatEnd`
+- ✅ System prompt instructs model to surface all HP changes, spell slots, status conditions, resources, death saves in `mechanicalEvents`; explain die rolls per sentence in `mechanic` field; no D&D jargon in narrative prose
 
 ---
 
