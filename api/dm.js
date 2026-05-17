@@ -51,6 +51,10 @@ SENTENCE MECHANICS — for each sentence that involves a die roll, explain it pl
 - Example: "Dennis rolled a 12 on the d20, plus his +5 spell attack bonus, for a total of 17 — beating the goblin's AC 13."
 - If no roll was involved, mechanic is null.
 
+NPC DIALOGUE RULE:
+When a player character successfully engages an NPC socially and the NPC is primed to share information (guard about to talk, merchant nervous but willing, contact who agreed to meet), the NPC must actually deliver the information in that same response. Do not describe the NPC preparing to speak, looking around, clearing their throat, or leaning in more than once. One beat of atmosphere is allowed. After that beat, the NPC speaks — with actual content, not another description of their body language.
+If the player has sent 2+ messages to the same NPC without receiving any substantive information, the NPC must deliver on the next response regardless of social roll outcome. Failed rolls can still deliver partial or misleading information — but something must be said.
+
 COMBAT:
 - combatTrigger: if combat begins, set to { "enemies": [...] } using ONLY: goblin, bugbear, wolf, skeleton, zombie, redbrand, nothic, glasstaff. Otherwise null.
 - combatEnd: true if all enemies are dead or fled. Otherwise false.
