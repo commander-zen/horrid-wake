@@ -4,14 +4,13 @@ import { rollInitiative, rollAttack, rollDamage, checkHit } from './dice.js';
 
 const PATH = '/sessions/lostmines/combat';
 
+// Full party — always enrolled together, no presence gating
+const ALL_PARTY_IDS = ['dennis', 'mac', 'charlie', 'dee', 'frank'];
+
+// Level-1 DEX modifiers for initiative (from SHEETS level1)
+const INITIATIVE_MODS = { dennis: 2, mac: 1, charlie: 1, dee: 2, frank: 1 };
+
 function db() { return window.firebaseDb; }
-
-function statMod(score) { return Math.floor((score - 10) / 2); }
-
-function dexMod(charId) {
-  const c = CHARS.find(c => c.id === charId);
-  return c ? statMod(c.stats.DEX) : 0;
-}
 
 function buildPlayerCombatant(charId) {
   const c = CHARS.find(c => c.id === charId);
@@ -19,7 +18,7 @@ function buildPlayerCombatant(charId) {
   return {
     id: charId,
     name: c.name,
-    initiative: rollInitiative(dexMod(charId)),
+    initiative: rollInitiative(INITIATIVE_MODS[charId] ?? 0),
     hp: c.hp,
     maxHp: c.hp,
     ac: c.ac,
@@ -29,14 +28,10 @@ function buildPlayerCombatant(charId) {
   };
 }
 
-// Reads present players from Firebase presence, adds all to initiative alongside enemies
+// Enrolls all five party members immediately — no presence gating
 export async function startCombat(enemyList) {
-  const presenceSnap = await db().ref('/sessions/lostmines/presence').once('value');
-  const presence = presenceSnap.val() || {};
-  const playerIds = Object.keys(presence);
-
   const combatants = [];
-  for (const charId of playerIds) {
+  for (const charId of ALL_PARTY_IDS) {
     const combatant = buildPlayerCombatant(charId);
     if (combatant) combatants.push(combatant);
   }
