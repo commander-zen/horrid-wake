@@ -24,7 +24,10 @@
       "Bash(curl \"https://generativelanguage.googleapis.com/v1beta/models?key=YOUR_API_KEY_HERE\")",
       "Bash(mkdir -p public/sprites)",
       "Bash(git rm *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(git pull *)",
+      "Bash(git stash *)",
+      "Bash(python3 -)"
     ]
   }
 }
