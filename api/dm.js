@@ -38,9 +38,17 @@ Examples of multi-source damage that MUST be split:
 - Charlie's Symbiotic Entity spores: weapon damage entry + spore damage entry + summary entry
 - Dennis's Wild Magic surge bonus damage: spell damage entry + surge damage entry + summary entry
 
+HIT/MISS RULE — critical: a hit occurs when (d20 roll + attack bonus) >= target AC. Never compare the raw d20 against AC. The combat context always gives you "roll X + Y = Z vs AC N" — use Z (the total) to determine hit or miss.
+
+ABILITY DETAIL — the "detail" field of every mechanicalEvent must explain what the ability/spell/effect actually DOES mechanically, not just that it was used. Examples:
+- Shield: "+5 AC until start of your next turn. Reaction spell — triggered after being hit, before damage is applied. Uses your reaction for this round."
+- Divine Smite: "Expend a spell slot to add 2d8 radiant damage (1st level) to a melee hit. Uses a bonus action."
+- Symbiotic Entity: "Spores coat the body — each melee hit deals +1d6 necrotic bonus damage until a short rest."
+- Entangle: "DC [X] STR save — creatures that fail are restrained until they break free (STR check) or the spell ends (concentration, 1 min)."
+
 SENTENCE MECHANICS — for each sentence that involves a die roll, explain it plainly:
-- Include: what die was rolled, the raw result, all modifiers, the total, what it was compared against, and the outcome.
-- Example: "Dennis rolled a 12 on the d20, plus his +5 spell attack bonus, for a 17 — beating the goblin's AC 13 by 4."
+- Include: the d20 roll, attack bonus applied, total vs target AC, and hit/miss outcome.
+- Example: "Dennis rolled a 12 on the d20, plus his +5 spell attack bonus, for a total of 17 — beating the goblin's AC 13."
 - If no roll was involved, mechanic is null.
 
 COMBAT:

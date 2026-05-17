@@ -540,9 +540,7 @@
     <button class="sc-back-btn" onclick="history.back()">&#8592; BACK</button>
     <div class="sc-topbar-title">
       <span class="sc-char-name" id="scCharName"></span>
-      <span class="sc-lvl-badge">LVL 1</span>
     </div>
-    <span class="sc-module-tag">Lost Mines of Phandelver</span>
     <button class="cs-sheet-btn" onclick="openCharSheet()" title="Character Sheet">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
         <circle cx="8" cy="5.5" r="2.5"/>
@@ -664,8 +662,9 @@
   const charId = params.get('character');
   const char   = CHARS.find(c => c.id === charId) || CHARS[0];
 
-  document.getElementById('scCharName').textContent = char.name;
-  document.title = char.name + ' — Summer Camp';
+  const firstName = char.name.split(' ')[0];
+  document.getElementById('scCharName').textContent = firstName;
+  document.title = firstName + ' — Summer Camp';
 
   // ── DOM refs ─────────────────────────────────────────────────────
   const log             = document.getElementById('scLog');
@@ -856,7 +855,7 @@
 
       if (currentTurn?.type === 'enemy' && currentTurn.hp > 0) {
         const livingPlayers = state.initiativeOrder.filter(c => c.type === 'player' && c.hp > 0);
-        if (livingPlayers.length && livingPlayers[0].id === char.id) {
+        if (livingPlayers.some(p => p.id === char.id)) {
           triggerEnemyTurn(currentTurn.id);
         }
       }
@@ -1022,9 +1021,9 @@
       damage = rollDamage(dmgCfg.dice, dmgCfg.mod).total + extra;
       subtype = attackResult.isCrit ? 'crit' : 'hit';
       await Combat.applyDamage(target.id, damage);
-      combatText = `${char.name} attacks ${target.name} — roll ${attackResult.total} vs AC ${target.ac}. Hit! ${damage} damage${extraDamageDice ? ' (includes smite)' : ''}${frankReckless ? ' (reckless)' : ''}.`;
+      combatText = `${char.name} attacks ${target.name} — roll ${attackResult.roll} + ${ATTACK_BONUS[char.id]} = ${attackResult.total} vs AC ${target.ac}. Hit! ${damage} damage${extraDamageDice ? ' (includes smite)' : ''}${frankReckless ? ' (reckless)' : ''}.`;
     } else {
-      combatText = `${char.name} attacks ${target.name} — roll ${attackResult.total} vs AC ${target.ac}. Miss${frankReckless ? ' (reckless)' : ''}.`;
+      combatText = `${char.name} attacks ${target.name} — roll ${attackResult.roll} + ${ATTACK_BONUS[char.id]} = ${attackResult.total} vs AC ${target.ac}. Miss${frankReckless ? ' (reckless)' : ''}.`;
     }
 
     await chatRef.push({ type: 'combat', subtype, characterId: char.id, text: combatText, timestamp: Date.now() });
@@ -1140,8 +1139,8 @@
       for (const atk of result.attacks) {
         const subtype = atk.hit ? (atk.isCrit ? 'crit' : 'hit') : 'miss';
         const text = atk.hit
-          ? `${result.attacker} attacks ${atk.target} — roll ${atk.total}. Hit! ${atk.damage} damage.`
-          : `${result.attacker} attacks ${atk.target} — roll ${atk.total}. Miss.`;
+          ? `${result.attacker} attacks ${atk.target} — roll ${atk.roll} + ${atk.attackBonus} = ${atk.total} vs AC ${atk.targetAc}. Hit! ${atk.damage} damage.`
+          : `${result.attacker} attacks ${atk.target} — roll ${atk.roll} + ${atk.attackBonus} = ${atk.total} vs AC ${atk.targetAc}. Miss.`;
         await chatRef.push({ type: 'combat', subtype, characterId: 'dm', text, timestamp: Date.now() });
         lines.push(text);
       }

@@ -205,6 +205,8 @@ export async function getEnemyAction(enemyId) {
 
     attacks.push({
       target: target.name,
+      targetAc: target.ac,
+      attackBonus: enemyData.attackBonus,
       roll: attackResult.roll,
       total: attackResult.total,
       isCrit: attackResult.isCrit,
