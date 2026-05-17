@@ -91,6 +91,8 @@
   }
   .combatant-chip.current-turn .combatant-chip-name { color: var(--gold); }
   .combatant-chip.dead .combatant-chip-name { text-decoration: line-through; }
+  .combatant-chip.tappable { cursor: pointer; }
+  .combatant-chip.tappable:hover { border-color: var(--gold); background: rgba(201,168,76,0.08); }
   .hp-bar-track {
     width: 100%; height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px;
   }
@@ -210,7 +212,16 @@
     font-family: 'Josefin Sans', sans-serif; font-size: 12px;
     letter-spacing: 0.12em; color: var(--text-dim);
     text-align: center; padding: 10px 0; text-transform: uppercase;
+    background: none; border: none; width: 100%; display: block;
   }
+  @keyframes gold-pulse { 0%,100% { opacity:0.6; } 50% { opacity:1; } }
+  .combat-waiting-label.tappable {
+    cursor: pointer;
+    border-bottom: 1px solid var(--gold-dim);
+    animation: gold-pulse 2s ease-in-out infinite;
+    color: var(--gold-dim);
+  }
+  .combat-waiting-label.tappable:hover { color: var(--gold); }
   .action-sections { display: flex; flex-direction: column; gap: 8px; }
   .action-section { display: flex; flex-direction: column; gap: 4px; }
   .action-section-label {
@@ -339,6 +350,13 @@
     font-family: 'Josefin Sans', sans-serif; font-size: 10px;
     color: var(--text-dim); letter-spacing: 0.12em; text-transform: uppercase;
   }
+  .cs-switch-btn {
+    background: none; border: none; color: var(--gold-dim);
+    font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.08em;
+    cursor: pointer; padding: 8px 0 0; text-align: left; opacity: 0.7;
+    display: block;
+  }
+  .cs-switch-btn:hover { opacity: 1; color: var(--gold); }
 
   .cs-panels-wrap {
     flex: 1; overflow: hidden; position: relative;
@@ -568,7 +586,7 @@
 
   <!-- Combat action bar -->
   <div class="combat-input-row" id="combatInput" style="display:none">
-    <div class="combat-waiting-label" id="combatWaiting" style="display:none"></div>
+    <button class="combat-waiting-label" id="combatWaiting" style="display:none"></button>
     <div class="action-sections" id="actionSections" style="display:none"></div>
   </div>
 </div>
@@ -590,6 +608,7 @@
     <div class="cs-hdr-name" id="csHdrName"></div>
     <div class="cs-hdr-class" id="csHdrClass"></div>
     <div class="cs-hdr-meta" id="csHdrMeta"></div>
+    <button class="cs-switch-btn" onclick="location.href='index.html'">&#8592; Switch Character</button>
   </div>
   <div class="cs-panels-wrap" id="csPanelsWrap">
     <div class="cs-edge-prev" onclick="csPrevPanel()"></div>
@@ -830,6 +849,10 @@
       track.appendChild(fill);
       chip.appendChild(nameEl);
       chip.appendChild(track);
+      if (c.type === 'player' && !dead) {
+        chip.classList.add('tappable');
+        chip.addEventListener('click', () => { location.href = 'summer-camp.html?character=' + c.id; });
+      }
       combatOrderEl.appendChild(chip);
     });
   }
@@ -852,6 +875,14 @@
       actionSectionsEl.style.display = 'none';
       const whose = currentTurn ? currentTurn.name.split(' ')[0] : '…';
       combatWaitEl.textContent = 'Waiting for ' + whose + '…';
+
+      if (currentTurn?.type === 'player' && currentTurn.hp > 0) {
+        combatWaitEl.classList.add('tappable');
+        combatWaitEl.onclick = () => { location.href = 'summer-camp.html?character=' + currentTurn.id; };
+      } else {
+        combatWaitEl.classList.remove('tappable');
+        combatWaitEl.onclick = null;
+      }
 
       if (currentTurn?.type === 'enemy' && currentTurn.hp > 0) {
         const livingPlayers = state.initiativeOrder.filter(c => c.type === 'player' && c.hp > 0);
