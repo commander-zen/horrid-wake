@@ -1,9 +1,9 @@
 import { buildCards } from '../components/characterCard.js';
 import { initDetailPanel } from '../components/detailPanel.js';
-import { initSummerCamp } from './summerCamp.js';
+import { initCharacterSheet } from '../components/characterSheet.js';
 
 export function init() {
-  initSummerCamp();
+  initCharacterSheet();
   initDetailPanel();
   buildCards();
 }

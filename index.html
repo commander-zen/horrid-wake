@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="styles/main.css">
 <link rel="stylesheet" href="styles/cards.css">
 <link rel="stylesheet" href="styles/detail.css">
-<link rel="stylesheet" href="styles/summerCamp.css">
+<link rel="stylesheet" href="styles/sheet.css">
 <style>
 .d-btn-chat{width:100%;padding:9px 11px;background:rgba(10,18,30,.5);border:1px solid rgba(40,70,110,.55);color:rgba(100,145,195,.8);font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;text-align:left;}
 .d-btn-chat:active{background:rgba(18,30,50,.65);border-color:rgba(60,100,155,.7);color:rgba(130,175,230,.9);}
@@ -24,7 +24,7 @@
   <div class="s-vignette"></div>
 
   <div class="s-title">
-    <h1>The Gang Goes on an Adventure</h1>
+    <h1>The Fellowship Answers the Call</h1>
 
     <div class="s-rule"><div class="s-rule-line"></div><div class="s-rule-gem"></div><div class="s-rule-line"></div></div>
   </div>
@@ -62,11 +62,14 @@
     <div class="d-identity" id="dIdentity"></div>
     <div class="d-btns">
       <button class="d-btn-back" onclick="closeDetail()">&#8592; Back</button>
-      <div class="d-ctas">
+      <div class="d-ctas" id="dCtas">
         <div class="d-cta-wrap">
-          <button class="d-btn-camp" onclick="window.location.href='summer-camp.html?character='+activeId">&#127957; SUMMER CAMP</button>
-          <div class="d-btn-sub d-btn-sub--camp">Play through Lost Mines of Phandelver with the gang, Levels 1&ndash;5.</div>
+          <button class="d-btn-camp" onclick="openSheet(activeId)">&#128220; VIEW CHARACTER SHEET</button>
+          <div class="d-btn-sub d-btn-sub--camp">Stats, gear, and features for the one-shot, Level 5.</div>
         </div>
+      </div>
+      <div class="d-custom-msg" id="dCustomMsg" style="display:none;padding:14px 4px;font-family:'IM Fell English',serif;font-style:italic;color:rgba(200,180,140,.85);font-size:14px;line-height:1.5;">
+        Cool — if you want to build your own character, connect with the DM before the trip and we'll get you set up.
       </div>
     </div>
   </div>
@@ -92,54 +95,7 @@
   <div class="sh-body" id="shBody"></div>
 </div>
 
-<!-- SUMMER CAMP VIEW -->
-<div id="summerCampView">
-  <div class="sc-topbar">
-    <button class="sc-close" onclick="closeSummerCamp()">&#10005;</button>
-    <div class="sc-topbar-title">
-      <span class="sc-top-name" id="scTopName"></span>
-      <span class="sc-lvl-badge">LVL 1</span>
-    </div>
-  </div>
-  <div class="sc-hero">
-    <div class="sc-hero-img" id="scHeroImg"></div>
-    <div class="sc-hero-fade"></div>
-  </div>
-  <div class="sc-body" id="scBody"></div>
-</div>
 
-<!-- ADVENTURE VIEW -->
-<div id="adventureView">
-  <div class="adv-topbar">
-    <button class="adv-close" onclick="closeAdventure()">&#10005;</button>
-    <div class="adv-party-hp" id="advPartyHp"></div>
-    <button class="adv-sheet-btn" onclick="openSheetFromAdventure()">SHEET</button>
-  </div>
-
-  <div class="adv-mat" id="advMat">
-    <div class="adv-mat-inner" id="advMatInner"></div>
-
-    <div class="adv-narration-panel" id="advNarrationPanel">
-      <button class="adv-narration-toggle" id="advNarrationToggle" onclick="toggleNarration()">&#9660; LOG</button>
-      <div id="advNarrationLog"></div>
-    </div>
-
-    <div class="adv-free-input-overlay" id="advFreeInputOverlay">
-      <input
-        class="adv-free-input"
-        id="advFreeInput"
-        type="text"
-        placeholder="Describe your action..."
-        autocomplete="off"
-      />
-    </div>
-  </div>
-
-  <div class="adv-action-bar" id="advActionBar"></div>
-</div>
-
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 <script type="module" src="app.js"></script>
 </body>
 </html>
