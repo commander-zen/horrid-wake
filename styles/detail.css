@@ -24,8 +24,8 @@
 }
 .d-hero-img{
   position:absolute;inset:0;
-  background-size:cover;
-  background-position:center 15%;
+  background-size:auto 42%;
+  background-position:center 18%;
   background-repeat:no-repeat;
   transform:scale(1.06);
   transition:transform .55s cubic-bezier(.23,1,.32,1);

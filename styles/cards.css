@@ -89,10 +89,12 @@
 /* the image itself */
 .card-img{
   position:absolute;inset:0;
-  background-size:cover;
+  /* emblems are square line-art, so contain (not cover) keeps the whole
+     device visible in this ~1:6 sliver. See services/images.js. */
+  background-size:58% auto;
   background-repeat:no-repeat;
-  background-position:center center;
-  filter:saturate(.65) brightness(.75);
+  background-position:center 42%;
+  opacity:.82;
   transition:filter .4s ease, transform .5s cubic-bezier(.23,1,.32,1);
 }
 
@@ -157,3 +159,18 @@
 
 canvas{position:fixed;inset:0;z-index:2;pointer-events:none;}
 
+
+/* name plate — the cards carry no other label, and half the party
+   is new to D&D, so the emblem alone isn't enough to pick by. */
+.card-name{
+  position:relative;z-index:3;
+  font-family:'Cinzel',serif;font-size:11px;font-weight:600;
+  letter-spacing:1.5px;text-transform:uppercase;
+  color:rgba(215,170,85,.92);
+  text-shadow:0 1px 6px rgba(0,0,0,.9);
+  text-align:center;line-height:1.2;
+  padding:0 2px;
+  pointer-events:none;
+}
+.char-card.dimmed .card-name{opacity:.35;}
+@media (max-width:420px){ .card-name{font-size:9px;letter-spacing:1px;} }

@@ -1,6 +1,6 @@
 export const CHARS = [
   {
-    id: 'aragorn', name: 'Aragorn, Son of Arathorn',
+    id: 'aragorn', short: 'Aragorn', name: 'Aragorn, Son of Arathorn',
     cls: 'Ranger · Dúnedain Wanderer',
     tag: '"I am Aragorn, son of Arathorn. If by life or death I can save you, I will."',
     lore: 'Heir to a throne he has spent his life avoiding. Reads tracks like a book, orc-sign better than most rangers read maps. Andúril was reforged for this. He is trying very hard not to make that a whole thing.',
@@ -9,7 +9,7 @@ export const CHARS = [
     imgKey: 'aragorn', accentColor: '#7a6a3a',
   },
   {
-    id: 'legolas', name: 'Legolas Greenleaf',
+    id: 'legolas', short: 'Legolas', name: 'Legolas Greenleaf',
     cls: 'Ranger · Woodland Marksman',
     tag: '"A red sun rises. Blood has been spilled this night."',
     lore: 'Prince of the Woodland Realm. Counts his kills out loud, mostly to needle Gimli. Can walk on snow without sinking and has never once let anyone forget it.',
@@ -18,7 +18,7 @@ export const CHARS = [
     imgKey: 'legolas', accentColor: '#3a6a3a',
   },
   {
-    id: 'gimli', name: 'Gimli, son of Glóin',
+    id: 'gimli', short: 'Gimli', name: 'Gimli, son of Glóin',
     cls: 'Barbarian · Path of the Berserker',
     tag: '"Certainty of death. Small chance of success. What are we waiting for?"',
     lore: 'Dwarf of the Lonely Mountain. Keeps a running tally of kills against Legolas and cheats at the count. Distrusts elves on principle, is currently losing that argument with himself.',
@@ -27,7 +27,7 @@ export const CHARS = [
     imgKey: 'gimli', accentColor: '#8a3a1a',
   },
   {
-    id: 'boromir', name: 'Boromir of Gondor',
+    id: 'boromir', short: 'Boromir', name: 'Boromir of Gondor',
     cls: 'Fighter · Champion',
     tag: '"One does not simply walk into Mordor. One brings a shield wall."',
     lore: 'Captain of the White Tower, here to see Gondor saved by whatever means necessary. The Ring keeps whispering to him. He keeps telling it to wait its turn.',
@@ -36,7 +36,7 @@ export const CHARS = [
     imgKey: 'boromir', accentColor: '#8a2a2a',
   },
   {
-    id: 'merry', name: 'Meriadoc Brandybuck',
+    id: 'merry', short: 'Merry', name: 'Meriadoc Brandybuck',
     cls: 'Rogue · Scout',
     tag: '"You are in league with... no mortal can hinder me."',
     lore: 'Everyone keeps forgetting the halflings are dangerous. That is the plan. Underestimated in every room he has ever stood in, which has worked out extremely well for him so far.',
@@ -45,7 +45,7 @@ export const CHARS = [
     imgKey: 'merry', accentColor: '#5a7a3a',
   },
   {
-    id: 'pippin', name: 'Peregrin Took',
+    id: 'pippin', short: 'Pippin', name: 'Peregrin Took',
     cls: 'Bard · College of Valor',
     tag: '"Fool of a Took. But at least he can carry a tune."',
     lore: 'Guard of the Citadel, connoisseur of second breakfasts, professional accident-haver. Louder than the situation usually calls for. Braver than the situation usually deserves.',
@@ -54,7 +54,7 @@ export const CHARS = [
     imgKey: 'pippin', accentColor: '#b8943a',
   },
   {
-    id: 'forge-your-own', name: 'Forge Your Own', isCustom: true,
+    id: 'forge-your-own', short: 'Forge Your Own', name: 'Forge Your Own', isCustom: true,
     cls: 'Your Choice',
     tag: '"Not every hero answers to a name already written."',
     lore: "Want to build a character from scratch instead of playing a member of the Fellowship? Cool — connect with the DM before the trip and we'll get you set up.",

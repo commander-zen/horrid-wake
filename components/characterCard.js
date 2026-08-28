@@ -20,7 +20,7 @@ export function buildCards() {
       <div class="card-top-fade"></div>
       <div class="card-sides"></div>
       <div class="card-bottom-fade"></div>
-
+      <div class="card-name">${c.short || c.name}</div>
     `;
     card.addEventListener('click', ()=>openDetail(c.id));
     row.appendChild(card);

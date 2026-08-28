@@ -44,7 +44,7 @@
   position:relative;height:220px;overflow:hidden;flex-shrink:0;
 }
 .sh-hero-img{
-  position:absolute;inset:0;background-size:cover;background-position:center 15%;
+  position:absolute;inset:0;background-size:auto 60%;background-position:center 30%;background-repeat:no-repeat;
   filter:brightness(.72) contrast(1.1) saturate(1.05);
   transform:scale(1.04);
 }
