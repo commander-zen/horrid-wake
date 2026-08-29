@@ -5,7 +5,10 @@
   --blood: #7a1010;
   --ember: #d94f00;
   --coal: #080402;
-  --display: 'Sunny','Cinzel Decorative',serif;
+  /* Title face. 'Sunny' is the drop-in slot for a licensed IASIP face at
+     fonts/iasip.woff2 if one ever lands; until then Playfair Display (free,
+     Google Fonts) carries it. Swap the second name to change the look. */
+  --display: 'Sunny','Fira Sans',system-ui,sans-serif;
 }
 /* ═══ DISPLAY FACE ═══
    Drop the IASIP title font in fonts/ as iasip.woff2 (woff2 is smallest and

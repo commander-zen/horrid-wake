@@ -19,11 +19,17 @@
   text-align:center;padding:20px 16px 0;pointer-events:none;
 }
 .s-title h1{
+  /* Title card, IASIP-style: heavy italic sans, white on black, no ember
+     glow. The drop shadow is only there to hold the text legible over the
+     campfire behind it -- it is not the old gold bloom. */
   font-family:var(--display);
-  font-size:clamp(28px,8vw,50px);
-  color:var(--gold-lt);
-  text-shadow:0 0 40px rgba(210,130,10,.75),0 0 80px rgba(160,60,0,.4),2px 3px 0 rgba(0,0,0,.95);
-  line-height:1;
+  font-style:italic;
+  font-weight:800;
+  font-size:clamp(26px,7.5vw,46px);
+  color:#fff;
+  text-shadow:0 2px 18px rgba(0,0,0,.95),0 0 44px rgba(0,0,0,.85);
+  line-height:1.04;
+  letter-spacing:-.01em;
 }
 .s-title p{
   font-family:'IM Fell English',serif;font-style:italic;
