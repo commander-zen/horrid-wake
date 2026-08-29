@@ -47,13 +47,24 @@ function renderSheet() {
     return `<span class="sh-pip ${cls}"></span>`;
   }).join('');
 
-  const list = (label, arr) => arr && arr.length ? `
-    <div class="sh-section">
-      <div class="sh-section-title">${label}</div>
-      ${arr.map(x => `<div class="sh-feature">&#9670; ${x}</div>`).join('')}
-    </div>` : '';
+  // Progressive disclosure. What a player needs mid-fight stays open at the
+  // top; reference material collapses behind a tap. Native <details> keeps it
+  // keyboard- and screen-reader-accessible with no JS.
+  const acc = (label, inner, count, open) => inner ? `
+    <details class="sh-acc"${open ? ' open' : ''}>
+      <summary>${label}${count != null ? ` <span class="sh-count">${count}</span>` : ''}</summary>
+      <div class="sh-acc-body">${inner}</div>
+    </details>` : '';
+
+  const diamonds = arr => (arr && arr.length)
+    ? arr.map(x => `<div class="sh-feature">&#9670; ${x}</div>`).join('') : '';
+
+  const rows = pairs => pairs
+    .map(([k, v]) => `<div class="sh-skill"><span class="sh-skill-name">${k}</span><span class="sh-skill-val">${v}</span></div>`)
+    .join('');
 
   document.getElementById('shBody').innerHTML = `
+    <div class="sh-primary">
     <div class="sh-vitals">
       <div class="sh-vital"><div class="sh-vital-v" style="color:#65c040">${s.hp}</div><div class="sh-vital-l">HP</div></div>
       <div class="sh-vital"><div class="sh-vital-v" style="color:#3d8fd4">${s.ac}</div><div class="sh-vital-l">AC</div></div>
@@ -72,10 +83,8 @@ function renderSheet() {
           </div>`).join('')}
       </div>
       <div class="sh-note">Saving-throw proficiencies: ${s.saves.map(x => x.toUpperCase()).join(', ')}.</div>
-    </div>
 
-    <div class="sh-section">
-      <div class="sh-section-title">Shadow &mdash; ${s.shadowPath}</div>
+      <div class="sh-section-title" style="margin-top:14px">Shadow &mdash; ${s.shadowPath}</div>
       <div class="sh-shadow">${pips}</div>
       <div class="sh-note">
         Miserable at ${miserable}, anguished at ${anguished} (your Wisdom score).
@@ -84,34 +93,30 @@ function renderSheet() {
       </div>
     </div>
 
-    <div class="sh-section">
-      <div class="sh-section-title">Skills</div>
-      <div class="sh-skills">
-        ${Object.entries(s.skills).map(([name, val]) => `
-          <div class="sh-skill">
-            <span class="sh-skill-name">${name}</span>
-            <span class="sh-skill-val">${val >= 0 ? '+' : ''}${val}</span>
-          </div>`).join('')}
-      </div>
-    </div>
+    ${acc('Features &amp; Traits', diamonds(s.features), s.features.length, true)}
 
-    ${list('Virtues', s.virtues)}
-    ${list('Rewards', s.rewards)}
-    ${list('Features &amp; Traits', s.features)}
+    ${acc('Skills', `<div class="sh-skills">${
+      Object.entries(s.skills).map(([name, val]) => `
+        <div class="sh-skill">
+          <span class="sh-skill-name">${name}</span>
+          <span class="sh-skill-val">${val >= 0 ? '+' : ''}${val}</span>
+        </div>`).join('')}</div>`, Object.keys(s.skills).length)}
 
-    <div class="sh-section">
-      <div class="sh-section-title">Equipment</div>
-      ${s.equipment.map(e => `<div class="sh-equip">${e}</div>`).join('')}
-    </div>
+    ${acc('Virtues &amp; Rewards',
+        diamonds([...s.virtues, ...s.rewards]),
+        s.virtues.length + s.rewards.length)}
 
-    <div class="sh-section">
-      <div class="sh-section-title">Background &mdash; ${s.background}</div>
-      <div class="sh-skill"><span class="sh-skill-name">Distinctive Features</span><span class="sh-skill-val">${s.distinctive.join(', ')}</span></div>
-      <div class="sh-skill"><span class="sh-skill-name">Standard of Living</span><span class="sh-skill-val">${s.standard}</span></div>
-      <div class="sh-skill"><span class="sh-skill-name">Size</span><span class="sh-skill-val">${s.size}</span></div>
-      <div class="sh-skill"><span class="sh-skill-name">Hit Die</span><span class="sh-skill-val">${s.hitDie}</span></div>
-      <div class="sh-skill"><span class="sh-skill-name">Languages</span><span class="sh-skill-val">${s.languages.join(', ')}</span></div>
-    </div>
+    ${acc('Equipment',
+        s.equipment.map(e => `<div class="sh-equip">${e}</div>`).join(''),
+        s.equipment.length)}
+
+    ${acc(`Background &mdash; ${s.background}`, rows([
+        ['Distinctive Features', s.distinctive.join(', ')],
+        ['Standard of Living',   s.standard],
+        ['Size',                 s.size],
+        ['Hit Die',              s.hitDie],
+        ['Languages',            s.languages.join(', ')],
+      ]))}
   `;
 }
 
