@@ -71,10 +71,19 @@ export const CHAR_IMGS = {
     <path d="M100 172 L120 100 M92 174 L112 100"/>
   `),
 
-  // An empty anvil — build your own.
-  forge: svg(`
-    <path d="M58 100 L142 100 L132 118 L118 124 L118 142 L82 142 L82 124 L68 118 Z"/>
-    <path d="M58 100 L38 108 L58 116"/>
-    <path d="M72 148 L128 148 L138 172 L62 172 Z"/>
+  // The One Ring, plain and unadorned until it is heated.
+  frodo: svg(`
+    <circle cx="100" cy="100" r="52" stroke-width="9"/>
+    <circle cx="100" cy="100" r="52" stroke-width="1.2" opacity="0.55"/>
+    <path d="M74 78 Q100 68 126 78" stroke-width="1.4" opacity="0.7"/>
+  `),
+
+  // A mallorn seedling — the gardener's answer to the Shadow.
+  sam: svg(`
+    <path d="M100 172 L100 96"/>
+    <path d="M100 118 Q66 112 56 78 Q94 76 100 114 Z"/>
+    <path d="M100 106 Q134 100 144 66 Q106 64 100 102 Z"/>
+    <path d="M100 96 Q100 62 116 42"/>
+    <path d="M78 176 L122 176"/>
   `),
 };

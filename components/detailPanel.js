@@ -1,13 +1,14 @@
 import { CHARS } from '../services/characters.js';
 
 const BIO = {
+  frodo:   "Ring-bearer. Carrying the thing everyone else is trying not to look at.",
+  sam:     "Gardener, cook, and the most stubborn loyalty in Middle-earth.",
   aragorn: "Ranger and rightful king, currently very busy not talking about it.",
   legolas: "Elven archer who has never missed and will remind you of that.",
   gimli:   "Dwarven berserker settling a centuries-old grudge one axe swing at a time.",
   boromir: "Gondor's finest, holding the line against everything — including himself.",
   merry:   "Halfling rogue nobody sees coming, on purpose.",
   pippin:  "Bard, guard, and full-time reason things get complicated.",
-  'forge-your-own': "Build your own hero instead of playing a pre-made one.",
 };
 
 let activeId = null;
@@ -31,13 +32,9 @@ export function openDetail(id) {
 
   const nameEl = document.getElementById('dName');
   nameEl.textContent = c.name;
-  nameEl.contentEditable = c.isCustom ? 'false' : 'true';
   document.getElementById('dCls').textContent = c.cls;
   document.getElementById('dTag').textContent = BIO[c.id] || '';
   document.getElementById('dIdentity').innerHTML = '';
-
-  document.getElementById('dCtas').style.display = c.isCustom ? 'none' : '';
-  document.getElementById('dCustomMsg').style.display = c.isCustom ? '' : 'none';
 
   document.getElementById('detailPanel').classList.add('open');
 }

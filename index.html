@@ -18,6 +18,8 @@
 <body>
 <canvas id="ec"></canvas>
 
+<button id="muteBtn" type="button" aria-pressed="false">&#9834; ON</button>
+
 <!-- SELECT -->
 <div class="screen" id="selectScreen">
   <div class="s-bg"></div>
@@ -62,16 +64,12 @@
     <div class="d-identity" id="dIdentity"></div>
     <div class="d-btns">
       <button class="d-btn-back" onclick="closeDetail()">&#8592; Back</button>
-      <div class="d-ctas" id="dCtas">
+      <div class="d-ctas">
         <div class="d-cta-wrap">
           <button class="d-btn-camp" onclick="openSheet(activeId)">&#128220; VIEW CHARACTER SHEET</button>
           <div class="d-btn-sub d-btn-sub--camp">Stats, gear, and features for the one-shot, Level 5.</div>
         </div>
       </div>
-      <div class="d-custom-msg" id="dCustomMsg" style="display:none;padding:14px 4px;font-family:'IM Fell English',serif;font-style:italic;color:rgba(200,180,140,.85);font-size:14px;line-height:1.5;">
-        Cool — if you want to build your own character, connect with the DM before the trip and we'll get you set up.
-      </div>
-    </div>
   </div>
 </div>
 
@@ -79,11 +77,7 @@
 <div id="sheetView">
   <div class="sh-topbar">
     <button class="sh-close" onclick="closeSheet()">&#10005;</button>
-    <div class="sh-lvl-wrap">
-      <button class="sh-lvl" id="shLvl1" onclick="setSheetLevel(1)">LEVEL 1</button>
-      <button class="sh-lvl active" id="shLvl5" onclick="setSheetLevel(5)">LEVEL 5</button>
     </div>
-  </div>
   <div class="sh-hero" id="shHero">
     <div class="sh-hero-img" id="shHeroImg"></div>
     <div class="sh-hero-fade"></div>

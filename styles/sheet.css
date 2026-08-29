@@ -142,3 +142,28 @@
   padding:5px 0;border-bottom:1px solid rgba(38,18,3,.7);
 }
 .sh-equip:last-child{border-bottom:none;}
+
+/* ── Shadow track ──────────────────────────────────────────────
+   One pip per point of Shadow the hero can hold; the cap is their
+   Wisdom score. Amber pips mark the miserable threshold (half WIS,
+   rounded up), the red pip marks anguished (full WIS). */
+.sh-shadow{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0 8px;}
+.sh-pip{
+  width:11px;height:11px;flex:0 0 auto;
+  border:1px solid rgba(120,80,30,.6);
+  background:rgba(0,0,0,.45);
+  transform:rotate(45deg);
+}
+.sh-pip.misery{border-color:rgba(200,120,20,.85);background:rgba(90,45,0,.5);}
+.sh-pip.anguish{border-color:rgba(170,25,25,.95);background:rgba(90,10,10,.6);}
+
+.sh-note{
+  font-family:'IM Fell English',serif;font-style:italic;
+  font-size:10.5px;line-height:1.5;
+  color:rgba(160,120,65,.75);
+  margin-top:6px;
+}
+
+/* saving-throw proficiency marker on the ability grid */
+.sh-ability.saved{border-color:rgba(160,110,40,.75);}
+.sh-ability.saved .sh-ability-label::after{content:' \25C6';font-size:6px;opacity:.85;}
