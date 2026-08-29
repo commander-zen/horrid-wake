@@ -1,16 +1,51 @@
 # SESSION_STATE.md — horrid-wake
-_Last updated: 2026-08-26 (session 4)_
+_Last updated: 2026-08-29 (session 5)_
 
 ---
 
 ## 🚀 Cold Start Prompt
 
 > Read this file top to bottom before doing anything.
-> Current priority: **Restore git (OneDrive is dehydrating .git), then land the IASIP font + jingle assets.**
+> Current priority: **Push the 4 local commits — see "Unpushed work" below. Needs Ben at his own machine.**
 > The AI-DM game stack has been stripped (2026-08-26). This repo is now ONLY the character-select app.
 > Do not suggest architectural changes unless I ask.
 > Do not create new files unless I ask — edit existing ones.
 > If anything is ambiguous, ask ONE clarifying question, then proceed.
+
+---
+
+## ⚠️ Unpushed work — read first
+
+**The repo moved off OneDrive on 2026-08-29.** Working copy is now:
+
+```
+C:/repos/horrid-wake          <- USE THIS
+~/OneDrive/Desktop/repos/horrid-wake   <- scrap, .git is damaged, delete when convinced
+```
+
+**Four commits are committed locally and NOT on GitHub:**
+
+| commit | what |
+|---|---|
+| `4f15f60` | retitle to "The Gang Fights a Balrog" + IASIP title card |
+| `6cb13d2` | HELIX reskin (magikdex design language) |
+| `c501130` | a11y: legible type, 44px targets, progressive disclosure |
+| _this one_ | session state |
+
+**Why they are stuck:** `git push` needs GitHub credentials. The credential
+helper can only raise its prompt in a real interactive terminal, so from an
+agent shell it hangs silently forever with no output and no error — `fetch`,
+`clone` and `ls-remote` all work because those are anonymous reads on a public
+repo. Diagnosed via `GIT_TERMINAL_PROMPT=0`, which turns the hang into
+`fatal: could not read Username for 'https://github.com'`.
+
+**The fix, from Ben's own terminal:**
+
+```bash
+cd C:/repos/horrid-wake && git push origin main
+```
+
+One prompt, credential caches, and agent-side pushes work again afterwards.
 
 ---
 
@@ -134,11 +169,13 @@ _(The `summer-camp.html` and `api/dm.js` sections were removed — see "Removed 
 4. ~~**Sheet level toggle is meaningless**~~ ✅ Done 2026-08-29 — toggle removed, sheets are single-level. *Old note:*  — the sheet still offers LEVEL 1 / LEVEL 5, but every Fellowship `level1` block is a byte-for-byte copy of its `level5` block (level-5 one-shot, no progression). Either write real level-1 blocks or hide the toggle.
 5. ~~**Old game infrastructure is dead weight**~~ ✅ Done 2026-08-26 — stripped. See "Removed 2026-08-26" above. Verified in-browser afterward: 13 requests all 200, no 404s, no console errors, select → detail → sheet → level toggle all working.
 6. **OneDrive is dehydrating files inside `.git` — REPO HAZARD.** OneDrive.exe was not running on 2026-08-29 and 332 files under `.git` (290 of them objects) are cloud placeholders that return "the cloud file provider exited unexpectedly". This breaks `git add`, `git push`, `repack`, and `fsck` with `mmap failed: Invalid argument`. Workaround used: `git hash-object -w` + `git update-index --cacheinfo` to stage by hash. **Real fix: move this repo off OneDrive.** Commit `f4a3b61` is committed but unpushed; everything after it is uncommitted. Working files are backed up in the session scratchpad.
-7. **IASIP theme assets not yet supplied.** `fonts/iasip.woff2` and `audio/theme.mp3` are wired but absent (3 expected 404s). Note the jingle fires on first tap, not on load — browsers block autoplay with sound. Also: `.s-title h1` used to reference a font named `AVQuest` that was never loaded anywhere; it now uses `var(--display)`.
-8. **Two dice modules left dangling, deliberately** — `services/dice.js` (33-line pure roller) is now imported by nothing, and `components/diceRoller.js` is a no-op stub whose comment still claims "dice rolling is handled invisibly by the DM AI." Both were left in place because a dice tray was an old backlog item; delete them if it isn't coming back.
-9. **Progression gating / 6th-slot builder / combat system** — all obsolete for the fall one-shot per the scope change. Retained here only in case the summer campaign is revived.
+7. **Design direction changed 2026-08-29.** The app is now reskinned to **HELIX**, the design language of magikdex's Brew flow: cool near-black grounds (`#08090c` / `#12151a` / `#1b2129`), sky-blue accent `#38bdf8`, off-white `#e8eaed` text, HELIX red `#e0555f`, Noto Sans Mono + Zilla Slab type, chunky Win98-style bevels. The old gold/ember Frazetta skin is gone — the "Aesthetic Rules" section further down is **superseded** and kept only for history. Title is IASIP-style: Fira Sans 800 italic, white, no bloom.
+8. **The campfire is now blue — open design question.** The ember particles and fire glow were recoloured with everything else. Internally consistent, but a blue fire reads as a portal rather than a hearth. Options: keep as an abstract particle field, delete the fire entirely (recommended — it is a Frazetta idea with no role in a terminal aesthetic), or make the embers the one deliberate warm exception.
+9. **IASIP theme assets not yet supplied.** `fonts/iasip.woff2` and `audio/theme.mp3` are wired but absent (3 expected 404s). Note the jingle fires on first tap, not on load — browsers block autoplay with sound. Also: `.s-title h1` used to reference a font named `AVQuest` that was never loaded anywhere; it now uses `var(--display)`.
+10. **Two dice modules left dangling, deliberately** — `services/dice.js` (33-line pure roller) is now imported by nothing, and `components/diceRoller.js` is a no-op stub whose comment still claims "dice rolling is handled invisibly by the DM AI." Both were left in place because a dice tray was an old backlog item; delete them if it isn't coming back.
+11. **Progression gating / 6th-slot builder / combat system** — all obsolete for the fall one-shot per the scope change. Retained here only in case the summer campaign is revived.
 
-## Aesthetic Rules — Never Break These
+## Aesthetic Rules — SUPERSEDED 2026-08-29 (kept for history; see Known Issues #7)
 
 - Background: `#1a1008`
 - Gold accent: `#c8943a`
