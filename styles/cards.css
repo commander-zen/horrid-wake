@@ -4,7 +4,7 @@
 .s-bg{
   position:absolute;inset:0;
   background:
-    radial-gradient(ellipse 90% 50% at 50% 80%, rgba(180,60,0,.22) 0%,transparent 65%),
+    radial-gradient(ellipse 90% 50% at 50% 80%, rgba(25,72,94,.22) 0%,transparent 65%),
     radial-gradient(ellipse 120% 70% at 50% 100%, rgba(50,10,0,.55) 0%,transparent 60%),
     linear-gradient(180deg,#030100 0%,#060301 50%,#0a0402 100%);
 }
@@ -32,8 +32,8 @@
   letter-spacing:-.01em;
 }
 .s-title p{
-  font-family:'IM Fell English',serif;font-style:italic;
-  color:rgba(160,95,20,.65);font-size:11px;letter-spacing:4px;margin-top:5px;
+  font-family:'Zilla Slab',serif;font-style:italic;
+  color:rgba(95,155,191,.65);font-size:11px;letter-spacing:4px;margin-top:5px;
 }
 .s-rule{display:flex;align-items:center;gap:8px;max-width:240px;margin:7px auto 0;}
 .s-rule-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dk),transparent);}
@@ -47,7 +47,7 @@
 .fire-glow{
   position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);
   width:180px;height:90px;
-  background:radial-gradient(ellipse at 50% 100%,rgba(255,90,0,.38),rgba(160,40,0,.18) 50%,transparent 75%);
+  background:radial-gradient(ellipse at 50% 100%,rgba(32,100,131,.38),rgba(21,59,78,.18) 50%,transparent 75%);
   filter:blur(14px);
   animation:gp .28s ease-in-out infinite alternate;
 }
@@ -56,13 +56,13 @@
 .fire-logs::before,.fire-logs::after{
   content:'';position:absolute;width:46px;height:6px;
   background:linear-gradient(90deg,#100500,#281002,#100500);
-  border-radius:3px;box-shadow:0 1px 8px rgba(255,70,0,.5);top:3px;left:5px;
+  border-radius:3px;box-shadow:0 1px 8px rgba(30,92,121,.5);top:3px;left:5px;
 }
 .fire-logs::after{transform:rotate(54deg);transform-origin:center;}
 .fire-coals{
   position:absolute;bottom:3px;left:50%;transform:translateX(-50%);
   width:38px;height:6px;
-  background:radial-gradient(ellipse,rgba(255,110,0,.9),rgba(170,35,0,.5),transparent);
+  background:radial-gradient(ellipse,rgba(35,108,142,.9),rgba(21,59,78,.5),transparent);
   border-radius:50%;animation:coal .32s ease-in-out infinite alternate;
 }
 @keyframes coal{from{opacity:.6}to{opacity:1}}
@@ -121,8 +121,8 @@
   position:absolute;inset:0;pointer-events:none;
   background:
     linear-gradient(0deg,
-      rgba(160,55,0,.65) 0%,
-      rgba(100,30,0,.35) 18%,
+      rgba(23,66,86,.65) 0%,
+      rgba(17,43,56,.35) 18%,
       rgba(50,10,0,.1) 35%,
       transparent 55%);
   transition:opacity .3s;
@@ -137,7 +137,7 @@
 /* top fade */
 .card-top-fade{
   position:absolute;top:0;left:0;right:0;height:30%;pointer-events:none;
-  background:linear-gradient(180deg,rgba(3,1,0,.8) 0%,transparent 100%);
+  background:linear-gradient(180deg,rgba(8,9,12,.8) 0%,transparent 100%);
 }
 
 /* bottom fade into ground */
@@ -153,8 +153,8 @@
 }
 .char-card:active .card-fire-light{
   background:linear-gradient(0deg,
-    rgba(220,90,0,.75) 0%,
-    rgba(140,45,0,.4) 20%,
+    rgba(30,93,122,.75) 0%,
+    rgba(21,57,75,.4) 20%,
     transparent 50%);
 }
 
@@ -169,8 +169,8 @@
 /* tap hint */
 .tap-hint{
   position:absolute;bottom:1.5%;left:0;right:0;text-align:center;z-index:8;
-  font-family:'IM Fell English',serif;font-style:italic;
-  color:rgba(160,95,20,.5);font-size:11px;letter-spacing:3px;
+  font-family:'Zilla Slab',serif;font-style:italic;
+  color:rgba(95,155,191,.5);font-size:11px;letter-spacing:3px;
   animation:hpulse 3s ease-in-out infinite;pointer-events:none;transition:opacity .4s;
 }
 @keyframes hpulse{0%,100%{opacity:.25}50%{opacity:.8}}
@@ -182,9 +182,9 @@ canvas{position:fixed;inset:0;z-index:2;pointer-events:none;}
    is new to D&D, so the emblem alone isn't enough to pick by. */
 .card-name{
   position:relative;z-index:3;
-  font-family:'Cinzel',serif;font-size:11px;font-weight:600;
+  font-family:'Noto Sans Mono',monospace;font-size:11px;font-weight:600;
   letter-spacing:1.5px;text-transform:uppercase;
-  color:rgba(215,170,85,.92);
+  color:rgba(232,234,237,.92);
   text-shadow:0 1px 6px rgba(0,0,0,.9);
   text-align:center;line-height:1.2;
   padding:0 2px;

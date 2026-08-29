@@ -6,7 +6,7 @@
 // contain` (not `cover`) to keep the whole device visible on every surface.
 // See the `--emblem` rules in cards.css / detail.css / sheet.css.
 
-const GOLD = '#c8943a';
+const GOLD = '#38bdf8';
 
 const svg = (body) => 'data:image/svg+xml;utf8,' + encodeURIComponent(
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" ` +

@@ -10,7 +10,7 @@ export function initCampfire() {
     return{x:cx+(Math.random()-.5)*70,y:r?innerHeight*(.42+Math.random()*.48):innerHeight*.75,
       vx:(Math.random()-.5)*.8,vy:-(0.4+Math.random()*1.6),
       life:r?Math.random():0,max:.4+Math.random()*.9,r:.6+Math.random()*2,
-      c:Math.random()>.42?'#d94f00':'#ffaa33'};
+      c:Math.random()>.42?'#38bdf8':'#8fd6ff'};
   }
   (function anim(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
