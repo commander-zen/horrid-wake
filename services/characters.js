@@ -434,3 +434,79 @@ export const SHEETS = {
     distinctive: ["Fierce", "Stern"]
   },
 };
+
+// ── COMBAT ACTIONS ────────────────────────────────────────────
+// What each hero can actually DO on their turn, written for people who have
+// never played. `type` is what it costs: move / action / bonus / reaction /
+// free. Attack bonuses and damage are derived from the level-5 builds above
+// (ability modifier + proficiency +3, plus reward and fighting-style bonuses).
+//
+// DERIVED, NOT TRANSCRIBED -- worth checking against the book before play.
+export const ACTIONS = {
+  frodo: [
+      { name: "Sting", type: "action", why: "Stab with the elven blade. It glows blue near orcs.", atk: "+7", dmg: "1d6+4", note: "Crits on 19 or 20", tag: "attack" },
+      { name: "Sneak Attack", type: "free", why: "If you have the advantage, or a friend is next to your target, add a pile of extra damage. Once per turn.", dmg: "+3d6", tag: "attack" },
+      { name: "Cunning Action", type: "bonus", why: "Dash, Disengage, or Hide — for free, every single turn.", tag: "move" },
+      { name: "Uncanny Dodge", type: "reaction", why: "You see the hit coming. Take half the damage.", tag: "defend" },
+      { name: "Shortbow", type: "action", why: "Shoot from a safe distance.", atk: "+7", dmg: "1d6+4", range: "80 ft", tag: "attack" }
+    ],
+  sam: [
+      { name: "Barrow-blade", type: "action", why: "Swing. You get two swings each turn.", atk: "+5", dmg: "1d6+3", note: "Two attacks per Action", tag: "attack" },
+      { name: "Goblin-Cleaver", type: "free", why: "After you hit someone, take a free swing at a different enemy standing next to them.", atk: "+5", dmg: "1d6+3", tag: "attack" },
+      { name: "Orc-hunter", type: "free", why: "You've hunted these things. Every hit on an orc does extra damage automatically.", dmg: "+2 vs orcs", tag: "attack" },
+      { name: "Protection", type: "reaction", why: "Someone swings at a friend beside you. Get your shield in the way.", tag: "defend" },
+      { name: "Rumour of the Earth", type: "action", why: "Go still and listen. You sense whether orcs are nearby, though not where.", uses: "1 per short rest", tag: "utility" }
+    ],
+  merry: [
+      { name: "Barrow-blade", type: "action", why: "Stab something. You're not the fighter, but you're not helpless.", atk: "+5", dmg: "1d6+2", tag: "attack" },
+      { name: "Rhymes of Lore", type: "bonus", why: "Shout the right old verse at a friend. They add a d8 to their next roll — and you can reroll it if it's bad.", dmg: "d8 to an ally", uses: "3 per short rest", tag: "support" },
+      { name: "Cunning Mind", type: "bonus", why: "Think fast. Make a knowledge check, or Help someone else, without spending your turn.", tag: "utility" },
+      { name: "Hands of a Healer", type: "free", why: "During a short rest, patch people up. Everyone resting heals noticeably more.", dmg: "+1d6 per die spent", tag: "support" },
+      { name: "Shortbow", type: "action", why: "Shoot from the back. Stay at the back.", atk: "+5", dmg: "1d6+2", range: "80 ft", tag: "attack" }
+    ],
+  pippin: [
+      { name: "Sword", type: "action", why: "Swing. Surprisingly effective for a hobbit.", atk: "+6", dmg: "1d8+4", tag: "attack" },
+      { name: "Sneak Attack", type: "free", why: "If you have the advantage, or a friend is next to your target, add extra damage. Once per turn.", dmg: "+1d6", tag: "attack" },
+      { name: "Words of the Herald", type: "bonus", why: "Shout something rousing. Help an ally attack from up to 30 feet away.", tag: "support" },
+      { name: "Uncanny Dodge", type: "reaction", why: "You see the hit coming. Take half the damage.", tag: "defend" },
+      { name: "Shortbow", type: "action", why: "Shoot from a distance.", atk: "+6", dmg: "1d6+3", range: "80 ft", tag: "attack" }
+    ],
+  aragorn: [
+      { name: "Andúril", type: "action", why: "Swing the sword. You get two swings each turn.", atk: "+7", dmg: "1d8+4", note: "Two attacks per Action", tag: "attack" },
+      { name: "Longbow", type: "action", why: "Shoot someone far away.", atk: "+3", dmg: "1d8", range: "150 ft", tag: "attack" },
+      { name: "Challenge", type: "bonus", why: "Call one enemy out. You hit them more easily, and they struggle to attack anyone but you.", uses: "1 per short rest", tag: "control" },
+      { name: "Leadership", type: "action", why: "Rally the party. Everyone nearby gets 8 temporary hit points.", uses: "1 per short rest", tag: "support" },
+      { name: "Opportunity attack", type: "reaction", why: "Someone runs away from you — hit them as they go.", atk: "+7", dmg: "1d8+4", tag: "attack" }
+    ],
+  boromir: [
+      { name: "Longsword", type: "action", why: "Swing the sword. You get two swings each turn.", atk: "+7", dmg: "1d8+5", note: "Two attacks per Action", tag: "attack" },
+      { name: "Bright Blade", type: "bonus", why: "Your blade blazes. For a minute you hit more often, and the next person to attack that target finds it easier too.", uses: "1 per short rest", tag: "buff" },
+      { name: "Leadership", type: "action", why: "Rally the party. Everyone nearby gets 7 temporary hit points.", uses: "1 per short rest", tag: "support" },
+      { name: "Protection", type: "reaction", why: "Someone swings at a friend beside you. Get your shield in the way and make it harder to hit them.", tag: "defend" },
+      { name: "Horn of Gondor", type: "action", why: "Blow the horn. No mechanical effect — but everyone in earshot knows Gondor came.", tag: "flavour" }
+    ],
+  legolas: [
+      { name: "Great bow", type: "action", why: "Shoot. You get two shots each turn.", atk: "+9", dmg: "1d10+4", range: "150 ft", note: "Two attacks per Action", tag: "attack" },
+      { name: "Mighty Shot", type: "free", why: "Put your whole body into a shot: harder to land, much worse if it does.", note: "−1d10 to hit, +2d10 damage", tag: "attack" },
+      { name: "Deadly Archery", type: "bonus", why: "Stand still and aim. Your next shot is far more likely to hit.", note: "Only if you haven't moved", tag: "buff" },
+      { name: "Surge of Vigour", type: "bonus", why: "Second wind — heal yourself, or take an extra Dash, Disengage or Dodge.", dmg: "heal 1d8+7", uses: "1 per short rest", tag: "support" },
+      { name: "White knives", type: "action", why: "Someone got close. Stab them.", atk: "+7", dmg: "1d6+4", tag: "attack" }
+    ],
+  gimli: [
+      { name: "Battle axe", type: "action", why: "Swing the axe. You get two swings each turn.", atk: "+7", dmg: "1d8+5", note: "Two attacks per Action; 1d10+5 in two hands", tag: "attack" },
+      { name: "Battle-Fury", type: "free", why: "Drop your guard and go berserk. You hit much harder and shrug off damage — but you're easier to hit back.", note: "Declare on your first attack", tag: "buff" },
+      { name: "Baruk Khazâd!", type: "bonus", why: "Roar the dwarven war-cry. Enemies who hear it may be frightened of you.", note: "They resist with a DC 15 check", uses: "1 per short rest", tag: "control" },
+      { name: "Surge of Vigour", type: "bonus", why: "Second wind — heal yourself, or take an extra Dash, Disengage or Dodge.", dmg: "heal 1d8+8", uses: "1 per short rest", tag: "support" },
+      { name: "Throwing axes", type: "action", why: "Throw an axe at something out of reach.", atk: "+7", dmg: "1d6+4", range: "20 ft", tag: "attack" }
+    ],
+};
+
+// Available to everyone, so no turn screen is ever empty.
+export const COMMON_ACTIONS = [
+    { name: "Move", type: "move", why: "Walk, run, climb. Your speed is on your sheet.", tag: "move" },
+    { name: "Dash", type: "action", why: "Move again. Double your distance this turn.", tag: "move" },
+    { name: "Disengage", type: "action", why: "Back away without anyone getting a free hit on you.", tag: "move" },
+    { name: "Dodge", type: "action", why: "Focus entirely on not being hit. Attackers have a harder time.", tag: "defend" },
+    { name: "Help", type: "action", why: "Assist a friend. Their next roll gets easier.", tag: "support" },
+    { name: "Hide", type: "action", why: "Get out of sight. Attacking from hiding is much better.", tag: "move" }
+  ];

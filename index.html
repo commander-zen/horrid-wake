@@ -54,6 +54,7 @@
 <div id="sheetView">
   <div class="sh-topbar">
     <button class="sh-close" onclick="closeSheet()">&#10005;</button>
+    <button class="sh-turn" onclick="openCombat(window.activeId)">MY TURN</button>
     <button class="sh-print" onclick="window.print()">PRINT</button>
     </div>
   <div class="sh-hero" id="shHero">
@@ -69,5 +70,30 @@
 
 
 <script type="module" src="app.js"></script>
+<!-- COMBAT -->
+<div id="combatView">
+  <div class="cb-top">
+    <button class="cb-close" id="cbClose" type="button">&#10005;</button>
+    <div class="cb-who"><span id="cbName"></span></div>
+  </div>
+
+  <div class="cb-hp">
+    <div class="cb-hp-row">
+      <button class="cb-hp-btn" id="cbHurt" type="button">&minus;</button>
+      <div class="cb-hp-mid">
+        <div class="cb-hp-n" id="cbHp"></div>
+        <div class="cb-hp-track"><div class="cb-hp-fill" id="cbHpBar"></div></div>
+        <div class="cb-hp-l">HEALTH</div>
+      </div>
+      <button class="cb-hp-btn" id="cbHeal" type="button">+</button>
+    </div>
+  </div>
+
+  <div class="cb-slots" id="cbSlots"></div>
+  <div class="cb-log" id="cbLog">Tap something to do it. The app rolls the dice and does the sums.</div>
+  <div class="cb-acts" id="cbActs"></div>
+  <button class="cb-end" id="cbEnd" type="button">END TURN</button>
+</div>
+
 </body>
 </html>

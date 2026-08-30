@@ -6,11 +6,29 @@ _Last updated: 2026-08-29 (session 5)_
 ## 🚀 Cold Start Prompt
 
 > Read this file top to bottom before doing anything.
-> Current priority: **Push the 4 local commits — see "Unpushed work" below. Needs Ben at his own machine.**
+> Current priority: **Check the derived combat numbers in `ACTIONS` (services/characters.js) before the table. Then character art into `images/`.**
 > The AI-DM game stack has been stripped (2026-08-26). This repo is now ONLY the character-select app.
 > Do not suggest architectural changes unless I ask.
 > Do not create new files unless I ask — edit existing ones.
 > If anything is ambiguous, ask ONE clarifying question, then proceed.
+
+---
+
+## Combat mode (added 2026-08-29)
+
+Per-player only; nothing syncs between phones, by design. Entry is the **MY TURN**
+button on the character sheet. A turn is presented as a budget -- Action / Bonus /
+Move / Reaction -- each greying out when spent, so a first-time player never has to
+know the vocabulary. The app rolls and adds; the player narrates.
+
+`ACTIONS` in `services/characters.js` holds ~5 abilities per hero plus 6 universal
+ones. **These are DERIVED from the level-5 builds, not transcribed from the book** --
+attack bonus = ability mod + proficiency (+3), damage = weapon die + mod, plus reward
+and fighting-style bonuses. Verify before play.
+
+DIBS: in-app claims are localStorage, so per-device. `KNOWN_DIBS` seeds claims
+everyone should see (Logan holds Aragorn). Ben can seed the rest rather than adding
+a backend.
 
 ---
 
