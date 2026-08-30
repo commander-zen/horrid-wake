@@ -16,8 +16,6 @@
 </style>
 </head>
 <body>
-<button id="muteBtn" type="button" aria-pressed="false">&#9834; ON</button>
-
 <!-- SELECT -->
 <div class="screen" id="selectScreen">
   <div class="s-bg"></div>
@@ -43,7 +41,11 @@
       </div>
       <div class="pv-role" id="pvRole"></div>
       <div class="pv-stats" id="pvStats"></div>
-      <button class="pv-go" id="pvGo" type="button">VIEW FULL SHEET</button>
+      <div class="pv-claim" id="pvClaim"></div>
+      <div class="pv-actions">
+        <button class="pv-btn pv-btn--dibs" id="pvDibs" type="button">DIBS</button>
+        <button class="pv-btn pv-btn--sheet" id="pvGo" type="button">FULL SHEET</button>
+      </div>
     </div>
   </div>
 </div>
@@ -52,6 +54,7 @@
 <div id="sheetView">
   <div class="sh-topbar">
     <button class="sh-close" onclick="closeSheet()">&#10005;</button>
+    <button class="sh-print" onclick="window.print()">PRINT</button>
     </div>
   <div class="sh-hero" id="shHero">
     <div class="sh-hero-img" id="shHeroImg"></div>

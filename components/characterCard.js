@@ -1,11 +1,14 @@
 import { CHARS } from '../services/characters.js';
-import { CHAR_IMGS } from '../services/images.js';
-import { showPreview } from './detailPanel.js';
+import { CHAR_IMGS, resolveArt } from '../services/images.js';
+import { showPreview, getDibs } from './detailPanel.js';
 
-// Fighting-game roster grid. The whole cast sits on screen at once -- eight
-// characters is exactly 4x2, which fits a 375px phone with no scrolling.
-// Tapping a cell updates the preview panel below; it never navigates, so
-// finding out who someone is costs one tap and zero screen changes.
+// Fighting-game roster grid: 2 across by 4 down, filling whatever height is
+// left after the title and preview, so the whole cast is visible at once with
+// no scrolling. Tapping a cell updates the preview panel below; it never
+// navigates, so finding out who someone is costs one tap and zero screens.
+//
+// Each cell shows character art from images/<id>.<ext> if present, and falls
+// back to the gold-line emblem otherwise.
 
 let IMGS = {};
 
@@ -24,11 +27,33 @@ export function buildCards() {
     cell.setAttribute('role', 'option');
     cell.setAttribute('aria-selected', 'false');
     cell.innerHTML = `
-      <div class="cell-art" style="background-image:url('${IMGS[c.imgKey] || ''}')"></div>
+      <img class="cell-art is-emblem" alt="">
+      <div class="cell-dibs"></div>
       <div class="cell-name">${c.short || c.name}</div>
     `;
+
+    const art = cell.querySelector('.cell-art');
+    resolveArt(c.id, IMGS[c.imgKey] || '', (src, isEmblem) => {
+      art.src = src;
+      art.classList.toggle('is-emblem', isEmblem);
+    });
+
     cell.addEventListener('click', () => select(c.id));
     grid.appendChild(cell);
+  });
+
+  paintDibs();
+  window.refreshRoster = paintDibs;
+}
+
+// Claimed characters are marked on the grid itself, so nobody has to tap
+// through eight cells to find out who is already spoken for.
+function paintDibs() {
+  const claims = getDibs();
+  document.querySelectorAll('.cell').forEach(el => {
+    const who = claims[el.dataset.id];
+    el.classList.toggle('claimed', !!who);
+    el.querySelector('.cell-dibs').textContent = who || '';
   });
 }
 

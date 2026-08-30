@@ -36,23 +36,6 @@ body::after{content:'';position:fixed;inset:0;z-index:999;pointer-events:none;op
 .screen.out{opacity:0;pointer-events:none;}
 
 
-/* ═══ SOUND TOGGLE ═══
-   Browsers refuse autoplay with sound until the user interacts with the
-   page, so the theme is armed on load and fired by the first tap. This
-   button lets people kill it, and the choice persists in localStorage. */
-#muteBtn{
-  position:fixed;top:12px;right:12px;z-index:900;
-  padding:6px 10px;
-  background:rgba(10,6,2,.62);
-  border:1px solid rgba(90,102,114,.5);
-  color:rgba(232,234,237,.9);
-  font-family:'Noto Sans Mono',monospace;font-size:10px;letter-spacing:1.5px;
-  text-transform:uppercase;cursor:pointer;
-  transition:opacity .2s,color .2s,border-color .2s;
-}
-#muteBtn.muted{color:rgba(90,102,114,.55);border-color:rgba(42,52,64,.4);}
-#muteBtn:active{border-color:var(--gold);}
-
 /* ═══ HELIX CHROME ═══
    magikdex's Brew flow leans on chunky Win98-style bevels rather than soft
    shadows: a hard 2px border, a light top/left edge and a dark bottom/right

@@ -1,3 +1,10 @@
+// Claims known before anyone opens the app. Anything claimed in-app is kept
+// in localStorage on that phone — see the note in detailPanel.js about why
+// cross-device dibs would need a backend we deliberately deleted.
+export const KNOWN_DIBS = {
+  aragorn: 'Logan',
+};
+
 export const CHARS = [
   {
     id: 'frodo', short: 'Frodo', name: 'Frodo Baggins',

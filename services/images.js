@@ -87,3 +87,22 @@ export const CHAR_IMGS = {
     <path d="M78 176 L122 176"/>
   `),
 };
+
+// ── CHARACTER ART ─────────────────────────────────────────────
+// Drop a portrait at images/<id>.<ext> and it takes over automatically;
+// until then the emblem above stands in. Extensions are tried in order so
+// you can save whatever you have without converting first.
+export const ART_EXT = ['jpg', 'jpeg', 'png', 'webp'];
+
+export function resolveArt(id, emblem, apply) {
+  let i = 0;
+  const tryNext = () => {
+    if (i >= ART_EXT.length) return apply(emblem, true);   // no art: emblem
+    const url = `images/${id}.${ART_EXT[i++]}`;
+    const probe = new Image();
+    probe.onload  = () => apply(url, false);
+    probe.onerror = tryNext;
+    probe.src = url;
+  };
+  tryNext();
+}
