@@ -6,25 +6,12 @@ import { resolveArt } from '../services/images.js';
 // that simply re-renders when a cell is tapped. Nothing slides, nothing
 // covers the roster, and the whole cast stays visible while you compare.
 //
-// DIBS: claims made in-app live in localStorage, which is per-device. A claim
-// made on Ben's phone is invisible on everyone else's. Genuinely shared dibs
-// needs a backend, and we deleted the Firebase stack three commits ago -- so
-// pre-known claims are seeded from KNOWN_DIBS in characters.js instead.
-
-const DIBS_KEY = 'hw-dibs';
-
-const readDibs = () => {
-  try { return { ...KNOWN_DIBS, ...JSON.parse(localStorage.getItem(DIBS_KEY) || '{}') }; }
-  catch { return { ...KNOWN_DIBS }; }
-};
-
-const writeDibs = (map) => {
-  const own = { ...map };
-  for (const k of Object.keys(KNOWN_DIBS)) delete own[k];   // don't persist seeds
-  try { localStorage.setItem(DIBS_KEY, JSON.stringify(own)); } catch {}
-};
-
-export function getDibs() { return readDibs(); }
+// DIBS is read-only and seeded from KNOWN_DIBS in characters.js. In-app
+// claiming was built and then removed on purpose: localStorage is per-device,
+// so a claim made on one phone was invisible on every other one -- which is
+// the opposite of what "that slot is filled" needs to mean. Claims are called
+// in the group chat and Ben seeds them here, so all eight phones agree.
+export function getDibs() { return { ...KNOWN_DIBS }; }
 
 let activeId = null;
 
@@ -65,64 +52,13 @@ export function showPreview(id) {
 }
 
 function paintClaim(id) {
-  const claim = readDibs()[id];
-  const line = document.getElementById('pvClaim');
-  const btn  = document.getElementById('pvDibs');
-
-  if (claim) {
-    line.innerHTML = `<span class="pv-claimed">${claim} has dibs</span>`;
-    btn.textContent = 'RELEASE';
-    btn.classList.add('taken');
-  } else {
-    line.innerHTML = '';
-    btn.textContent = 'DIBS';
-    btn.classList.remove('taken');
-  }
-}
-
-function toggleDibs() {
-  if (!activeId) return;
-  const map = readDibs();
-
-  if (map[activeId]) {
-    if (KNOWN_DIBS[activeId]) {
-      document.getElementById('pvClaim').innerHTML =
-        `<span class="pv-claimed">${KNOWN_DIBS[activeId]} called this one before the app existed. Talk to them.</span>`;
-      return;
-    }
-    delete map[activeId];
-    writeDibs(map);
-    paintClaim(activeId);
-    window.refreshRoster?.();
-    return;
-  }
-
-  // inline name entry, so nobody meets a browser prompt() dialog
-  const line = document.getElementById('pvClaim');
-  line.innerHTML = `
-    <form class="pv-namer" id="pvNamer">
-      <input id="pvNameIn" type="text" maxlength="18" autocomplete="off"
-             placeholder="your name" aria-label="Your name">
-      <button type="submit">OK</button>
-    </form>`;
-  const input = document.getElementById('pvNameIn');
-  input.focus();
-
-  document.getElementById('pvNamer').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const who = input.value.trim();
-    if (!who) return;
-    const m = readDibs();
-    m[activeId] = who;
-    writeDibs(m);
-    paintClaim(activeId);
-    window.refreshRoster?.();
-  });
+  const claim = getDibs()[id];
+  document.getElementById('pvClaim').innerHTML = claim
+    ? `<span class="pv-claimed">&#9679; ${claim} has dibs</span>`
+    : `<span class="pv-open">&#9675; Open &mdash; call dibs in the group chat</span>`;
 }
 
 export function initDetailPanel() {
   document.getElementById('pvGo')
     .addEventListener('click', () => activeId && window.openSheet(activeId));
-  document.getElementById('pvDibs')
-    .addEventListener('click', toggleDibs);
 }
