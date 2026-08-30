@@ -2,6 +2,7 @@ export const CHARS = [
   {
     id: 'frodo', short: 'Frodo', name: 'Frodo Baggins',
     cls: 'Hobbit of the Shire · Treasure Hunter',
+    role: "Sneaks past anything. Carries the thing nobody else can.",
     tag: '"I will take the Ring, though I do not know the way."',
     lore: 'Bilbo’s heir and the least likely hero in the company. Carries a weight nobody else can carry for him, and says less about it than anyone would like.',
     hp: 34, ac: 15, speed: 25, prof: 3,
@@ -11,6 +12,7 @@ export const CHARS = [
   {
     id: 'sam', short: 'Sam', name: 'Samwise Gamgee',
     cls: 'Hobbit of the Shire · Warden',
+    role: "Keeps people alive. Hits harder than a gardener should.",
     tag: '"I can’t carry it for you, but I can carry you."',
     lore: 'Gardener of Bag End. Brought rope, a frying pan, and a stubbornness that outlasts everything the road throws at it. The most dangerous loyalty in Middle-earth.',
     hp: 46, ac: 15, speed: 25, prof: 3,
@@ -20,6 +22,7 @@ export const CHARS = [
   {
     id: 'aragorn', short: 'Aragorn', name: 'Aragorn, Son of Arathorn',
     cls: 'Ranger of the North · Captain',
+    role: "Leads from the front. Tracks anything. Hits hard.",
     tag: '"I am Aragorn, son of Arathorn. If by life or death I can save you, I will."',
     lore: 'Heir to a throne he has spent his life avoiding. Reads tracks like a book, orc-sign better than most rangers read maps. Andúril was reforged for this. He is trying very hard not to make that a whole thing.',
     hp: 44, ac: 16, speed: 30, prof: 3,
@@ -29,6 +32,7 @@ export const CHARS = [
   {
     id: 'legolas', short: 'Legolas', name: 'Legolas Greenleaf',
     cls: 'Elf of Lindon · Champion',
+    role: "Kills things before they reach you. Never misses.",
     tag: '"A red sun rises. Blood has been spilled this night."',
     lore: 'Prince of the Woodland Realm. Counts his kills out loud, mostly to needle Gimli. Can walk on snow without sinking and has never once let anyone forget it.',
     hp: 38, ac: 17, speed: 35, prof: 3,
@@ -38,6 +42,7 @@ export const CHARS = [
   {
     id: 'gimli', short: 'Gimli', name: 'Gimli, son of Glóin',
     cls: 'Dwarf of Durin’s Folk · Champion',
+    role: "Hits hardest, dies last. Subtlety is not on the menu.",
     tag: '"Certainty of death. Small chance of success. What are we waiting for?"',
     lore: 'Dwarf of the Lonely Mountain. Keeps a running tally of kills against Legolas and cheats at the count. Distrusts elves on principle, is currently losing that argument with himself.',
     hp: 58, ac: 16, speed: 25, prof: 3,
@@ -47,6 +52,7 @@ export const CHARS = [
   {
     id: 'boromir', short: 'Boromir', name: 'Boromir of Gondor',
     cls: 'Barding · Captain',
+    role: "The wall. Soaks the damage so nobody else has to.",
     tag: '"One does not simply walk into Mordor. One brings a shield wall."',
     lore: 'Captain of the White Tower, here to see Gondor saved by whatever means necessary. The Ring keeps whispering to him. He keeps telling it to wait its turn.',
     hp: 52, ac: 18, speed: 30, prof: 3,
@@ -56,6 +62,7 @@ export const CHARS = [
   {
     id: 'merry', short: 'Merry', name: 'Meriadoc Brandybuck',
     cls: 'Hobbit of the Shire · Scholar',
+    role: "Knows things. Patches you up. Reads the map.",
     tag: '"You are in league with... no mortal can hinder me."',
     lore: 'Everyone keeps forgetting the halflings are dangerous. That is the plan. Underestimated in every room he has ever stood in, which has worked out extremely well for him so far.',
     hp: 36, ac: 16, speed: 25, prof: 3,
@@ -65,6 +72,7 @@ export const CHARS = [
   {
     id: 'pippin', short: 'Pippin', name: 'Peregrin Took',
     cls: 'Hobbit of the Shire · Messenger',
+    role: "Talks the party up. Buffs everyone. Causes incidents.",
     tag: '"Fool of a Took. But at least he can carry a tune."',
     lore: 'Guard of the Citadel, connoisseur of second breakfasts, professional accident-haver. Louder than the situation usually calls for. Braver than the situation usually deserves.',
     hp: 33, ac: 14, speed: 25, prof: 3,

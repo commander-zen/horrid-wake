@@ -1,4 +1,3 @@
-import { initCampfire } from './components/campfire.js';
 import { initDiceRoller } from './components/diceRoller.js';
 import { init } from './screens/selectScreen.js';
 
@@ -46,7 +45,6 @@ function initTheme() {
   paint();
 }
 
-initCampfire();
 initTheme();
 initDiceRoller();
 init();

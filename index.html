@@ -16,8 +16,6 @@
 </style>
 </head>
 <body>
-<canvas id="ec"></canvas>
-
 <button id="muteBtn" type="button" aria-pressed="false">&#9834; ON</button>
 
 <!-- SELECT -->
@@ -27,49 +25,26 @@
 
   <div class="s-title">
     <h1>The Gang Fights a Balrog</h1>
-
-    <div class="s-rule"><div class="s-rule-line"></div><div class="s-rule-gem"></div><div class="s-rule-line"></div></div>
   </div>
 
-  <div class="fire-wrap">
-    <div class="fire-glow"></div>
-    <svg class="flames" width="46" height="72" viewBox="0 0 46 72" fill="none">
-      <path class="fo" d="M23 68C7 52 3 35 11 21c2 13 8 7 6-4 4 11 10 5 8-6 6 13 12 31 8 49z" fill="rgba(150,45,0,.52)"/>
-      <path class="fm" d="M23 68c-12-16-13-31-7-44 2 8 6 4 5-2 3 8 7 4 6-3 4 10 10 27 7 43z" fill="rgba(228,102,0,.76)"/>
-      <path class="fi" d="M23 68c-7-14-8-25-4-34 1 6 4 3 3-2 2 6 5 3 4-2 3 8 7 21 5 35z" fill="rgba(255,210,65,.94)"/>
-      <ellipse cx="23" cy="67" rx="9" ry="4" fill="rgba(255,248,185,.7)"/>
-    </svg>
-    <div class="fire-coals"></div>
-    <div class="fire-logs"></div>
-  </div>
+  <!-- Fighting-game roster: whole cast visible at once, no scrolling. -->
+  <div class="roster" id="roster" role="listbox" aria-label="Choose your character"></div>
 
-  <div class="chars-row" id="charsRow"></div>
-  <div class="tap-hint" id="tapHint">Tap a champion to answer the call</div>
-</div>
-
-<!-- DETAIL -->
-<div id="detailPanel">
-  <div class="d-backdrop"></div>
-  <div class="d-hero">
-    <div class="d-hero-img" id="dHeroImg"></div>
-    <div class="d-hero-overlay"></div>
-  </div>
-  <div class="d-card">
-    <div class="d-name-row">
-      <div class="d-name" id="dName" contenteditable="true" spellcheck="false"></div>
-      <span class="d-name-hint">tap to rename</span>
-    </div>
-    <div class="d-cls" id="dCls"></div>
-    <div class="d-tag" id="dTag"></div>
-    <div class="d-identity" id="dIdentity"></div>
-    <div class="d-btns">
-      <button class="d-btn-back" onclick="closeDetail()">&#8592; Back</button>
-      <div class="d-ctas">
-        <div class="d-cta-wrap">
-          <button class="d-btn-camp" onclick="openSheet(activeId)">&#128220; VIEW CHARACTER SHEET</button>
-          <div class="d-btn-sub d-btn-sub--camp">Stats, gear, and features for the one-shot, Level 5.</div>
+  <!-- Live preview. Updates on tap; never navigates away. -->
+  <div class="preview" id="preview">
+    <div class="pv-empty" id="pvEmpty">Pick your guy</div>
+    <div class="pv-body" id="pvBody" hidden>
+      <div class="pv-top">
+        <div class="pv-emblem" id="pvEmblem"></div>
+        <div class="pv-id">
+          <div class="pv-name" id="pvName"></div>
+          <div class="pv-cls" id="pvCls"></div>
         </div>
       </div>
+      <div class="pv-role" id="pvRole"></div>
+      <div class="pv-stats" id="pvStats"></div>
+      <button class="pv-go" id="pvGo" type="button">VIEW FULL SHEET</button>
+    </div>
   </div>
 </div>
 

@@ -31,164 +31,96 @@
   line-height:1.04;
   letter-spacing:-.01em;
 }
-.s-title p{
-  font-family:'Zilla Slab',serif;font-style:italic;
-  color:rgba(95,155,191,.65);font-size:11px;letter-spacing:4px;margin-top:5px;
-}
-.s-rule{display:flex;align-items:center;gap:8px;max-width:240px;margin:7px auto 0;}
-.s-rule-line{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dk),transparent);}
-.s-rule-gem{width:5px;height:5px;background:var(--gold);transform:rotate(45deg);flex-shrink:0;}
 
-/* FIRE */
-.fire-wrap{
-  position:absolute;bottom:13%;left:50%;transform:translateX(-50%);
-  z-index:6;width:60px;display:flex;flex-direction:column;align-items:center;
-}
-.fire-glow{
-  position:absolute;bottom:-18px;left:50%;transform:translateX(-50%);
-  width:180px;height:90px;
-  background:radial-gradient(ellipse at 50% 100%,rgba(32,100,131,.38),rgba(21,59,78,.18) 50%,transparent 75%);
-  filter:blur(14px);
-  animation:gp .28s ease-in-out infinite alternate;
-}
-@keyframes gp{from{opacity:.55;transform:translateX(-50%) scaleX(.86)}to{opacity:1;transform:translateX(-50%) scaleX(1.14)}}
-.fire-logs{position:relative;width:56px;height:12px;z-index:2;}
-.fire-logs::before,.fire-logs::after{
-  content:'';position:absolute;width:46px;height:6px;
-  background:linear-gradient(90deg,#100500,#281002,#100500);
-  border-radius:3px;box-shadow:0 1px 8px rgba(30,92,121,.5);top:3px;left:5px;
-}
-.fire-logs::after{transform:rotate(54deg);transform-origin:center;}
-.fire-coals{
-  position:absolute;bottom:3px;left:50%;transform:translateX(-50%);
-  width:38px;height:6px;
-  background:radial-gradient(ellipse,rgba(35,108,142,.9),rgba(21,59,78,.5),transparent);
-  border-radius:50%;animation:coal .32s ease-in-out infinite alternate;
-}
-@keyframes coal{from{opacity:.6}to{opacity:1}}
-.flames{position:absolute;bottom:11px;left:50%;transform:translateX(-50%);overflow:visible;}
-.fo{animation:fo .21s ease-in-out infinite alternate;transform-origin:50% 100%;}
-.fm{animation:fm .17s ease-in-out infinite alternate;transform-origin:50% 100%;}
-.fi{animation:fi .13s ease-in-out infinite alternate;transform-origin:50% 100%;}
-@keyframes fo{0%{transform:scaleX(.86) scaleY(.91) rotate(-2deg)}100%{transform:scaleX(1.11) scaleY(1.07) rotate(2deg)}}
-@keyframes fm{0%{transform:scaleX(1.05) scaleY(.95) rotate(3deg)}100%{transform:scaleX(.9) scaleY(1.06) rotate(-2deg)}}
-@keyframes fi{0%{transform:scaleX(.91) scaleY(1.06)}100%{transform:scaleX(1.08) scaleY(.93)}}
+/* ═══ ROSTER GRID ═══
+   Fighting-game character select. Eight characters is exactly 4x2, which
+   fits a 375px phone with no scrolling, so the whole cast is comparable at
+   a glance. Replaces the old horizontal strip of ~98px vertical slivers --
+   a shape that could show a symbol but never a face. */
+#selectScreen{display:flex;flex-direction:column;}
+.s-title{position:relative;flex:0 0 auto;padding:16px 14px 10px;}
 
-/* CHARACTER CARDS */
-.chars-row{
-  position:absolute;bottom:0;left:0;right:0;height:80%;
-  z-index:7;display:flex;align-items:flex-end;
-  gap:3px;padding:0 6px;
-  /* 8 cards no longer fit a phone at a legible width, so the row scrolls.
-     `safe center` centres when everything fits (desktop) and falls back to
-     start-alignment when it overflows, instead of clipping the first cards
-     out of reach. */
-  justify-content:flex-start;
-  justify-content:safe center;
-  overflow-x:auto;overflow-y:hidden;
-  scroll-snap-type:x proximity;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:none;
+.roster{
+  flex:0 0 auto;z-index:7;
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:6px;padding:0 10px;
 }
-.chars-row::-webkit-scrollbar{display:none;}
-
-.char-card{
-  flex:0 0 auto;width:26vw;min-width:86px;max-width:150px;height:100%;
-  scroll-snap-align:center;
-  position:relative;cursor:pointer;
-  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
-  padding-bottom:3%;
-  transform-origin:bottom center;
-  transition:transform .4s cubic-bezier(.23,1,.32,1), filter .4s ease, opacity .35s ease;
-  -webkit-user-select:none;user-select:none;
-  overflow:hidden;
+.cell{
+  position:relative;aspect-ratio:4/5;
+  background:#12151a;padding:0;cursor:pointer;overflow:hidden;
+  border:2px solid #1b2129;
+  border-top-color:#3c4856;border-left-color:#3c4856;
+  border-bottom-color:#08090c;border-right-color:#08090c;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  transition:border-color .12s,box-shadow .12s,transform .12s;
 }
-
-/* the image itself */
-.card-img{
-  position:absolute;inset:0;
-  /* emblems are square line-art, so contain (not cover) keeps the whole
-     device visible in this ~1:6 sliver. See services/images.js. */
-  background-size:58% auto;
-  background-repeat:no-repeat;
-  background-position:center 42%;
-  opacity:.82;
-  transition:filter .4s ease, transform .5s cubic-bezier(.23,1,.32,1);
+.cell-art{
+  position:absolute;left:0;right:0;top:0;bottom:22px;
+  background-size:60% auto;background-position:center 45%;
+  background-repeat:no-repeat;opacity:.85;transition:opacity .12s;
 }
-
-/* warm firelight bleeding up from bottom */
-.card-fire-light{
-  position:absolute;inset:0;pointer-events:none;
-  background:
-    linear-gradient(0deg,
-      rgba(23,66,86,.65) 0%,
-      rgba(17,43,56,.35) 18%,
-      rgba(50,10,0,.1) 35%,
-      transparent 55%);
-  transition:opacity .3s;
+.cell-name{
+  position:relative;z-index:2;
+  font-family:'Noto Sans Mono',monospace;font-size:11px;
+  letter-spacing:.4px;text-transform:uppercase;
+  color:rgba(200,206,214,.82);background:#08090c;
+  padding:4px 2px;text-align:center;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  transition:background .12s,color .12s;
 }
-
-/* side fade — blends into darkness */
-.card-sides{
-  position:absolute;inset:0;pointer-events:none;
-  box-shadow:inset 12px 0 22px rgba(0,0,0,.85), inset -12px 0 22px rgba(0,0,0,.85);
+/* selection has to be unmistakable across a table in a dim room */
+.cell.sel{
+  border-color:#38bdf8;
+  box-shadow:0 0 0 2px rgba(56,189,248,.4),0 0 24px rgba(56,189,248,.32);
+  transform:translateY(-2px);
 }
+.cell.sel .cell-art{opacity:1;}
+.cell.sel .cell-name{background:#38bdf8;color:#08090c;font-weight:700;}
+.cell:active{transform:translateY(0);}
 
-/* top fade */
-.card-top-fade{
-  position:absolute;top:0;left:0;right:0;height:30%;pointer-events:none;
-  background:linear-gradient(180deg,rgba(8,9,12,.8) 0%,transparent 100%);
+/* ═══ LIVE PREVIEW ═══
+   Fills the rest of the screen and re-renders in place. Never navigates,
+   so the roster stays visible while you compare. */
+.preview{
+  flex:1 1 auto;z-index:7;min-height:0;overflow-y:auto;
+  padding:12px 12px calc(env(safe-area-inset-bottom) + 16px);
 }
-
-/* bottom fade into ground */
-.card-bottom-fade{
-  position:absolute;bottom:0;left:0;right:0;height:35%;pointer-events:none;
-  background:linear-gradient(0deg,rgba(4,1,0,1) 0%,rgba(4,1,0,.75) 35%,transparent 100%);
+.pv-empty{
+  height:100%;display:flex;align-items:center;justify-content:center;
+  font-family:'Noto Sans Mono',monospace;font-size:13px;letter-spacing:2px;
+  text-transform:uppercase;color:rgba(90,102,114,.75);
 }
-
-/* active / tap state */
-.char-card:active .card-img{
-  filter:saturate(1.05) brightness(.95);
-  transform:scale(1.03);
+.pv-top{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.pv-emblem{
+  width:66px;height:66px;flex:0 0 auto;
+  background-size:contain;background-position:center;background-repeat:no-repeat;
+  border:2px solid #1b2129;background-color:#08090c;
 }
-.char-card:active .card-fire-light{
-  background:linear-gradient(0deg,
-    rgba(30,93,122,.75) 0%,
-    rgba(21,57,75,.4) 20%,
-    transparent 50%);
+.pv-name{
+  font-family:'Fira Sans',system-ui,sans-serif;font-style:italic;font-weight:800;
+  font-size:27px;line-height:1.05;color:#fff;
 }
-
-/* dimmed when another is selected */
-.char-card.dimmed{
-  opacity:.12;
-  filter:grayscale(.9) brightness(.3);
-  pointer-events:none;
+.pv-cls{
+  font-family:'Noto Sans Mono',monospace;font-size:11px;letter-spacing:.6px;
+  color:rgba(56,189,248,.92);margin-top:3px;
 }
-
-
-/* tap hint */
-.tap-hint{
-  position:absolute;bottom:1.5%;left:0;right:0;text-align:center;z-index:8;
-  font-family:'Zilla Slab',serif;font-style:italic;
-  color:rgba(95,155,191,.5);font-size:11px;letter-spacing:3px;
-  animation:hpulse 3s ease-in-out infinite;pointer-events:none;transition:opacity .4s;
+.pv-role{
+  font-family:'Zilla Slab',serif;font-size:15px;line-height:1.4;
+  color:rgba(200,206,214,.9);margin-bottom:12px;
 }
-@keyframes hpulse{0%,100%{opacity:.25}50%{opacity:.8}}
-
-canvas{position:fixed;inset:0;z-index:2;pointer-events:none;}
-
-
-/* name plate — the cards carry no other label, and half the party
-   is new to D&D, so the emblem alone isn't enough to pick by. */
-.card-name{
-  position:relative;z-index:3;
-  font-family:'Noto Sans Mono',monospace;font-size:11px;font-weight:600;
-  letter-spacing:1.5px;text-transform:uppercase;
-  color:rgba(232,234,237,.92);
-  text-shadow:0 1px 6px rgba(0,0,0,.9);
-  text-align:center;line-height:1.2;
-  padding:0 2px;
-  pointer-events:none;
+.pv-stats{display:flex;gap:8px;margin-bottom:14px;}
+.pv-stat{
+  flex:1;text-align:center;padding:9px 4px;background:#12151a;
+  border:2px solid #1b2129;
+  border-top-color:#3c4856;border-left-color:#3c4856;
+  border-bottom-color:#08090c;border-right-color:#08090c;
 }
-.char-card.dimmed .card-name{opacity:.35;}
-@media (max-width:420px){ .card-name{font-size:9px;letter-spacing:1px;} }
+.pv-stat-v{font-family:'Noto Sans Mono',monospace;font-size:24px;font-weight:700;color:#e8eaed;line-height:1;}
+.pv-stat-l{font-family:'Noto Sans Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(90,102,114,.9);margin-top:5px;}
+.pv-go{
+  width:100%;padding:15px;cursor:pointer;
+  background:#38bdf8;color:#08090c;border:0;
+  font-family:'Noto Sans Mono',monospace;font-size:13px;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;
+}
+.pv-go:active{background:#5f9bbf;}

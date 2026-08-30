@@ -1,52 +1,42 @@
-import { CHARS } from '../services/characters.js';
+import { CHARS, SHEETS } from '../services/characters.js';
 
-const BIO = {
-  frodo:   "Ring-bearer. Carrying the thing everyone else is trying not to look at.",
-  sam:     "Gardener, cook, and the most stubborn loyalty in Middle-earth.",
-  aragorn: "Ranger and rightful king, currently very busy not talking about it.",
-  legolas: "Elven archer who has never missed and will remind you of that.",
-  gimli:   "Dwarven berserker settling a centuries-old grudge one axe swing at a time.",
-  boromir: "Gondor's finest, holding the line against everything — including himself.",
-  merry:   "Halfling rogue nobody sees coming, on purpose.",
-  pippin:  "Bard, guard, and full-time reason things get complicated.",
-};
+// Live preview panel. This used to be a full-screen detail sheet you
+// navigated to and back out of; it is now a fixed panel under the roster grid
+// that simply re-renders when a cell is tapped. Nothing slides, nothing
+// covers the roster, and the whole cast stays visible while you compare.
 
 let activeId = null;
 
 export function getActiveId() { return activeId; }
 
-export function openDetail(id) {
+export function showPreview(id) {
   activeId = id;
   window.activeId = id;
 
-  const c = CHARS.find(x=>x.id===id);
+  const c = CHARS.find(x => x.id === id);
+  const s = SHEETS[id];
 
-  document.querySelectorAll('.char-card').forEach(el=>{
-    el.classList.toggle('dimmed', el.dataset.id!==id);
-  });
-  document.getElementById('tapHint').style.opacity='0';
+  document.getElementById('pvEmpty').hidden = true;
+  document.getElementById('pvBody').hidden = false;
 
-  const heroImg = document.getElementById('dHeroImg');
-  heroImg.style.backgroundImage = `url('${window.IMGS[c.imgKey] || ''}')`;
-  heroImg.style.backgroundPosition = 'center center';
+  document.getElementById('pvEmblem').style.backgroundImage =
+    `url('${window.IMGS[c.imgKey] || ''}')`;
+  document.getElementById('pvName').textContent = c.short || c.name;
+  document.getElementById('pvCls').textContent = c.cls;
+  document.getElementById('pvRole').textContent = c.role || '';
 
-  const nameEl = document.getElementById('dName');
-  nameEl.textContent = c.name;
-  document.getElementById('dCls').textContent = c.cls;
-  document.getElementById('dTag').textContent = BIO[c.id] || '';
-  document.getElementById('dIdentity').innerHTML = '';
-
-  document.getElementById('detailPanel').classList.add('open');
-}
-
-export function closeDetail() {
-  activeId = null;
-  window.activeId = null;
-  document.getElementById('detailPanel').classList.remove('open');
-  document.querySelectorAll('.char-card').forEach(el=>el.classList.remove('dimmed'));
-  document.getElementById('tapHint').style.opacity='';
+  // Three numbers, in plain words. Anyone who has never played D&D can read
+  // "Health / Armour / Speed" faster than "HP / AC / SPD".
+  document.getElementById('pvStats').innerHTML = [
+    ['Health', s.hp], ['Armour', s.ac], ['Speed', s.speed],
+  ].map(([label, val]) => `
+    <div class="pv-stat">
+      <div class="pv-stat-v">${val}</div>
+      <div class="pv-stat-l">${label}</div>
+    </div>`).join('');
 }
 
 export function initDetailPanel() {
-  window.closeDetail = closeDetail;
+  document.getElementById('pvGo')
+    .addEventListener('click', () => activeId && window.openSheet(activeId));
 }
