@@ -299,6 +299,12 @@
    #sheetView and #combatView and the same bevel/type idiom -- no new
    components, just the existing ones carrying different copy. */
 .mission-bar{
+  /* .s-bg and .s-vignette are absolutely positioned and fill #selectScreen.
+     Positioned elements paint above non-positioned ones whatever the DOM
+     order, so without these two lines the bar renders at full size and is
+     buried under both overlays -- which is exactly what happened. Same
+     reason .roster and .preview carry z-index:7. */
+  position:relative;z-index:7;
   flex:0 0 auto;margin:0 10px 8px;padding:11px 12px;cursor:pointer;
   display:flex;align-items:center;justify-content:space-between;
   background:#12151a;
