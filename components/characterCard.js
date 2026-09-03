@@ -44,6 +44,11 @@ export function buildCards() {
 
   paintDibs();
   window.refreshRoster = paintDibs;
+
+  // Select someone immediately. The preview panel is a fixed height, so
+  // leaving it empty on load wasted ~300px on a placeholder -- nearly half
+  // the screen on a tall phone. Now it always shows a character.
+  if (CHARS.length) select(CHARS[0].id);
 }
 
 // Claimed characters are marked on the grid itself, so nobody has to tap

@@ -92,7 +92,7 @@
   /* fixed height on purpose: with the roster greedy and this panel sized to
      its content, the grid resized the moment you tapped a cell. Pinning it
      means the layout never moves under your thumb. */
-  flex:0 0 306px;z-index:7;overflow-y:auto;
+  flex:0 0 272px;z-index:7;overflow-y:auto;
   padding:12px 12px calc(env(safe-area-inset-bottom) + 16px);
 }
 /* `display:flex` here outranks the [hidden] attribute's display:none, so the
@@ -104,16 +104,16 @@
   font-family:'Noto Sans Mono',monospace;font-size:13px;letter-spacing:2px;
   text-transform:uppercase;color:rgba(90,102,114,.75);
 }
-.pv-top{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.pv-top{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
 .pv-emblem{
-  width:76px;height:76px;flex:0 0 auto;
+  width:64px;height:64px;flex:0 0 auto;
   background-size:cover;background-position:center 22%;background-repeat:no-repeat;
   border:2px solid #1b2129;background-color:#08090c;
 }
 .pv-emblem.is-emblem{background-size:contain;}
 .pv-name{
   font-family:'Fira Sans',system-ui,sans-serif;font-style:italic;font-weight:800;
-  font-size:27px;line-height:1.05;color:#fff;
+  font-size:24px;line-height:1.05;color:#fff;
 }
 .pv-cls{
   font-family:'Noto Sans Mono',monospace;font-size:11px;letter-spacing:.6px;
@@ -123,9 +123,9 @@
   font-family:'Zilla Slab',serif;font-size:15px;line-height:1.4;
   color:rgba(200,206,214,.9);margin-bottom:12px;
 }
-.pv-stats{display:flex;gap:8px;margin-bottom:14px;}
+.pv-stats{display:flex;gap:8px;margin-bottom:10px;}
 .pv-stat{
-  flex:1;text-align:center;padding:9px 4px;background:#12151a;
+  flex:1;text-align:center;padding:7px 4px;background:#12151a;
   border:2px solid #1b2129;
   border-top-color:#3c4856;border-left-color:#3c4856;
   border-bottom-color:#08090c;border-right-color:#08090c;
@@ -165,7 +165,7 @@
 }
 .pv-actions{display:flex;gap:8px;}
 .pv-btn{
-  flex:1;padding:15px 8px;cursor:pointer;border:0;
+  flex:1;padding:14px 8px;cursor:pointer;border:0;
   font-family:'Noto Sans Mono',monospace;font-size:13px;font-weight:700;
   letter-spacing:1.5px;text-transform:uppercase;
 }
