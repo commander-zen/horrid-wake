@@ -25,6 +25,10 @@
     <h1>The Gang Fights a Balrog</h1>
   </div>
 
+  <button class="mission-bar" id="missionOpen" type="button">
+    THE MISSION <span>&rsaquo;</span>
+  </button>
+
   <!-- Fighting-game roster: whole cast visible at once, no scrolling. -->
   <div class="roster" id="roster" role="listbox" aria-label="Choose your character"></div>
 
@@ -69,6 +73,50 @@
 
 
 <script type="module" src="app.js"></script>
+<!-- MISSION -->
+<div id="missionView">
+  <div class="ms-top">
+    <button class="ms-close" id="missionClose" type="button">&#10005;</button>
+    <div class="ms-title">The Mission</div>
+  </div>
+
+  <div class="ms-body">
+    <div class="ms-setting">
+      A Fellowship-flavoured one-shot at 5th level. Familiar D&amp;D mechanics,
+      Middle-earth trappings &mdash; if you have played 5e you already know how
+      this works, and if you have not, the app does the sums for you.
+    </div>
+
+    <div class="ms-rule"></div>
+
+    <p class="ms-lead">
+      Something walked the Old Road three nights ago. No one who saw it will say
+      what it was &mdash; only that the trees bent away from it, and the moon
+      didn&rsquo;t rise until it had passed.
+    </p>
+
+    <p>
+      An old man named Rowan finds you on the road, breathless and limping. He
+      has tended a small wayside shrine on the old pilgrim road for forty years
+      &mdash; and three nights ago, in the terror left behind by whatever passed
+      through, a warband of Isengard&rsquo;s orcs overran it.
+    </p>
+
+    <p>
+      They are holding the shrine&rsquo;s one holy relic: the Old Watcher&rsquo;s
+      Blade, a sword laid there centuries ago, said to never rust and never dull.
+      Rowan fears what they mean to do with it.
+    </p>
+
+    <blockquote class="ms-quote">
+      &ldquo;Please. It&rsquo;s not just steel. It&rsquo;s the only thing that&rsquo;s
+      kept this stretch of road safe in my lifetime.&rdquo;
+    </blockquote>
+
+    <div class="ms-foot">Pick your character. Rowan is not a patient man.</div>
+  </div>
+</div>
+
 <!-- COMBAT -->
 <div id="combatView">
   <div class="cb-top">

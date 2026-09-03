@@ -293,3 +293,65 @@
   font-family:'Noto Sans Mono',monospace;font-size:12px;font-weight:700;letter-spacing:1.5px;
 }
 .sh-print{margin-left:8px;}
+
+/* ═══ MISSION BRIEFING ═══
+   Player-facing pre-game content. Reuses the slide-in view pattern from
+   #sheetView and #combatView and the same bevel/type idiom -- no new
+   components, just the existing ones carrying different copy. */
+.mission-bar{
+  flex:0 0 auto;margin:0 10px 8px;padding:11px 12px;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;
+  background:#12151a;
+  border:2px solid #1b2129;
+  border-top-color:#3c4856;border-left-color:#3c4856;
+  border-bottom-color:#08090c;border-right-color:#08090c;
+  font-family:'Noto Sans Mono',monospace;font-size:12px;font-weight:700;
+  letter-spacing:2px;color:#38bdf8;
+}
+.mission-bar span{font-size:18px;line-height:1;color:rgba(90,102,114,.9);}
+.mission-bar:active{background:#1b2129;}
+
+#missionView{
+  position:fixed;inset:0;z-index:130;background:#08090c;
+  transform:translateX(100%);transition:transform .28s cubic-bezier(.23,1,.32,1);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+#missionView.open{transform:translateX(0);}
+.ms-top{
+  display:flex;align-items:center;gap:10px;flex:0 0 auto;
+  padding:calc(env(safe-area-inset-top) + 10px) 12px 10px;
+  border-bottom:2px solid #1b2129;
+}
+.ms-close{
+  width:44px;height:44px;flex:0 0 auto;cursor:pointer;font-size:16px;
+  background:none;border:1px solid rgba(56,189,248,.5);color:rgba(56,189,248,.9);
+}
+.ms-title{
+  font-family:'Fira Sans',system-ui,sans-serif;font-style:italic;
+  font-weight:800;font-size:24px;color:#fff;
+}
+.ms-body{
+  flex:1 1 auto;min-height:0;overflow-y:auto;
+  padding:16px 16px calc(env(safe-area-inset-bottom) + 24px);
+}
+.ms-setting{
+  font-family:'Noto Sans Mono',monospace;font-size:12px;line-height:1.6;
+  color:rgba(150,170,190,.9);
+}
+.ms-rule{height:2px;background:#1b2129;margin:16px 0;}
+.ms-body p{
+  font-family:'Zilla Slab',serif;font-size:16px;line-height:1.55;
+  color:rgba(210,216,224,.94);margin-bottom:14px;
+}
+.ms-lead{color:#e8eaed !important;}
+.ms-quote{
+  margin:18px 0;padding:12px 14px;
+  border-left:3px solid #38bdf8;background:#12151a;
+  font-family:'Zilla Slab',serif;font-style:italic;font-size:16px;
+  line-height:1.5;color:#e8eaed;
+}
+.ms-foot{
+  margin-top:20px;padding-top:14px;border-top:2px solid #1b2129;
+  font-family:'Noto Sans Mono',monospace;font-size:12px;letter-spacing:1px;
+  color:rgba(90,102,114,.95);
+}
