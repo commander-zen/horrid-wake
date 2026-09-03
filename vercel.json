@@ -1,3 +1,32 @@
 {
-  "cleanUrls": true
+  "cleanUrls": true,
+  "headers": [
+    {
+      "comment": "The entry point must never be cached. Everything else is reached through it, so if a phone serves a stale index.html the whole app is stale -- which is exactly what happened after the art and mission-briefing deploys.",
+      "source": "/",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/index.html",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ]
+    },
+    {
+      "comment": "Code and styles change most sessions, and there is no build step adding content hashes to filenames, so these have to revalidate too. They are small; the round trip costs little.",
+      "source": "/(.*)\\.(js|css)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ]
+    },
+    {
+      "comment": "Character art and fonts are the heavy bytes and effectively never change once named. Cache them hard so a phone on venue wifi only pays for them once.",
+      "source": "/(.*)\\.(jpg|jpeg|png|webp|svg|woff|woff2|ico)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    }
+  ]
 }
