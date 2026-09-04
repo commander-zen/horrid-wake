@@ -51,9 +51,9 @@ function renderSheet() {
   // Progressive disclosure. What a player needs mid-fight stays open at the
   // top; reference material collapses behind a tap. Native <details> keeps it
   // keyboard- and screen-reader-accessible with no JS.
-  const acc = (label, inner, count, open) => inner ? `
+  const acc = (label, inner, open) => inner ? `
     <details class="sh-acc"${open ? ' open' : ''}>
-      <summary>${label}${count != null ? ` <span class="sh-count">${count}</span>` : ''}</summary>
+      <summary>${label}</summary>
       <div class="sh-acc-body">${inner}</div>
     </details>` : '';
 
@@ -61,7 +61,7 @@ function renderSheet() {
     ? arr.map(x => `<div class="sh-feature" data-ex="item" data-t="${esc(x)}">${x}</div>`).join('') : '';
 
   const rows = pairs => pairs
-    .map(([k, v]) => `<div class="sh-skill"><span class="sh-skill-name">${k}</span><span class="sh-skill-val">${v}</span></div>`)
+    .map(([k, v, ex]) => `<div class="sh-skill" data-ex="bg" data-t="${esc(ex)}"><span class="sh-skill-name">${k}</span><span class="sh-skill-val">${v}</span></div>`)
     .join('');
 
   document.getElementById('shBody').innerHTML = `
@@ -110,29 +110,26 @@ function renderSheet() {
       </div>
     </div>
 
-    ${acc('Features &amp; Traits', diamonds(s.features), s.features.length, true)}
+    ${acc('Features &amp; Traits', diamonds(s.features), true)}
 
     ${acc('Skills', `<div class="sh-skills">${
       Object.entries(s.skills).map(([name, val]) => `
         <div class="sh-skill" data-ex="skill" data-t="${esc(name)}">
           <span class="sh-skill-name">${name}</span>
           <span class="sh-skill-val">${val >= 0 ? '+' : ''}${val}</span>
-        </div>`).join('')}</div>`, Object.keys(s.skills).length)}
+        </div>`).join('')}</div>`)}
 
-    ${acc('Virtues &amp; Rewards',
-        diamonds([...s.virtues, ...s.rewards]),
-        s.virtues.length + s.rewards.length)}
+    ${acc('Virtues &amp; Rewards', diamonds([...s.virtues, ...s.rewards]))}
 
     ${acc('Equipment',
-        s.equipment.map(e => `<div class="sh-equip" data-ex="item" data-t="${esc(e)}">${e}</div>`).join(''),
-        s.equipment.length)}
+        s.equipment.map(e => `<div class="sh-equip" data-ex="item" data-t="${esc(e)}">${e}</div>`).join(''))}
 
     ${acc(`Background &mdash; ${s.background}`, rows([
-        ['Distinctive Features', s.distinctive.join(', ')],
-        ['Standard of Living',   s.standard],
-        ['Size',                 s.size],
-        ['Hit Die',              s.hitDie],
-        ['Languages',            s.languages.join(', ')],
+        ['Distinctive Features', s.distinctive.join(', '), 'features'],
+        ['Standard of Living',   s.standard,               'living'],
+        ['Size',                 s.size,                   'size'],
+        ['Hit Die',              s.hitDie,                 'hitdie'],
+        ['Languages',            s.languages.join(', '),   'langs'],
       ]))}
   `;
 }
@@ -158,7 +155,21 @@ const VITAL = {
   prof:  ['Proficiency Bonus', 'Your training bonus. It is already added into anything you are trained in, so you do not need to add it yourself.'],
 };
 
+const BG = {
+  features: ['Distinctive Features',
+    'Two words that sum up how your character carries themselves. They are not a rule you have to obey &mdash; they are a hint for playing them. Lean into them at the table and the DM may hand you Inspiration for it.'],
+  living: ['Standard of Living',
+    'How comfortable your folk are. It decided what kit you started with and what you can afford without anyone counting coins. Frugal is not poor; it means your people do not measure worth in gold.'],
+  size: ['Size',
+    'Small or Medium. Small folk &mdash; hobbits and the like &mdash; can move straight through the space a bigger creature is standing in, which is more useful in a fight than it sounds.'],
+  hitdie: ['Hit Die',
+    'The die you roll to heal yourself when the party takes a short rest. A d10 heals more than a d8, which is why the sturdier callings get one.'],
+  langs: ['Languages',
+    "What you can speak, read and write. Westron is the common tongue everyone shares; anything else belongs to your own folk, and is occasionally the only reason a conversation goes anywhere."],
+};
+
 function explain(kind, key, sheet) {
+  if (kind === 'bg') { const [n, w] = BG[key] || ['', '']; return [n, w]; }
   if (kind === 'abil') {
     const [name, what] = ABIL[key] || ['', ''];
     return [name, `${what}<br><br><b>The big number is your modifier</b> &mdash; add it to any roll using ${name}. The small number underneath is the raw score it comes from; you rarely need it.`];
