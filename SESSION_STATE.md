@@ -6,7 +6,7 @@ _Last updated: 2026-09-04 (session 6)_
 ## 🚀 Cold Start Prompt
 
 > Read this file top to bottom before doing anything.
-> Current priority: **Verify the ~60 derived combat numbers in `ACTIONS` (services/characters.js). They were reasoned out from the level-5 builds, not transcribed from the book, and nothing has checked them against the printable yet. After that: seed the remaining dibs in `KNOWN_DIBS` -- the app still tells the group "7 still open".**
+> Current priority: **Verify the ~60 derived combat numbers in `ACTIONS` (services/characters.js). They were reasoned out from the level-5 builds, not transcribed from the book, and nothing has checked them against the printable yet. After that: seed the remaining dibs in `KNOWN_DIBS` -- Logan/Aragorn and Cullen/Sam are in, six still open.**
 > The AI-DM game stack has been stripped (2026-08-26). This repo is now ONLY the character-select app.
 > Do not suggest architectural changes unless I ask.
 > Do not create new files unless I ask — edit existing ones.
@@ -300,7 +300,7 @@ session.
   not the same as knowing the rules.
 - **The `ACTIONS` combat numbers are still unverified** (~60 derived, not
   transcribed). The verification printable is still outstanding.
-- **Dibs is still only Logan/Aragorn.** The roster says "7 still open".
+- **Dibs: Logan/Aragorn, Cullen/Sam.** Six still open (2026-09-04).
 
 ### If an LLM version is ever wanted
 It needs: a Vercel serverless function, an API key in project env vars, and a
