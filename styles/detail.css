@@ -56,7 +56,7 @@
 /* name editable */
 .d-name-row{display:flex;align-items:baseline;gap:8px;margin-bottom:8px;}
 .d-name{
-  font-family:'AVQuest',cursive;
+  font-family:var(--display);
   font-size:clamp(35px,8vw,48px);
   color:var(--gold-lt);
   text-shadow:0 0 18px rgba(34,106,139,.5);
@@ -69,7 +69,7 @@
 .d-name:focus{border-bottom-color:rgba(20,53,70,.6);}
 .d-name-hint{font-family:'Zilla Slab',serif;font-style:italic;font-size:8px;color:rgba(25,73,96,.28);white-space:nowrap;}
 .d-cls{font-size:0.95rem;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:6px;}
-.d-tag{font-family:'Josefin Sans',sans-serif;font-weight:300;font-style:italic;color:rgba(39,125,165,.85);font-size:1rem;margin-bottom:12px;line-height:1.4;}
+.d-tag{font-family:'Zilla Slab',serif;font-weight:300;font-style:italic;color:rgba(39,125,165,.85);font-size:1rem;margin-bottom:12px;line-height:1.4;}
 
 /* identity block */
 .d-identity{margin-bottom:10px;}
@@ -80,7 +80,7 @@
   color:var(--ember);margin-bottom:3px;
 }
 .d-identity-text{
-  font-family:'Josefin Sans',sans-serif;font-weight:300;
+  font-family:'Zilla Slab',serif;font-weight:300;
   font-size:13px;line-height:1.55;
   color:rgba(39,125,165,.88);
 }
@@ -121,7 +121,7 @@
 }
 .d-btn-camp:active{background:rgba(28,42,14,.65);border-color:rgba(27,79,104,.7);color:rgba(151,152,155,.9);}
 .d-btn-sub{
-  font-family:'Josefin Sans',sans-serif;font-weight:300;
+  font-family:'Zilla Slab',serif;font-weight:300;
   font-size:0.75rem;color:rgba(24,71,93,.55);padding:0 2px;line-height:1.4;
 }
 .d-btn-sub--camp{color:rgba(25,74,97,.7);}

@@ -1,5 +1,4 @@
 import { CHARS, SHEETS, KNOWN_DIBS } from '../services/characters.js';
-import { resolveArt } from '../services/images.js';
 
 // Live preview panel. This used to be a full-screen detail sheet you
 // navigated to and back out of; it is now a fixed panel under the roster grid
@@ -27,15 +26,7 @@ export function showPreview(id) {
   document.getElementById('pvEmpty').hidden = true;
   document.getElementById('pvBody').hidden = false;
 
-  const em = document.getElementById('pvEmblem');
-  em.classList.add('is-emblem');
-  resolveArt(c.id, window.IMGS[c.imgKey] || '', (src, isEmblem) => {
-    if (activeId !== id) return;              // a faster tap already won
-    em.style.backgroundImage = `url('${src}')`;
-    em.classList.toggle('is-emblem', isEmblem);
-  });
   document.getElementById('pvName').textContent = c.short || c.name;
-  document.getElementById('pvCls').textContent = c.cls;
   document.getElementById('pvRole').textContent = c.role || '';
 
   // Three numbers, in plain words. Anyone who has never played D&D reads

@@ -54,7 +54,7 @@
 }
 .sh-hero-info{position:absolute;bottom:16px;left:18px;right:18px;}
 .sh-char-name{
-  font-family:'AVQuest',cursive;
+  font-family:var(--display);
   font-size:clamp(17px,5.5vw,26px);
   color:var(--gold-lt);line-height:1;margin-bottom:5px;
   text-shadow:0 2px 14px rgba(0,0,0,.95);
@@ -86,7 +86,7 @@
 
 .sh-section{margin-bottom:20px;}
 .sh-section-title{
-  font-family:'AVQuest',cursive;
+  font-family:var(--display);
   font-size:13px;letter-spacing:2px;color:var(--gold);
   border-bottom:1px solid rgba(17,41,54,.6);
   padding-bottom:5px;margin-bottom:10px;text-transform:uppercase;

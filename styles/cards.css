@@ -51,9 +51,7 @@
 .cell{
   position:relative;min-height:0;
   background:#12151a;padding:0;cursor:pointer;overflow:hidden;
-  border:2px solid #1b2129;
-  border-top-color:#3c4856;border-left-color:#3c4856;
-  border-bottom-color:#08090c;border-right-color:#08090c;
+  border:1px solid #232a33;
   display:flex;flex-direction:column;justify-content:flex-end;
   transition:border-color .12s,box-shadow .12s,transform .12s;
 }
@@ -77,7 +75,7 @@
 }
 /* selection has to be unmistakable across a table in a dim room */
 .cell.sel{
-  border-color:#38bdf8;
+  border-color:#38bdf8;border-width:2px;
   box-shadow:0 0 0 2px rgba(56,189,248,.4),0 0 24px rgba(56,189,248,.32);
   transform:translateY(-2px);
 }
@@ -92,7 +90,7 @@
   /* fixed height on purpose: with the roster greedy and this panel sized to
      its content, the grid resized the moment you tapped a cell. Pinning it
      means the layout never moves under your thumb. */
-  flex:0 0 272px;z-index:7;overflow-y:auto;
+  flex:0 0 214px;z-index:7;overflow-y:auto;
   padding:12px 12px calc(env(safe-area-inset-bottom) + 16px);
 }
 /* `display:flex` here outranks the [hidden] attribute's display:none, so the
@@ -123,15 +121,12 @@
   font-family:'Zilla Slab',serif;font-size:15px;line-height:1.4;
   color:rgba(200,206,214,.9);margin-bottom:12px;
 }
-.pv-stats{display:flex;gap:8px;margin-bottom:10px;}
+.pv-stats{display:flex;gap:0;margin-bottom:14px;}
 .pv-stat{
-  flex:1;text-align:center;padding:7px 4px;background:#12151a;
-  border:2px solid #1b2129;
-  border-top-color:#3c4856;border-left-color:#3c4856;
-  border-bottom-color:#08090c;border-right-color:#08090c;
+  flex:1;text-align:left;padding:0 14px 0 0;
 }
-.pv-stat-v{font-family:'Noto Sans Mono',monospace;font-size:24px;font-weight:700;color:#e8eaed;line-height:1;}
-.pv-stat-l{font-family:'Noto Sans Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:rgba(90,102,114,.9);margin-top:5px;}
+.pv-stat-v{font-family:'Noto Sans Mono',monospace;font-size:26px;font-weight:700;color:#e8eaed;line-height:1;}
+.pv-stat-l{font-family:'Noto Sans Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(120,134,148,.95);margin-top:6px;}
 .pv-go{
   width:100%;padding:15px;cursor:pointer;
   background:#38bdf8;color:#08090c;border:0;
