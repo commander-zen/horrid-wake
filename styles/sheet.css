@@ -450,3 +450,120 @@
   letter-spacing:.8px;color:#12161c;background:#aeb8c4;
   padding:2px 5px;border-radius:4px;margin-right:6px;
 }
+
+/* ═══ THE LOREMASTER ═══
+   A rules bot in the bottom-right corner. Same slide-in idiom, panel colours
+   and 44px touch floor as #sheetView / #combatView -- no new visual language,
+   because a fifth look on one screen is how an app starts feeling cheap. */
+
+.lm-fab{
+  position:fixed;z-index:150;cursor:pointer;
+  right:calc(env(safe-area-inset-right) + 14px);
+  bottom:calc(env(safe-area-inset-bottom) + 14px);
+  width:56px;height:56px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  background:#1c222b;border:2px solid rgba(229,50,45,.75);
+  color:rgba(229,50,45,.95);
+  box-shadow:0 6px 18px rgba(0,0,0,.55);
+  transition:transform .15s ease, background .15s ease;
+}
+.lm-fab svg{width:30px;height:30px;display:block;}
+.lm-fab:active{transform:scale(.92);background:#242c37;}
+/* the FAB would sit on top of END TURN, and mid-fight the turn tracker wins */
+body:has(#combatView.open) .lm-fab,
+body:has(#missionView.open) .lm-fab,
+body:has(#loremasterView.open) .lm-fab{display:none;}
+
+#loremasterView{
+  position:fixed;inset:0;z-index:160;background:#12161c;
+  transform:translateY(100%);transition:transform .28s cubic-bezier(.23,1,.32,1);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+#loremasterView.open{transform:translateY(0);}
+
+.lm-top{
+  display:flex;align-items:center;gap:10px;flex:0 0 auto;
+  padding:calc(env(safe-area-inset-top) + 10px) 12px 10px;
+  border-bottom:2px solid #2a323d;
+}
+.lm-close{
+  width:44px;height:44px;flex:0 0 auto;cursor:pointer;font-size:17px;
+  background:none;border:1px solid rgba(229,50,45,.6);color:rgba(229,50,45,.95);
+}
+.lm-who{
+  font-family:var(--display);font-size:15px;letter-spacing:.09em;
+  color:var(--gold-lt);line-height:1.15;
+}
+.lm-sub{
+  display:block;font-family:inherit;font-size:10px;letter-spacing:.05em;
+  text-transform:none;color:#8b96a5;margin-top:2px;
+}
+
+.lm-log{
+  flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:14px 12px;display:flex;flex-direction:column;gap:10px;
+}
+.lm-msg{max-width:88%;padding:11px 13px;font-size:14px;line-height:1.5;}
+.lm-you{
+  align-self:flex-end;background:#2a323d;color:var(--gold-lt);
+  border:1px solid #38424f;
+}
+.lm-wiz{
+  align-self:flex-start;background:#1c222b;color:#c9d1da;
+  border:1px solid #2a323d;border-left:3px solid rgba(229,50,45,.7);
+}
+.lm-wiz b{color:var(--gold-lt);}
+.lm-wiz ul,.lm-wiz ol{margin:8px 0 10px;padding-left:20px;}
+.lm-wiz ul:last-child,.lm-wiz ol:last-child{margin-bottom:0;}
+.lm-wiz li{margin-bottom:5px;}
+.lm-wiz li:last-child{margin-bottom:0;}
+
+/* Where the answer came from. Shown because the table asked for a specific
+   fallback order, and a player deserves to know when they are reading a
+   house rule rather than a printed one. */
+.lm-meta{
+  font-size:10px;letter-spacing:.06em;text-transform:uppercase;
+  color:#8b96a5;margin-bottom:7px;display:flex;flex-wrap:wrap;
+  align-items:center;gap:6px;
+}
+.lm-src{
+  padding:2px 6px;border:1px solid #38424f;font-size:9px;letter-spacing:.04em;
+  text-transform:none;white-space:nowrap;
+}
+.lm-src-lotr{color:#8fb98f;border-color:#3d5240;}
+.lm-src-5e{color:#7fa8c9;border-color:#35505f;}
+.lm-src-table{color:#c9a35f;border-color:#5c4a28;}
+.lm-src-you{color:#b98fb2;border-color:#4d3a52;}
+.lm-cost{color:#8b96a5;font-size:11px;text-transform:uppercase;letter-spacing:.05em;}
+
+.lm-suggest{
+  flex:0 0 auto;display:flex;flex-wrap:wrap;gap:7px;padding:0 12px 10px;
+}
+.lm-suggest[hidden]{display:none;}
+.lm-chip{
+  cursor:pointer;font:inherit;font-size:12px;padding:9px 11px;min-height:44px;
+  background:#1c222b;border:1px solid #2a323d;color:#a9b4c0;
+}
+.lm-chip:active{background:#2a323d;color:var(--gold-lt);}
+
+.lm-bar{
+  flex:0 0 auto;display:flex;gap:8px;border-top:2px solid #2a323d;
+  padding:10px 12px calc(env(safe-area-inset-bottom) + 10px);
+  background:#161b22;
+}
+.lm-input{
+  flex:1 1 auto;min-width:0;font:inherit;font-size:16px; /* 16px stops iOS zooming on focus */
+  padding:11px 12px;background:#12161c;border:1px solid #2a323d;color:var(--gold-lt);
+}
+.lm-input::placeholder{color:#6c7683;}
+.lm-input:focus{outline:none;border-color:rgba(229,50,45,.6);}
+.lm-send{
+  flex:0 0 auto;cursor:pointer;font-family:var(--display);font-size:13px;
+  letter-spacing:.09em;padding:0 16px;min-height:44px;
+  background:none;border:1px solid rgba(229,50,45,.6);color:rgba(229,50,45,.95);
+}
+.lm-send:active{background:rgba(229,50,45,.15);}
+
+/* The FAB sits over the dibs line on short screens. Pull the note clear
+   rather than moving the button, which belongs in the thumb corner. */
+.roster-note{padding-right:62px;}

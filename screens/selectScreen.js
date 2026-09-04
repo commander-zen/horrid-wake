@@ -1,6 +1,7 @@
 import { buildCards } from '../components/characterCard.js';
 import { initCharacterSheet } from '../components/characterSheet.js';
 import { initCombat } from './combat.js';
+import { initLoremaster } from '../components/loremaster.js';
 
 // The pre-game briefing. Player-facing only: what Rowan tells you on the road
 // and nothing past it.
@@ -16,5 +17,6 @@ export function init() {
   initMission();
   initCharacterSheet();
   initCombat();
+  initLoremaster();
   buildCards();
 }

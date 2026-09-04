@@ -1,12 +1,12 @@
 # SESSION_STATE.md — horrid-wake
-_Last updated: 2026-08-29 (session 5)_
+_Last updated: 2026-09-04 (session 6)_
 
 ---
 
 ## 🚀 Cold Start Prompt
 
 > Read this file top to bottom before doing anything.
-> Current priority: **Seed the remaining dibs in `KNOWN_DIBS` (services/characters.js) — the app currently tells the group "7 still open".**
+> Current priority: **Verify the ~60 derived combat numbers in `ACTIONS` (services/characters.js). They were reasoned out from the level-5 builds, not transcribed from the book, and nothing has checked them against the printable yet. After that: seed the remaining dibs in `KNOWN_DIBS` -- the app still tells the group "7 still open".**
 > The AI-DM game stack has been stripped (2026-08-26). This repo is now ONLY the character-select app.
 > Do not suggest architectural changes unless I ask.
 > Do not create new files unless I ask — edit existing ones.
@@ -237,3 +237,73 @@ Sam's Warden feature was renamed Shadow-Lore -> "Favoured Foe: Orcs (+2
 damage)" so it does not read as a leftover; it is live and grants real damage.
 
 All recoverable from git history if a campaign ever happens.
+
+
+## The Loremaster: a rules bot with no backend (2026-09-04) ✅
+
+Wizard icon, bottom-right, on the roster and on every character sheet. Tap it,
+ask a rules question in plain English, get an answer with a badge saying where
+the answer came from. Hidden while THE MISSION or MY TURN is open, because
+those are full-screen and the corner belongs to them.
+
+**Why it is not an LLM.** The ask was "attached to the 5e tools repo". Three
+things blocked that, and all three are worth remembering:
+
+1. **The LotR rules text does not exist in 5etools.** TLotRR is there as 438
+   index stubs in `search/index-partnered.json` — a name, a page number and a
+   category each. No stat blocks, no rules text. It is a lookup table for
+   people who already own the book.
+2. **Shipping the rules text would be republishing it.** Free League's prose in
+   a public repo on a public URL is redistribution, and most of the 5etools
+   data has the same problem (non-SRD WotC content). Game *mechanics* are not
+   copyrightable; the sentences explaining them are. Every answer in the bot is
+   written from scratch for that reason.
+3. **There is no backend.** Firebase and Groq went in `cb9b9f1`. An LLM needs a
+   Vercel function, an API key, and a per-question cost — and it would fail at
+   a venue with bad wifi, which is the one place this thing has to work.
+
+**What it actually is.** `components/loremaster.js` — 34 hand-written entries
+covering turn structure, attacking, advantage, death saves, rests, conditions,
+opportunity attacks, cover, and the LotR-specific vocabulary (culture, calling,
+Fellowship points, Virtues, the renamed skills). A keyword matcher scores the
+question against each entry and **refuses to answer below a threshold**. It
+runs entirely in the browser: no network call after page load.
+
+Each answer is badged with its source — LotR Roleplaying, 5th Edition, Ben's
+call (house rules for this one-shot), or Your sheet. With a character sheet
+open it answers from that character's real data: "whats my ac" gets Gimli's 16,
+not a definition of AC.
+
+**Verified 2026-09-04:** 36/36 real rules questions answered correctly.
+6/6 spoiler-shaped questions ("what monsters are we fighting", "tell me about
+the balrog", "who is the boss", "is there a twist", "how many enemies are
+there") return **idk man** — the bot has no encounter data and cannot leak the
+session.
+
+### Bugs found and fixed during that verification
+- "what happens if i hit 0 hp" returned **Hit Points**, not death saves — the
+  entry title "Hit points" contains the word *hit*, and the title bonus was
+  stacking on top of an exact phrase match. Title weight is now a tie-breaker
+  only.
+- "how fast am i" returned **Culture, not race** — the phrase "what am i" is
+  nothing but stopwords, so it degenerated into matching any question with
+  "am" and "i" in it. Phrases with no content word are now skipped.
+- "what monsters are we fighting" returned a real answer via "what do i do in a
+  fight" → collapsed to the single token *fight*. Short phrases must now match
+  in full, and the confidence threshold was raised so the bot fails toward
+  "idk man" rather than toward a confident wrong answer.
+
+### Known issues
+- **The knowledge base is hand-written and finite.** 34 entries. It covers what
+  a new player asks in a fight; it does not cover everything in either book. It
+  says "idk man" and points at the DM, which is the correct behaviour but is
+  not the same as knowing the rules.
+- **The `ACTIONS` combat numbers are still unverified** (~60 derived, not
+  transcribed). The verification printable is still outstanding.
+- **Dibs is still only Logan/Aragorn.** The roster says "7 still open".
+
+### If an LLM version is ever wanted
+It needs: a Vercel serverless function, an API key in project env vars, and a
+system prompt carrying the mechanics summaries already written in
+`components/loremaster.js` (safe to send — they are original text). Keep the
+offline bank as the fallback for when the venue wifi dies.
