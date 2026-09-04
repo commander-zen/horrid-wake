@@ -6,7 +6,7 @@ _Last updated: 2026-08-29 (session 5)_
 ## 🚀 Cold Start Prompt
 
 > Read this file top to bottom before doing anything.
-> Current priority: **Check the derived combat numbers in `ACTIONS` (services/characters.js) before the table. Then character art into `images/`.**
+> Current priority: **Seed the remaining dibs in `KNOWN_DIBS` (services/characters.js) — the app currently tells the group "7 still open".**
 > The AI-DM game stack has been stripped (2026-08-26). This repo is now ONLY the character-select app.
 > Do not suggest architectural changes unless I ask.
 > Do not create new files unless I ask — edit existing ones.
@@ -118,16 +118,16 @@ One prompt, credential caches, and agent-side pushes work again afterwards.
 
 All from It's Always Sunny in Philadelphia. Level 1 for Summer Camp, level 5 for the bachelor party one-shot.
 
-| ID | Culture | Calling (path) | Shadow Path | HP / AC / Speed |
-|---|---|---|---|---|
-| frodo | Hobbit of the Shire | Treasure Hunter (Burglar) | Dragon-Sickness | 33 / 15 / 25 |
-| sam | Hobbit of the Shire | Warden (Hunter) | Path of Despair | 49 / 16 / 25 |
-| merry | Hobbit of the Shire | Scholar (Lore) | Lure of Secrets | 33 / 14 / 25 |
-| pippin | Hobbit of the Shire | Messenger (Herald) | Wandering-Madness | 33 / 17 / 30 |
-| aragorn | Ranger of the North | Captain (Chieftain) | Lure of Power | 44 / 16 / 35 |
-| boromir | Barding | Captain (Thane) | Lure of Power | 44 / 16 / 30 |
-| legolas | Elf of Lindon | Champion (Sharp-Shooter) | Curse of Vengeance | 44 / 16 / 30 |
-| gimli | Dwarf of Durin's Folk | Champion (Slayer) | Curse of Vengeance | 59 / 16 / 25 |
+| ID | Culture | Calling (path) | HP / AC / Speed |
+|---|---|---|---|
+| frodo | Hobbit of the Shire | Treasure Hunter (Burglar) | 33 / 15 / 25 |
+| sam | Hobbit of the Shire | Warden (Hunter) | 49 / 16 / 25 |
+| merry | Hobbit of the Shire | Scholar (Lore) | 33 / 14 / 25 |
+| pippin | Hobbit of the Shire | Messenger (Herald) | 33 / 17 / 30 |
+| aragorn | Ranger of the North | Captain (Chieftain) | 44 / 16 / 35 |
+| boromir | Barding | Captain (Thane) | 44 / 16 / 30 |
+| legolas | Elf of Lindon | Champion (Sharp-Shooter) | 44 / 16 / 30 |
+| gimli | Dwarf of Durin's Folk | Champion (Slayer) | 59 / 16 / 25 |
 
 All six callings are represented; Captain and Champion are doubled with different paths.
 
@@ -221,3 +221,19 @@ _(The `summer-camp.html` and `api/dm.js` sections were removed — see "Removed 
 - Always commit directly to `main` — never `gh pr create` (not authenticated)
 - Always verify the fix landed on `main` before assuming it's deployed
 - Deliver all code changes as Claude Code prompts, not inline suggestions
+
+
+## Shadow: deliberately not modelled (2026-09-04)
+
+The corruption track was built and then removed at Ben's call. It is a
+campaign mechanic -- points accrue over many sessions before miserable or
+anguished is reached -- and this is one evening with beers. Tracking it by
+hand for eight players was overhead nobody was going to pay.
+
+Removed: the pip track and thresholds on the sheet, its tap-to-explain entry,
+the CSS, `shadowPath` from all eight builds, and the Hobbit-Sense feature
+(advantage on saves vs Shadow), which did nothing once the track was gone.
+Sam's Warden feature was renamed Shadow-Lore -> "Favoured Foe: Orcs (+2
+damage)" so it does not read as a leftover; it is live and grants real damage.
+
+All recoverable from git history if a campaign ever happens.

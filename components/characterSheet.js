@@ -46,15 +46,6 @@ function renderSheet() {
     { key: 'wis', label: 'WIS', val: s.wis }, { key: 'cha', label: 'CHA', val: s.cha },
   ];
 
-  // Shadow thresholds are pure functions of Wisdom: miserable at half your WIS
-  // rounded up, anguished at the full score, which is also the hard cap.
-  const miserable = Math.ceil(s.wis / 2);
-  const anguished = s.wis;
-  const pips = Array.from({ length: anguished }, (_, i) => {
-    const cls = i + 1 >= anguished ? 'anguish' : (i + 1 >= miserable ? 'misery' : '');
-    return `<span class="sh-pip ${cls}"></span>`;
-  }).join('');
-
   // Progressive disclosure. What a player needs mid-fight stays open at the
   // top; reference material collapses behind a tap. Native <details> keeps it
   // keyboard- and screen-reader-accessible with no JS.
@@ -108,13 +99,6 @@ function renderSheet() {
       </div>
       <div class="sh-note">A filled dot means you are trained in that save &mdash; your proficiency bonus of +${s.prof} is already included.</div>
 
-      <div class="sh-section-title" style="margin-top:14px">Shadow &mdash; ${s.shadowPath}</div>
-      <div class="sh-shadow" data-ex="shadow" data-t="${esc(s.shadowPath)}">${pips}</div>
-      <div class="sh-note">
-        Miserable at ${miserable}, anguished at ${anguished} (your Wisdom score).
-        Miserable costs the Company 1 Fellowship and turns a rolled 1 or 2 into a
-        failure; anguished adds disadvantage on everything until a bout of madness.
-      </div>
     </div>
 
     ${acc('Features &amp; Traits', diamonds(s.features), true)}
@@ -194,13 +178,6 @@ function explain(kind, key, sheet) {
   }
   if (kind === 'skill') {
     return [key, `When you try something using ${key}, roll a d20 and add this number. The DM says whether it worked.<br><br>Everything you are trained in already has your proficiency bonus baked in.`];
-  }
-  if (kind === 'shadow') {
-    return ['Shadow: ' + key,
-      `Shadow is the toll that fear, grief and doing ugly things take on you. Each diamond is one point.<br><br>` +
-      `Fill the amber ones and you are <b>miserable</b>: the Company loses a point of Fellowship, and a rolled 1 or 2 fails no matter what.<br><br>` +
-      `Reach the red one and you are <b>anguished</b>: disadvantage on everything until your character snaps and does something they regret.<br><br>` +
-      `<i>${key}</i> is the particular way your character goes wrong when it gets that far.`];
   }
   if (kind === 'item') {
     const act = (window.__ACTIONS || []).find(a => key.toLowerCase().includes(a.name.toLowerCase()));

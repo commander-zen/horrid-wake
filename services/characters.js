@@ -139,16 +139,15 @@ export const PRIMARY_STAT = { frodo:'dex', sam:'con', aragorn:'wis', legolas:'de
 // bonuses + the virtue ASIs each calling grants by 5th level. Rewards come
 // at 3rd and 5th level, so everyone has exactly two.
 //
-// Note the system's own vocabulary: races are CULTURES, classes are
-// CALLINGS, and each calling carries a SHADOW PATH used by the Shadow
-// rules in Chapter 8.
+// Note the system's own vocabulary: races are CULTURES and classes are
+// CALLINGS. The Shadow corruption track is deliberately not modelled -- it
+// needs a campaign to pay off and this is one evening.
 export const SHEETS = {
   frodo: {
     culture: "Hobbit of the Shire",
     subculture: "Fallohide",
     calling: "Treasure Hunter",
     path: "Burglar",
-    shadowPath: "Dragon-Sickness",
     background: "Tookish Blood",
     standard: "Common",
     size: "Small",
@@ -174,7 +173,7 @@ export const SHEETS = {
     },
     virtues: ["Art of Disappearing"],
     rewards: ["Close-fitting Mail-shirt (mithril)", "Keen Sword"],
-    features: ["Expertise (Stealth, Riddle)", "Sneak Attack (3d6)", "Cunning Action", "Clever-Handed", "Tree-Climber", "Uncanny Dodge", "Hobbit-Sense (advantage on saves vs Shadow)", "Unobtrusive"],
+    features: ["Expertise (Stealth, Riddle)", "Sneak Attack (3d6)", "Cunning Action", "Clever-Handed", "Tree-Climber", "Uncanny Dodge", "Unobtrusive"],
     equipment: ["Sting (sword)", "Mithril mail-shirt", "Elven cloak", "Phial of Galadriel", "Thieves' tools", "Pipe"],
     languages: ["Westron"],
     distinctive: ["Eager", "Honourable"]
@@ -184,7 +183,6 @@ export const SHEETS = {
     subculture: "Harfoot",
     calling: "Warden",
     path: "Hunter",
-    shadowPath: "Path of Despair",
     background: "Restless Farmer",
     standard: "Common",
     size: "Small",
@@ -210,7 +208,7 @@ export const SHEETS = {
     },
     virtues: ["Prowess", "Tough as Old Tree-Roots"],
     rewards: ["Reinforced Shield", "Grievous Sword"],
-    features: ["Shadow-Lore (Orcs)", "Warded Lands (the Shire)", "Fighting Style: Protection", "Hunter's Prey: Goblin-Cleaver", "Rumour of the Earth", "Extra Attack", "Hobbit-Sense (advantage on saves vs Shadow)", "Unobtrusive"],
+    features: ["Favoured Foe: Orcs (+2 damage)", "Warded Lands (the Shire)", "Fighting Style: Protection", "Hunter's Prey: Goblin-Cleaver", "Rumour of the Earth", "Extra Attack", "Unobtrusive"],
     equipment: ["Barrow-blade (sword)", "Shield", "Hide armour", "Elven rope", "Box of Lórien earth", "Cook's utensils", "Pipe"],
     languages: ["Westron"],
     distinctive: ["Faithful", "Rustic"]
@@ -220,7 +218,6 @@ export const SHEETS = {
     subculture: "Stoor",
     calling: "Scholar",
     path: "Lore",
-    shadowPath: "Lure of Secrets",
     background: "Bucklander",
     standard: "Common",
     size: "Small",
@@ -247,7 +244,7 @@ export const SHEETS = {
     },
     virtues: ["Prowess"],
     rewards: ["Keen Sword", "Cunning-make Leather Shirt"],
-    features: ["Crafts (Rune-craft, Song-craft)", "Rhymes of Lore (d8)", "Unending Rhymes", "Unarmoured Defence", "Cunning Mind", "Hands of a Healer", "Expertise (Old Lore, cartographer's tools)", "Lore-Master", "Hobbit-Sense (advantage on saves vs Shadow)"],
+    features: ["Crafts (Rune-craft, Song-craft)", "Rhymes of Lore (d8)", "Unending Rhymes", "Unarmoured Defence", "Cunning Mind", "Hands of a Healer", "Expertise (Old Lore, cartographer's tools)", "Lore-Master"],
     equipment: ["Barrow-blade (sword)", "Healer's kit", "Cartographer's tools", "Maps of the Shire and Buckland", "Pipe"],
     languages: ["Westron"],
     distinctive: ["Rustic", "Wary"]
@@ -257,7 +254,6 @@ export const SHEETS = {
     subculture: "Fallohide",
     calling: "Messenger",
     path: "Herald",
-    shadowPath: "Wandering-Madness",
     background: "Tookish Blood",
     standard: "Common",
     size: "Small",
@@ -285,7 +281,7 @@ export const SHEETS = {
     },
     virtues: ["Prowess", "Three is Company"],
     rewards: ["Grievous Sword", "Reinforced Shield"],
-    features: ["Folk-Lore (double proficiency on Old Lore)", "Tireless and Swift (+5 ft.)", "Unarmoured Defence", "Sneak Attack (1d6)", "Errand Runner", "Forth to Battle", "Fighting Style: Defense", "Uncanny Dodge", "Hobbit-Sense (advantage on saves vs Shadow)"],
+    features: ["Folk-Lore (double proficiency on Old Lore)", "Tireless and Swift (+5 ft.)", "Unarmoured Defence", "Sneak Attack (1d6)", "Errand Runner", "Forth to Battle", "Fighting Style: Defense", "Uncanny Dodge"],
     equipment: ["Sword", "Shield", "Livery of the Citadel", "Pipe", "A gaming set"],
     languages: ["Westron"],
     distinctive: ["Eager", "Merry"]
@@ -295,7 +291,6 @@ export const SHEETS = {
     subculture: null,
     calling: "Captain",
     path: "Chieftain",
-    shadowPath: "Lure of Power",
     background: "Hunter of Orcs",
     standard: "Frugal",
     size: "Medium",
@@ -333,7 +328,6 @@ export const SHEETS = {
     subculture: null,
     calling: "Captain",
     path: "Thane",
-    shadowPath: "Lure of Power",
     background: "By Hammer and Anvil",
     standard: "Prosperous",
     size: "Medium",
@@ -368,7 +362,6 @@ export const SHEETS = {
     subculture: null,
     calling: "Champion",
     path: "Sharp-Shooter",
-    shadowPath: "Curse of Vengeance",
     background: "Tower Guard",
     standard: "Frugal",
     size: "Medium",
@@ -404,7 +397,6 @@ export const SHEETS = {
     subculture: "Erebor",
     calling: "Champion",
     path: "Slayer",
-    shadowPath: "Curse of Vengeance",
     background: "The Grief of Azanulbizar",
     standard: "Prosperous",
     size: "Medium",
