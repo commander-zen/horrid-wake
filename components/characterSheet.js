@@ -1,4 +1,4 @@
-import { CHARS, SHEETS, PRIMARY_STAT } from '../services/characters.js';
+import { CHARS, SHEETS, PRIMARY_STAT, ACTIONS, COMMON_ACTIONS } from '../services/characters.js';
 
 // ── SHEET VIEW ────────────────────────────────────────────────
 // Renders a single level-5 The Lord of the Rings Roleplaying sheet.
@@ -20,6 +20,7 @@ export function closeSheet() {
   document.getElementById('sheetView').classList.remove('open');
 }
 
+const esc = t => String(t).replace(/"/g, '&quot;');
 const mod = v => { const m = Math.floor((v - 10) / 2); return (m >= 0 ? '+' : '') + m; };
 
 function renderSheet() {
@@ -57,7 +58,7 @@ function renderSheet() {
     </details>` : '';
 
   const diamonds = arr => (arr && arr.length)
-    ? arr.map(x => `<div class="sh-feature">&#9670; ${x}</div>`).join('') : '';
+    ? arr.map(x => `<div class="sh-feature" data-ex="item" data-t="${esc(x)}">${x}</div>`).join('') : '';
 
   const rows = pairs => pairs
     .map(([k, v]) => `<div class="sh-skill"><span class="sh-skill-name">${k}</span><span class="sh-skill-val">${v}</span></div>`)
@@ -66,17 +67,17 @@ function renderSheet() {
   document.getElementById('shBody').innerHTML = `
     <div class="sh-primary">
     <div class="sh-vitals">
-      <div class="sh-vital"><div class="sh-vital-v" style="color:#65c040">${s.hp}</div><div class="sh-vital-l">HP</div></div>
-      <div class="sh-vital"><div class="sh-vital-v" style="color:#3d8fd4">${s.ac}</div><div class="sh-vital-l">AC</div></div>
-      <div class="sh-vital"><div class="sh-vital-v" style="color:var(--gold)">${s.speed}</div><div class="sh-vital-l">Speed</div></div>
-      <div class="sh-vital"><div class="sh-vital-v" style="color:var(--gold)">+${s.prof}</div><div class="sh-vital-l">Prof</div></div>
+      <div class="sh-vital" data-ex="vital" data-t="hp"><div class="sh-vital-v" style="color:#65c040">${s.hp}</div><div class="sh-vital-l">HP</div></div>
+      <div class="sh-vital" data-ex="vital" data-t="ac"><div class="sh-vital-v" style="color:#3d8fd4">${s.ac}</div><div class="sh-vital-l">AC</div></div>
+      <div class="sh-vital" data-ex="vital" data-t="speed"><div class="sh-vital-v">${s.speed}</div><div class="sh-vital-l">Speed</div></div>
+      <div class="sh-vital" data-ex="vital" data-t="prof"><div class="sh-vital-v">+${s.prof}</div><div class="sh-vital-l">Prof</div></div>
     </div>
 
     <div class="sh-section">
       <div class="sh-section-title">Ability Scores</div>
       <div class="sh-ability-grid">
         ${stats.map(({ key, label, val }) => `
-          <div class="sh-ability${key === primary ? ' primary' : ''}">
+          <div class="sh-ability${key === primary ? ' primary' : ''}" data-ex="abil" data-t="${key}">
             <div class="sh-ability-label">${label}</div>
             <div class="sh-ability-mod">${mod(val)}</div>
             <div class="sh-ability-score">${val}</div>
@@ -91,7 +92,7 @@ function renderSheet() {
           const prof = s.saves.includes(key);
           const total = Math.floor((val - 10) / 2) + (prof ? s.prof : 0);
           return `
-          <div class="sh-save${prof ? ' on' : ''}">
+          <div class="sh-save${prof ? ' on' : ''}" data-ex="save" data-t="${key}">
             <span class="sh-save-dot"></span>
             <span class="sh-save-n">${label}</span>
             <span class="sh-save-v">${total >= 0 ? '+' : ''}${total}</span>
@@ -101,7 +102,7 @@ function renderSheet() {
       <div class="sh-note">A filled dot means you are trained in that save &mdash; your proficiency bonus of +${s.prof} is already included.</div>
 
       <div class="sh-section-title" style="margin-top:14px">Shadow &mdash; ${s.shadowPath}</div>
-      <div class="sh-shadow">${pips}</div>
+      <div class="sh-shadow" data-ex="shadow" data-t="${esc(s.shadowPath)}">${pips}</div>
       <div class="sh-note">
         Miserable at ${miserable}, anguished at ${anguished} (your Wisdom score).
         Miserable costs the Company 1 Fellowship and turns a rolled 1 or 2 into a
@@ -113,7 +114,7 @@ function renderSheet() {
 
     ${acc('Skills', `<div class="sh-skills">${
       Object.entries(s.skills).map(([name, val]) => `
-        <div class="sh-skill">
+        <div class="sh-skill" data-ex="skill" data-t="${esc(name)}">
           <span class="sh-skill-name">${name}</span>
           <span class="sh-skill-val">${val >= 0 ? '+' : ''}${val}</span>
         </div>`).join('')}</div>`, Object.keys(s.skills).length)}
@@ -123,7 +124,7 @@ function renderSheet() {
         s.virtues.length + s.rewards.length)}
 
     ${acc('Equipment',
-        s.equipment.map(e => `<div class="sh-equip">${e}</div>`).join(''),
+        s.equipment.map(e => `<div class="sh-equip" data-ex="item" data-t="${esc(e)}">${e}</div>`).join(''),
         s.equipment.length)}
 
     ${acc(`Background &mdash; ${s.background}`, rows([
@@ -136,8 +137,86 @@ function renderSheet() {
   `;
 }
 
+// ── TAP TO EXPLAIN ────────────────────────────────────────────
+// Every number on this sheet is tappable. Half the party has never played,
+// and a sheet full of unexplained abbreviations is exactly where they stall.
+// Written for someone who does not know what a d20 is.
+
+const ABIL = {
+  str: ['Strength', 'Raw muscle. Swinging heavy weapons, shoving, climbing, hauling things.'],
+  dex: ['Dexterity', 'Speed and precision. Dodging, sneaking, shooting a bow, acting early in a fight.'],
+  con: ['Constitution', 'Toughness. How much punishment you soak, and whether you stay standing.'],
+  int: ['Intelligence', 'Book smarts. Old lore, riddles, puzzles, spotting something forged.'],
+  wis: ['Wisdom', 'Reading the room and the road. Noticing things, tracking, resisting the Shadow.'],
+  cha: ['Charisma', 'Force of personality. Persuading, lying, leading, performing.'],
+};
+
+const VITAL = {
+  hp:    ['Hit Points', 'How much damage you can take before you go down. It drops as you get hit and comes back when you rest or someone heals you.'],
+  ac:    ['Armour Class', 'How hard you are to hit. Someone attacking you rolls a d20 and needs this number or higher to land it.'],
+  speed: ['Speed', 'How far you can move on your turn, in feet. Roughly one big stride per 5 feet.'],
+  prof:  ['Proficiency Bonus', 'Your training bonus. It is already added into anything you are trained in, so you do not need to add it yourself.'],
+};
+
+function explain(kind, key, sheet) {
+  if (kind === 'abil') {
+    const [name, what] = ABIL[key] || ['', ''];
+    return [name, `${what}<br><br><b>The big number is your modifier</b> &mdash; add it to any roll using ${name}. The small number underneath is the raw score it comes from; you rarely need it.`];
+  }
+  if (kind === 'vital') { const [n, w] = VITAL[key] || ['', '']; return [n, w]; }
+  if (kind === 'save') {
+    const [name] = ABIL[key] || [key];
+    const trained = sheet.saves.includes(key);
+    return ['Saving Throw: ' + name,
+      `A saving throw is a roll to <i>avoid</i> something happening to you &mdash; diving clear of a trap, shrugging off fear, resisting poison.<br><br>` +
+      (trained
+        ? `You are <b>trained</b> in this one, so your +${sheet.prof} proficiency is already included in the number shown.`
+        : `You are not trained in this one, so the number is just your ${name} modifier.`) +
+      `<br><br>Roll a d20, add the number, and tell the DM the total.`];
+  }
+  if (kind === 'skill') {
+    return [key, `When you try something using ${key}, roll a d20 and add this number. The DM says whether it worked.<br><br>Everything you are trained in already has your proficiency bonus baked in.`];
+  }
+  if (kind === 'shadow') {
+    return ['Shadow: ' + key,
+      `Shadow is the toll that fear, grief and doing ugly things take on you. Each diamond is one point.<br><br>` +
+      `Fill the amber ones and you are <b>miserable</b>: the Company loses a point of Fellowship, and a rolled 1 or 2 fails no matter what.<br><br>` +
+      `Reach the red one and you are <b>anguished</b>: disadvantage on everything until your character snaps and does something they regret.<br><br>` +
+      `<i>${key}</i> is the particular way your character goes wrong when it gets that far.`];
+  }
+  if (kind === 'item') {
+    const act = (window.__ACTIONS || []).find(a => key.toLowerCase().includes(a.name.toLowerCase()));
+    if (act && act.why) return [act.name, act.why + (act.atk ? `<br><br>To hit: <b>${act.atk}</b>${act.dmg ? ` &nbsp;·&nbsp; Damage: <b>${act.dmg}</b>` : ''}` : '')];
+    return [key, 'Part of your kit or your training. If it matters this round, tap MY TURN &mdash; anything you can actually do on a turn is listed there with the dice already worked out. Otherwise ask the DM.'];
+  }
+  return [key, ''];
+}
+
+function openExplain(kind, key) {
+  const s = SHEETS[sheetCharId];
+  const [title, bodyHtml] = explain(kind, key, s);
+  if (!title) return;
+  document.getElementById('exTitle').textContent = title;
+  document.getElementById('exBody').innerHTML = bodyHtml;
+  document.getElementById('explainView').classList.add('open');
+}
+
 // ── INIT: expose globals needed by inline HTML onclick handlers ──
 export function initCharacterSheet() {
   window.openSheet  = openSheet;
   window.closeSheet = closeSheet;
+
+  window.__ACTIONS = Object.values(ACTIONS).flat().concat(COMMON_ACTIONS);
+
+  // one delegated listener rather than one per element, since the sheet
+  // re-renders whenever a different character is opened
+  document.getElementById('shBody').addEventListener('click', (e) => {
+    const el = e.target.closest('[data-ex]');
+    if (!el) return;
+    openExplain(el.dataset.ex, el.dataset.t);
+  });
+
+  const close = () => document.getElementById('explainView').classList.remove('open');
+  document.getElementById('exClose').addEventListener('click', close);
+  document.getElementById('exBackdrop').addEventListener('click', close);
 }
