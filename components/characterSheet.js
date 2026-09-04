@@ -37,7 +37,8 @@ function renderSheet() {
   document.getElementById('shCharName').textContent = c.name;
   document.getElementById('shClassLine').innerHTML =
     `${s.culture} &middot; ${s.calling}${s.path ? ' (' + s.path + ')' : ''}` +
-    `<span class="sh-lvl-badge">LVL 5</span>`;
+    `<span class="sh-lvl-badge">LVL 5</span>` +
+    (c.role ? `<div class="sh-role">${c.role}</div>` : '');
 
   const stats = [
     { key: 'str', label: 'STR', val: s.str }, { key: 'dex', label: 'DEX', val: s.dex },

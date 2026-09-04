@@ -1,11 +1,13 @@
-import { CHARS } from '../services/characters.js';
+import { CHARS, KNOWN_DIBS } from '../services/characters.js';
 import { CHAR_IMGS, resolveArt } from '../services/images.js';
-import { showPreview, getDibs } from './detailPanel.js';
 
-// Fighting-game roster grid: 2 across by 4 down, filling whatever height is
-// left after the title and preview, so the whole cast is visible at once with
-// no scrolling. Tapping a cell updates the preview panel below; it never
-// navigates, so finding out who someone is costs one tap and zero screens.
+// Dibs are seeded in code and read-only -- see KNOWN_DIBS in characters.js.
+export function getDibs() { return { ...KNOWN_DIBS }; }
+
+// Roster grid: 2 across by 4 down, filling the screen under the title.
+// A tile already carries the art, the name and any claim -- everything you
+// need to recognise someone -- so tapping one goes straight to the sheet
+// rather than through a preview panel that repeated what the tile said.
 //
 // Each cell shows character art from images/<id>.<ext> if present, and falls
 // back to the gold-line emblem otherwise.
@@ -45,10 +47,11 @@ export function buildCards() {
   paintDibs();
   window.refreshRoster = paintDibs;
 
-  // Select someone immediately. The preview panel is a fixed height, so
-  // leaving it empty on load wasted ~300px on a placeholder -- nearly half
-  // the screen on a tall phone. Now it always shows a character.
-  if (CHARS.length) select(CHARS[0].id);
+  const claims = getDibs();
+  const open = CHARS.filter(c => !claims[c.id]).length;
+  document.getElementById('rosterNote').textContent = open
+    ? open + ' still open — call dibs in the group chat'
+    : 'Everyone has been claimed.';
 }
 
 // Claimed characters are marked on the grid itself, so nobody has to tap
@@ -68,5 +71,6 @@ function select(id) {
     el.classList.toggle('sel', on);
     el.setAttribute('aria-selected', String(on));
   });
-  showPreview(id);
+  window.activeId = id;
+  window.openSheet(id);
 }

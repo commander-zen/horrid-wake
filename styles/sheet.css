@@ -448,3 +448,11 @@
 /* everything explainable reads as tappable */
 [data-ex]{cursor:pointer;}
 [data-ex]:active{filter:brightness(1.35);}
+
+/* Plain-English role, moved here when the preview panel was removed.
+   It is the line that tells a first-timer what they actually do. */
+.sh-role{
+  margin-top:8px;font-family:'Zilla Slab',serif;font-style:normal;
+  font-size:15px;line-height:1.4;letter-spacing:0;text-transform:none;
+  color:rgba(206,214,222,.95);
+}

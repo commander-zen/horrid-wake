@@ -1,6 +1,6 @@
-// Claims known before anyone opens the app. Anything claimed in-app is kept
-// in localStorage on that phone — see the note in detailPanel.js about why
-// cross-device dibs would need a backend we deliberately deleted.
+// Who has called which character. Seeded here rather than claimed in-app:
+// localStorage is per-device, so an in-app claim was invisible on every other
+// phone. Claims are called in the group chat and added here.
 export const KNOWN_DIBS = {
   aragorn: 'Logan',
 };
