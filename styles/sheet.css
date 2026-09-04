@@ -442,3 +442,11 @@
   font-size:15px;line-height:1.4;letter-spacing:0;text-transform:none;
   color:rgba(206,214,222,.95);
 }
+
+/* Advantage is a roll-twice rule, not a bonus, so it gets its own marker
+   rather than being folded into the number beside it. */
+.sh-adv{
+  font-family:'Fira Sans',system-ui,sans-serif;font-size:9px;font-weight:700;
+  letter-spacing:.8px;color:#12161c;background:#aeb8c4;
+  padding:2px 5px;border-radius:4px;margin-right:6px;
+}

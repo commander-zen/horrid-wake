@@ -88,16 +88,18 @@ function renderSheet() {
       <div class="sh-saves">
         ${stats.map(({ key, label, val }) => {
           const prof = s.saves.includes(key);
+          const adv  = (s.advSaves || []).includes(key);
           const total = Math.floor((val - 10) / 2) + (prof ? s.prof : 0);
           return `
           <div class="sh-save${prof ? ' on' : ''}" data-ex="save" data-t="${key}">
             <span class="sh-save-dot"></span>
             <span class="sh-save-n">${label}</span>
+            ${adv ? '<span class="sh-adv">ADV</span>' : ''}
             <span class="sh-save-v">${total >= 0 ? '+' : ''}${total}</span>
           </div>`;
         }).join('')}
       </div>
-      <div class="sh-note">A filled dot means you are trained in that save &mdash; your proficiency bonus of +${s.prof} is already included.</div>
+      <div class="sh-note">A filled dot means you are trained in that save &mdash; your proficiency bonus of +${s.prof} is already included. <b>ADV</b> means roll two dice and keep the better.</div>
 
     </div>
 
@@ -174,6 +176,9 @@ function explain(kind, key, sheet) {
       (trained
         ? `You are <b>trained</b> in this one, so your +${sheet.prof} proficiency is already included in the number shown.`
         : `You are not trained in this one, so the number is just your ${name} modifier.`) +
+      ((sheet.advSaves || []).includes(key)
+        ? `<br><br><b>You have advantage here.</b> Roll two d20s and use the better one &mdash; hobbits are famously hard to rattle.`
+        : '') +
       `<br><br>Roll a d20, add the number, and tell the DM the total.`];
   }
   if (kind === 'skill') {

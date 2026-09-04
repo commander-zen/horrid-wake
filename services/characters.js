@@ -163,6 +163,7 @@ export const SHEETS = {
     wis: 14,
     cha: 10,
     saves: ["dex", "int"],
+    advSaves: ["wis"],
     skills: {
       Investigation: 6,
       "Old Lore": 4,
@@ -173,7 +174,7 @@ export const SHEETS = {
     },
     virtues: ["Art of Disappearing"],
     rewards: ["Close-fitting Mail-shirt (mithril)", "Keen Sword"],
-    features: ["Expertise (Stealth, Riddle)", "Sneak Attack (3d6)", "Cunning Action", "Clever-Handed", "Tree-Climber", "Uncanny Dodge", "Unobtrusive"],
+    features: ["Hobbit-Sense (advantage on Wisdom saves)", "Expertise (Stealth, Riddle)", "Sneak Attack (3d6)", "Cunning Action", "Clever-Handed", "Tree-Climber", "Uncanny Dodge", "Unobtrusive"],
     equipment: ["Sting (sword)", "Mithril mail-shirt", "Elven cloak", "Phial of Galadriel", "Thieves' tools", "Pipe"],
     languages: ["Westron"],
     distinctive: ["Eager", "Honourable"]
@@ -198,6 +199,7 @@ export const SHEETS = {
     wis: 14,
     cha: 10,
     saves: ["str", "wis"],
+    advSaves: ["wis"],
     skills: {
       "Animal Handling": 5,
       Athletics: 5,
@@ -208,7 +210,7 @@ export const SHEETS = {
     },
     virtues: ["Prowess", "Tough as Old Tree-Roots"],
     rewards: ["Reinforced Shield", "Grievous Sword"],
-    features: ["Favoured Foe: Orcs (+2 damage)", "Warded Lands (the Shire)", "Fighting Style: Protection", "Hunter's Prey: Goblin-Cleaver", "Rumour of the Earth", "Extra Attack", "Unobtrusive"],
+    features: ["Hobbit-Sense (advantage on Wisdom saves)", "Favoured Foe: Orcs (+2 damage)", "Warded Lands (the Shire)", "Fighting Style: Protection", "Hunter's Prey: Goblin-Cleaver", "Rumour of the Earth", "Extra Attack", "Unobtrusive"],
     equipment: ["Barrow-blade (sword)", "Shield", "Hide armour", "Elven rope", "Box of Lórien earth", "Cook's utensils", "Pipe"],
     languages: ["Westron"],
     distinctive: ["Faithful", "Rustic"]
@@ -233,6 +235,7 @@ export const SHEETS = {
     wis: 14,
     cha: 10,
     saves: ["int", "wis"],
+    advSaves: ["wis"],
     skills: {
       Hunting: 5,
       Investigation: 6,
@@ -244,7 +247,7 @@ export const SHEETS = {
     },
     virtues: ["Prowess"],
     rewards: ["Keen Sword", "Cunning-make Leather Shirt"],
-    features: ["Crafts (Rune-craft, Song-craft)", "Rhymes of Lore (d8)", "Unending Rhymes", "Unarmoured Defence", "Cunning Mind", "Hands of a Healer", "Expertise (Old Lore, cartographer's tools)", "Lore-Master"],
+    features: ["Hobbit-Sense (advantage on Wisdom saves)", "Crafts (Rune-craft, Song-craft)", "Rhymes of Lore (d8)", "Unending Rhymes", "Unarmoured Defence", "Cunning Mind", "Hands of a Healer", "Expertise (Old Lore, cartographer's tools)", "Lore-Master"],
     equipment: ["Barrow-blade (sword)", "Healer's kit", "Cartographer's tools", "Maps of the Shire and Buckland", "Pipe"],
     languages: ["Westron"],
     distinctive: ["Rustic", "Wary"]
@@ -269,6 +272,7 @@ export const SHEETS = {
     wis: 12,
     cha: 18,
     saves: ["dex", "cha"],
+    advSaves: ["wis"],
     skills: {
       Deception: 7,
       "Old Lore": 6,
@@ -281,7 +285,7 @@ export const SHEETS = {
     },
     virtues: ["Prowess", "Three is Company"],
     rewards: ["Grievous Sword", "Reinforced Shield"],
-    features: ["Folk-Lore (double proficiency on Old Lore)", "Tireless and Swift (+5 ft.)", "Unarmoured Defence", "Sneak Attack (1d6)", "Errand Runner", "Forth to Battle", "Fighting Style: Defense", "Uncanny Dodge"],
+    features: ["Hobbit-Sense (advantage on Wisdom saves)", "Folk-Lore (double proficiency on Old Lore)", "Tireless and Swift (+5 ft.)", "Unarmoured Defence", "Sneak Attack (1d6)", "Errand Runner", "Forth to Battle", "Fighting Style: Defense", "Uncanny Dodge"],
     equipment: ["Sword", "Shield", "Livery of the Citadel", "Pipe", "A gaming set"],
     languages: ["Westron"],
     distinctive: ["Eager", "Merry"]
