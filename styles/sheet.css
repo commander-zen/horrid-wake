@@ -104,9 +104,18 @@
   box-shadow:0 0 14px rgba(29,88,115,.18) inset;
 }
 .sh-ability-label{font-size:11px;letter-spacing:2px;color:rgba(90,102,114,.7);text-transform:uppercase;margin-bottom:4px;}
-.sh-ability-score{font-family:'Zilla Slab',serif;font-size:20px;line-height:1;color:rgba(232,234,237,.9);}
-.sh-ability-mod{font-size:13px;color:rgba(56,189,248,.95);margin-top:3px;}
-.sh-ability.primary .sh-ability-mod{color:var(--gold-lt);}
+/* the raw score is reference only; the modifier above it is what gets rolled */
+.sh-ability-score{
+  font-family:'Noto Sans Mono',monospace;font-size:12px;line-height:1;
+  color:rgba(150,170,190,.9);
+  background:#08090c;border:1px solid #232a33;border-radius:9px;
+  padding:4px 0;margin-top:7px;
+}
+  .sh-ability-mod{
+  font-family:'Noto Sans Mono',monospace;font-size:26px;font-weight:700;
+  line-height:1;color:#e8eaed;margin-top:6px;
+}
+.sh-ability.primary .sh-ability-mod{color:#38bdf8;}
 
 .sh-skills{display:flex;flex-direction:column;gap:3px;}
 .sh-skill{
@@ -360,4 +369,28 @@
   margin-top:20px;padding-top:14px;border-top:2px solid #1b2129;
   font-family:'Noto Sans Mono',monospace;font-size:12px;letter-spacing:1px;
   color:rgba(90,102,114,.95);
+}
+
+/* ── Saving throws, D&D Beyond style ───────────────────────────
+   A filled dot means trained. Showing the finished number matters more
+   than showing the working: the whole point of this app is that nobody
+   has to do arithmetic at the table. */
+.sh-saves{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.sh-save{
+  display:flex;align-items:center;gap:8px;
+  padding:9px 10px;background:#12151a;border:1px solid #232a33;
+}
+.sh-save-dot{
+  width:11px;height:11px;flex:0 0 auto;border-radius:50%;
+  border:1.5px solid #3c4856;background:transparent;
+}
+.sh-save.on .sh-save-dot{background:#e8eaed;border-color:#e8eaed;}
+.sh-save.on{border-color:#3c4856;}
+.sh-save-n{
+  flex:1;font-family:'Noto Sans Mono',monospace;font-size:12px;
+  letter-spacing:1px;color:rgba(190,200,212,.9);
+}
+.sh-save-v{
+  font-family:'Noto Sans Mono',monospace;font-size:15px;font-weight:700;
+  color:#e8eaed;
 }

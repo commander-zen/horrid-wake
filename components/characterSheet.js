@@ -76,13 +76,29 @@ function renderSheet() {
       <div class="sh-section-title">Ability Scores</div>
       <div class="sh-ability-grid">
         ${stats.map(({ key, label, val }) => `
-          <div class="sh-ability${key === primary ? ' primary' : ''}${s.saves.includes(key) ? ' saved' : ''}">
+          <div class="sh-ability${key === primary ? ' primary' : ''}">
             <div class="sh-ability-label">${label}</div>
-            <div class="sh-ability-score">${val}</div>
             <div class="sh-ability-mod">${mod(val)}</div>
+            <div class="sh-ability-score">${val}</div>
           </div>`).join('')}
       </div>
-      <div class="sh-note">Saving-throw proficiencies: ${s.saves.map(x => x.toUpperCase()).join(', ')}.</div>
+    </div>
+
+    <div class="sh-primary">
+      <div class="sh-section-title">Saving Throws</div>
+      <div class="sh-saves">
+        ${stats.map(({ key, label, val }) => {
+          const prof = s.saves.includes(key);
+          const total = Math.floor((val - 10) / 2) + (prof ? s.prof : 0);
+          return `
+          <div class="sh-save${prof ? ' on' : ''}">
+            <span class="sh-save-dot"></span>
+            <span class="sh-save-n">${label}</span>
+            <span class="sh-save-v">${total >= 0 ? '+' : ''}${total}</span>
+          </div>`;
+        }).join('')}
+      </div>
+      <div class="sh-note">A filled dot means you are trained in that save &mdash; your proficiency bonus of +${s.prof} is already included.</div>
 
       <div class="sh-section-title" style="margin-top:14px">Shadow &mdash; ${s.shadowPath}</div>
       <div class="sh-shadow">${pips}</div>
