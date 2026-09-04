@@ -6,7 +6,7 @@
   position:fixed;inset:0;z-index:100;
   transform:translateX(100%);
   transition:transform .42s cubic-bezier(.23,1,.32,1);
-  background:linear-gradient(160deg,#100804 0%,#060301 100%);
+  background:linear-gradient(160deg,#161b22 0%,#10141a 100%);
   overflow-y:auto;-webkit-overflow-scrolling:touch;
 }
 #sheetView.open{transform:translateX(0);}
@@ -43,8 +43,9 @@
 .sh-hero{
   position:relative;height:220px;overflow:hidden;flex-shrink:0;
 }
+.sh-hero-img.is-emblem{background-size:auto 52%;background-position:center 34%;}
 .sh-hero-img{
-  position:absolute;inset:0;background-size:auto 60%;background-position:center 30%;background-repeat:no-repeat;
+  position:absolute;inset:0;background-size:cover;background-position:center 22%;background-repeat:no-repeat;
   filter:brightness(.72) contrast(1.1) saturate(1.05);
   transform:scale(1.04);
 }
@@ -66,7 +67,7 @@
 .sh-lvl-badge{
   display:inline-block;margin-left:8px;
   background:rgba(55,28,4,.85);border:1px solid rgba(21,59,77,.6);
-  color:var(--gold);font-family:'Fira Sans',system-ui,sans-serif;
+  color:#e8eaed;font-family:'Fira Sans',system-ui,sans-serif;
   font-size:11px;letter-spacing:2px;padding:2px 7px;vertical-align:middle;
 }
 
@@ -79,6 +80,7 @@
   border:1px solid rgba(27,33,41,.6);
 }
 .sh-vital-v{
+  color:#e8eaed;
   font-family:'Zilla Slab',serif;
   font-size:30px;line-height:1;margin-bottom:3px;
 }
@@ -87,7 +89,7 @@
 .sh-section{margin-bottom:20px;}
 .sh-section-title{
   font-family:var(--display);
-  font-size:13px;letter-spacing:2px;color:var(--gold);
+  font-size:13px;letter-spacing:2px;color:rgba(174,184,196,.95);
   border-bottom:1px solid rgba(17,41,54,.6);
   padding-bottom:5px;margin-bottom:10px;text-transform:uppercase;
 }

@@ -1,4 +1,5 @@
 import { CHARS, SHEETS, PRIMARY_STAT, ACTIONS, COMMON_ACTIONS } from '../services/characters.js';
+import { resolveArt } from '../services/images.js';
 
 // ── SHEET VIEW ────────────────────────────────────────────────
 // Renders a single level-5 The Lord of the Rings Roleplaying sheet.
@@ -11,7 +12,12 @@ let sheetCharId = null;
 export function openSheet(id) {
   sheetCharId = id;
   const c = CHARS.find(x => x.id === id);
-  document.getElementById('shHeroImg').style.backgroundImage = `url('${window.IMGS[c.imgKey] || ''}')`;
+  const hero = document.getElementById('shHeroImg');
+  resolveArt(c.id, window.IMGS[c.imgKey] || '', (src, isEmblem) => {
+    if (sheetCharId !== id) return;
+    hero.style.backgroundImage = `url('${src}')`;
+    hero.classList.toggle('is-emblem', isEmblem);
+  });
   renderSheet();
   document.getElementById('sheetView').classList.add('open');
 }
@@ -68,7 +74,7 @@ function renderSheet() {
     <div class="sh-primary">
     <div class="sh-vitals">
       <div class="sh-vital" data-ex="vital" data-t="hp"><div class="sh-vital-v" style="color:#65c040">${s.hp}</div><div class="sh-vital-l">HP</div></div>
-      <div class="sh-vital" data-ex="vital" data-t="ac"><div class="sh-vital-v" style="color:#3d8fd4">${s.ac}</div><div class="sh-vital-l">AC</div></div>
+      <div class="sh-vital" data-ex="vital" data-t="ac"><div class="sh-vital-v">${s.ac}</div><div class="sh-vital-l">AC</div></div>
       <div class="sh-vital" data-ex="vital" data-t="speed"><div class="sh-vital-v">${s.speed}</div><div class="sh-vital-l">Speed</div></div>
       <div class="sh-vital" data-ex="vital" data-t="prof"><div class="sh-vital-v">+${s.prof}</div><div class="sh-vital-l">Prof</div></div>
     </div>

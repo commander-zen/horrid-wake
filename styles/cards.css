@@ -6,7 +6,7 @@
   background:
     radial-gradient(ellipse 90% 50% at 50% 80%, rgba(25,72,94,.22) 0%,transparent 65%),
     radial-gradient(ellipse 120% 70% at 50% 100%, rgba(50,10,0,.55) 0%,transparent 60%),
-    linear-gradient(180deg,#030100 0%,#060301 50%,#0a0402 100%);
+    linear-gradient(180deg,#12161c 0%,#12161c 50%,#12161c 100%);
 }
 .s-vignette{
   position:absolute;inset:0;pointer-events:none;

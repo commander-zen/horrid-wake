@@ -25,7 +25,10 @@
 
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{width:100%;height:100%;overflow:hidden;background:#12161c;}
-body{font-family:'Fira Sans',system-ui,sans-serif;color:var(--gold);touch-action:manipulation;}
+/* Default text is neutral. --gold is the accent (DDB red) and is applied
+   deliberately to things you can press; inheriting it made every
+   unstyled element on every screen red by default. */
+body{font-family:'Fira Sans',system-ui,sans-serif;color:#e8eaed;touch-action:manipulation;}
 
 /* grain */
 body::after{content:'';position:fixed;inset:0;z-index:999;pointer-events:none;opacity:.05;
