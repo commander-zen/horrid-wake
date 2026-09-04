@@ -307,3 +307,16 @@ It needs: a Vercel serverless function, an API key in project env vars, and a
 system prompt carrying the mechanics summaries already written in
 `components/loremaster.js` (safe to send — they are original text). Keep the
 offline bank as the fallback for when the venue wifi dies.
+
+## The live URL is https://iasime.vercel.app (2026-09-04)
+
+The Vercel project was renamed and `horrid-wake.vercel.app` now returns
+`DEPLOYMENT_NOT_FOUND`. Deploy verification against the old host silently
+reported "not deployed" for a change that was in fact live -- 30 polls, all
+false negatives, because a 404 body simply does not contain the string being
+grepped for.
+
+**Check the status code, not just the content.** And when a deploy looks stuck,
+the deployment URL comes from
+`gh api repos/commander-zen/horrid-wake/deployments/<id>/statuses`, which
+names the environment URL directly, rather than from guessing hostnames.
