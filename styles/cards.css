@@ -49,9 +49,9 @@
   gap:6px;padding:0 10px 8px;
 }
 .cell{
-  position:relative;min-height:0;
-  background:#12151a;padding:0;cursor:pointer;overflow:hidden;
-  border:1px solid #232a33;
+  position:relative;min-height:0;border-radius:10px;
+  background:#1c222b;padding:0;cursor:pointer;overflow:hidden;
+  border:1px solid #2a323d;border-radius:8px;
   display:flex;flex-direction:column;justify-content:flex-end;
   transition:border-color .12s,box-shadow .12s,transform .12s;
 }
@@ -64,8 +64,8 @@
 /* the emblem stand-in is line art, not a photo: contain, don't crop */
 .cell-art.is-emblem{object-fit:contain;padding:12% 0 4%;opacity:.85;}
 .cell-name{
-  position:absolute;left:0;right:0;bottom:0;z-index:2;
-  font-family:'Noto Sans Mono',monospace;font-size:11px;
+  position:absolute;left:0;right:0;bottom:0;z-index:2;border-radius:0 0 9px 9px;
+  font-family:'Fira Sans',system-ui,sans-serif;font-size:11px;
   letter-spacing:.4px;text-transform:uppercase;
   color:#e8eaed;
   background:linear-gradient(transparent,rgba(8,9,12,.86) 42%,rgba(8,9,12,.96));
@@ -75,12 +75,12 @@
 }
 /* selection has to be unmistakable across a table in a dim room */
 .cell.sel{
-  border-color:#38bdf8;border-width:2px;
-  box-shadow:0 0 0 2px rgba(56,189,248,.4),0 0 24px rgba(56,189,248,.32);
+  border-color:#e5322d;border-width:2px;
+  box-shadow:0 0 0 2px rgba(229,50,45,.45),0 0 24px rgba(229,50,45,.3);
   transform:translateY(-2px);
 }
 .cell.sel .cell-art{opacity:1;}
-.cell.sel .cell-name{background:linear-gradient(transparent,rgba(56,189,248,.9) 42%,#38bdf8);color:#08090c;font-weight:700;}
+.cell.sel .cell-name{background:linear-gradient(transparent,rgba(229,50,45,.95) 42%,#aeb8c4);color:#12161c;font-weight:700;}
 .cell:active{transform:translateY(0);}
 
 /* ═══ LIVE PREVIEW ═══
@@ -99,14 +99,14 @@
 .pv-empty[hidden]{display:none;}
 .pv-empty{
   height:100%;display:flex;align-items:center;justify-content:center;
-  font-family:'Noto Sans Mono',monospace;font-size:13px;letter-spacing:2px;
+  font-family:'Fira Sans',system-ui,sans-serif;font-size:13px;letter-spacing:2px;
   text-transform:uppercase;color:rgba(90,102,114,.75);
 }
 .pv-top{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
 .pv-emblem{
   width:64px;height:64px;flex:0 0 auto;
   background-size:cover;background-position:center 22%;background-repeat:no-repeat;
-  border:2px solid #1b2129;background-color:#08090c;
+  border:2px solid #2a323d;border-radius:8px;background-color:#12161c;
 }
 .pv-emblem.is-emblem{background-size:contain;}
 .pv-name{
@@ -114,8 +114,8 @@
   font-size:24px;line-height:1.05;color:#fff;
 }
 .pv-cls{
-  font-family:'Noto Sans Mono',monospace;font-size:11px;letter-spacing:.6px;
-  color:rgba(56,189,248,.92);margin-top:3px;
+  font-family:'Fira Sans',system-ui,sans-serif;font-size:11px;letter-spacing:.6px;
+  color:rgba(174,184,196,.95);margin-top:3px;
 }
 .pv-role{
   font-family:'Zilla Slab',serif;font-size:15px;line-height:1.4;
@@ -125,12 +125,12 @@
 .pv-stat{
   flex:1;text-align:left;padding:0 14px 0 0;
 }
-.pv-stat-v{font-family:'Noto Sans Mono',monospace;font-size:26px;font-weight:700;color:#e8eaed;line-height:1;}
-.pv-stat-l{font-family:'Noto Sans Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(120,134,148,.95);margin-top:6px;}
+.pv-stat-v{font-family:'Fira Sans',system-ui,sans-serif;font-size:26px;font-weight:700;color:#e8eaed;line-height:1;}
+.pv-stat-l{font-family:'Fira Sans',system-ui,sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(120,134,148,.95);margin-top:6px;}
 .pv-go{
   width:100%;padding:15px;cursor:pointer;
-  background:#38bdf8;color:#08090c;border:0;
-  font-family:'Noto Sans Mono',monospace;font-size:13px;font-weight:700;
+  background:#e5322d;color:#fff;border:0;
+  font-family:'Fira Sans',system-ui,sans-serif;font-size:13px;font-weight:700;
   letter-spacing:2px;text-transform:uppercase;
 }
 .pv-go:active{background:#5f9bbf;}
@@ -139,10 +139,10 @@
    Who has already called which character, visible on the grid so nobody
    taps through eight cells to find out. */
 .cell-dibs{
-  position:absolute;top:0;left:0;right:0;z-index:3;
-  font-family:'Noto Sans Mono',monospace;font-size:11px;
+  position:absolute;top:0;left:0;right:0;z-index:3;border-radius:9px 9px 0 0;
+  font-family:'Fira Sans',system-ui,sans-serif;font-size:11px;
   letter-spacing:.5px;padding:3px 4px;text-align:center;
-  background:rgba(56,189,248,.92);color:#08090c;font-weight:700;
+  background:rgba(174,184,196,.95);color:#12161c;font-weight:700;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 .cell:not(.claimed) .cell-dibs{display:none;}
@@ -151,26 +151,26 @@
 
 .pv-claim{min-height:22px;margin-bottom:8px;}
 .pv-open{
-  font-family:'Noto Sans Mono',monospace;font-size:12px;
+  font-family:'Fira Sans',system-ui,sans-serif;font-size:12px;
   color:rgba(150,170,190,.85);letter-spacing:.3px;
 }
 .pv-claimed{
-  font-family:'Noto Sans Mono',monospace;font-size:12px;
-  color:rgba(56,189,248,.95);letter-spacing:.4px;
+  font-family:'Fira Sans',system-ui,sans-serif;font-size:12px;
+  color:rgba(174,184,196,.95);letter-spacing:.4px;
 }
 .pv-actions{display:flex;gap:8px;}
 .pv-btn{
-  flex:1;padding:14px 8px;cursor:pointer;border:0;
-  font-family:'Noto Sans Mono',monospace;font-size:13px;font-weight:700;
+  flex:1;padding:15px 8px;cursor:pointer;border:0;border-radius:10px;
+  font-family:'Fira Sans',system-ui,sans-serif;font-size:13px;font-weight:700;
   letter-spacing:1.5px;text-transform:uppercase;
 }
-.pv-btn--sheet{background:#38bdf8;color:#08090c;}
+.pv-btn--sheet{background:#e5322d;color:#fff;}
 .pv-btn:active{opacity:.75;}
 
 .sh-print{
   margin-left:auto;padding:0 14px;height:44px;cursor:pointer;
-  background:none;border:1px solid rgba(56,189,248,.5);color:rgba(56,189,248,.9);
-  font-family:'Noto Sans Mono',monospace;font-size:12px;letter-spacing:1.5px;
+  background:none;border:1px solid rgba(229,50,45,.6);color:rgba(229,50,45,.95);
+  font-family:'Fira Sans',system-ui,sans-serif;font-size:12px;letter-spacing:1.5px;
 }
 
 /* the sheet is the only thing worth putting on paper */

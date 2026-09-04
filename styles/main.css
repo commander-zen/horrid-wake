@@ -1,10 +1,10 @@
 ﻿:root {
-  --gold: #38bdf8;
+  --gold: #e5322d;
   --gold-lt: #e8eaed;
-  --gold-dk: #1b2129;
+  --gold-dk: #2a323d;
   --blood: #e0555f;
   --ember: #5f9bbf;
-  --coal: #08090c;
+  --coal: #12161c;
   /* Title face. 'Sunny' is the drop-in slot for a licensed IASIP face at
      fonts/iasip.woff2 if one ever lands; until then Playfair Display (free,
      Google Fonts) carries it. Swap the second name to change the look. */
@@ -24,8 +24,8 @@
 }
 
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{width:100%;height:100%;overflow:hidden;background:#000;}
-body{font-family:'Noto Sans Mono',monospace;color:var(--gold);touch-action:manipulation;}
+html,body{width:100%;height:100%;overflow:hidden;background:#12161c;}
+body{font-family:'Fira Sans',system-ui,sans-serif;color:var(--gold);touch-action:manipulation;}
 
 /* grain */
 body::after{content:'';position:fixed;inset:0;z-index:999;pointer-events:none;opacity:.05;
@@ -41,16 +41,16 @@ body::after{content:'';position:fixed;inset:0;z-index:999;pointer-events:none;op
    shadows: a hard 2px border, a light top/left edge and a dark bottom/right
    one. Reproduced here so the two apps read as the same family. */
 .helix-bevel{
-  border:2px solid #1b2129;
-  border-top-color:#3c4856;
-  border-left-color:#3c4856;
-  border-bottom-color:#08090c;
-  border-right-color:#08090c;
-  background:#12151a;
+  border:2px solid #2a323d;border-radius:8px;
+  border-top-color:#3a4450;
+  border-left-color:#3a4450;
+  border-bottom-color:#12161c;
+  border-right-color:#12161c;
+  background:#1c222b;
 }
 .helix-bevel--in{
-  border-top-color:#08090c;
-  border-left-color:#08090c;
-  border-bottom-color:#3c4856;
-  border-right-color:#3c4856;
+  border-top-color:#12161c;
+  border-left-color:#12161c;
+  border-bottom-color:#3a4450;
+  border-right-color:#3a4450;
 }

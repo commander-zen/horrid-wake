@@ -20,7 +20,7 @@
 }
 .sh-close{
   background:none;border:1px solid rgba(23,64,85,.5);
-  color:rgba(56,189,248,.7);font-size:15px;
+  color:rgba(174,184,196,.85);font-size:15px;
   width:44px;height:44px;cursor:pointer;
   display:flex;align-items:center;justify-content:center;
   transition:all .2s;flex-shrink:0;
@@ -31,7 +31,7 @@
   background:rgba(20,10,2,.8);
   border:1px solid rgba(16,39,51,.6);
   color:rgba(26,75,98,.7);
-  font-family:'Noto Sans Mono',monospace;font-size:12px;letter-spacing:2px;
+  font-family:'Fira Sans',system-ui,sans-serif;font-size:12px;letter-spacing:2px;
   padding:7px 16px;cursor:pointer;transition:all .2s;
 }
 .sh-lvl:first-child{border-right:none;}
@@ -66,7 +66,7 @@
 .sh-lvl-badge{
   display:inline-block;margin-left:8px;
   background:rgba(55,28,4,.85);border:1px solid rgba(21,59,77,.6);
-  color:var(--gold);font-family:'Noto Sans Mono',monospace;
+  color:var(--gold);font-family:'Fira Sans',system-ui,sans-serif;
   font-size:11px;letter-spacing:2px;padding:2px 7px;vertical-align:middle;
 }
 
@@ -100,22 +100,22 @@
   transition:box-shadow .3s;
 }
 .sh-ability.primary{
-  border-color:rgba(56,189,248,.45);
+  border-color:rgba(174,184,196,.4);
   box-shadow:0 0 14px rgba(29,88,115,.18) inset;
 }
 .sh-ability-label{font-size:11px;letter-spacing:2px;color:rgba(90,102,114,.7);text-transform:uppercase;margin-bottom:4px;}
 /* the raw score is reference only; the modifier above it is what gets rolled */
 .sh-ability-score{
-  font-family:'Noto Sans Mono',monospace;font-size:12px;line-height:1;
+  font-family:'Fira Sans',system-ui,sans-serif;font-size:12px;line-height:1;
   color:rgba(150,170,190,.9);
-  background:#08090c;border:1px solid #232a33;border-radius:9px;
+  background:#12161c;border:1px solid #2a323d;border-radius:8px;border-radius:9px;
   padding:4px 0;margin-top:7px;
 }
   .sh-ability-mod{
-  font-family:'Noto Sans Mono',monospace;font-size:26px;font-weight:700;
+  font-family:'Fira Sans',system-ui,sans-serif;font-size:26px;font-weight:700;
   line-height:1;color:#e8eaed;margin-top:6px;
 }
-.sh-ability.primary .sh-ability-mod{color:#38bdf8;}
+.sh-ability.primary .sh-ability-mod{color:#aeb8c4;}
 
 .sh-skills{display:flex;flex-direction:column;gap:3px;}
 .sh-skill{
@@ -125,7 +125,7 @@
   border-left:2px solid rgba(27,33,41,.55);
 }
 .sh-skill-name{font-size:13px;color:rgba(200,206,214,.9);}
-.sh-skill-val{font-family:'Noto Sans Mono',monospace;font-size:12px;color:var(--gold-lt);}
+.sh-skill-val{font-family:'Fira Sans',system-ui,sans-serif;font-size:12px;color:var(--gold-lt);}
 
 .sh-spell-group{margin-bottom:10px;}
 .sh-spell-group-label{font-size:11px;letter-spacing:2px;color:rgba(90,102,114,.7);text-transform:uppercase;margin-bottom:5px;}
@@ -163,7 +163,7 @@
   background:rgba(0,0,0,.45);
   transform:rotate(45deg);
 }
-.sh-pip.misery{border-color:rgba(56,189,248,.85);background:rgba(18,40,58,.5);}
+.sh-pip.misery{border-color:rgba(214,158,46,.9);background:rgba(70,50,10,.5);}
 .sh-pip.anguish{border-color:rgba(224,85,95,.95);background:rgba(70,20,26,.6);}
 
 .sh-note{
@@ -183,18 +183,18 @@
    mid-fight stays open at the top; reference material collapses behind a
    tap. Native <details> so it stays keyboard- and screen-reader-friendly. */
 .sh-acc{
-  margin-bottom:10px;
-  border:2px solid #1b2129;
-  border-top-color:#3c4856;border-left-color:#3c4856;
-  border-bottom-color:#08090c;border-right-color:#08090c;
-  background:#12151a;
+  margin-bottom:10px;border-radius:10px;overflow:hidden;
+  border:2px solid #2a323d;border-radius:8px;
+  border-top-color:#3a4450;border-left-color:#3a4450;
+  border-bottom-color:#12161c;border-right-color:#12161c;
+  background:#1c222b;
 }
 .sh-acc>summary{
   list-style:none;cursor:pointer;
   padding:15px 12px;                 /* clears the 44px tap-target floor */
-  font-family:'Noto Sans Mono',monospace;
+  font-family:'Fira Sans',system-ui,sans-serif;
   font-size:12px;letter-spacing:2px;text-transform:uppercase;
-  color:rgba(56,189,248,.92);
+  color:rgba(174,184,196,.95);
   display:flex;align-items:center;justify-content:space-between;gap:10px;
   user-select:none;
 }
@@ -203,17 +203,18 @@
   content:'+';font-size:16px;line-height:1;color:rgba(90,102,114,.9);
 }
 .sh-acc[open]>summary::after{content:'2';}
-.sh-acc[open]>summary{border-bottom:1px solid #1b2129;}
-.sh-acc>summary:active{background:#1b2129;}
+.sh-acc[open]>summary{border-bottom:1px solid #2a323d;}
+.sh-acc>summary:active{background:#2a323d;}
 .sh-acc-body{padding:10px 12px 14px;}
 .sh-count{font-size:11px;color:rgba(90,102,114,.85);letter-spacing:1px;}
 
 /* the always-open block at the top */
 .sh-primary{
-  border:2px solid #1b2129;
-  border-top-color:#3c4856;border-left-color:#3c4856;
-  border-bottom-color:#08090c;border-right-color:#08090c;
-  background:#12151a;padding:12px;margin-bottom:12px;
+  border-radius:10px;
+  border:2px solid #2a323d;border-radius:8px;
+  border-top-color:#3a4450;border-left-color:#3a4450;
+  border-bottom-color:#12161c;border-right-color:#12161c;
+  background:#1c222b;padding:12px;margin-bottom:12px;
 }
 
 /* ═══ COMBAT MODE ═══
@@ -221,7 +222,7 @@
    Bonus, Move, Reaction -- each greying out when used, so nobody has to
    already know what "bonus action" means to take a turn correctly. */
 #combatView{
-  position:fixed;inset:0;z-index:120;background:#08090c;
+  position:fixed;inset:0;z-index:120;background:#12161c;
   transform:translateX(100%);transition:transform .28s cubic-bezier(.23,1,.32,1);
   display:flex;flex-direction:column;overflow:hidden;
 }
@@ -229,11 +230,11 @@
 .cb-top{
   display:flex;align-items:center;gap:10px;flex:0 0 auto;
   padding:calc(env(safe-area-inset-top) + 10px) 12px 10px;
-  border-bottom:2px solid #1b2129;
+  border-bottom:2px solid #2a323d;
 }
 .cb-close{
   width:44px;height:44px;flex:0 0 auto;cursor:pointer;
-  background:none;border:1px solid rgba(56,189,248,.5);color:rgba(56,189,248,.9);
+  background:none;border:1px solid rgba(229,50,45,.6);color:rgba(229,50,45,.95);
   font-size:16px;
 }
 .cb-who{font-family:'Fira Sans',system-ui,sans-serif;font-style:italic;font-weight:800;font-size:24px;color:#fff;}
@@ -241,65 +242,70 @@
 .cb-hp{flex:0 0 auto;padding:12px;}
 .cb-hp-row{display:flex;align-items:center;gap:10px;}
 .cb-hp-btn{
+  border-radius:10px;
   width:52px;height:52px;flex:0 0 auto;cursor:pointer;font-size:24px;
-  background:#12151a;color:#e8eaed;border:2px solid #3c4856;
-  font-family:'Noto Sans Mono',monospace;
+  background:#1c222b;color:#e8eaed;border:2px solid #3a4450;
+  font-family:'Fira Sans',system-ui,sans-serif;
 }
-.cb-hp-btn:active{background:#1b2129;}
+.cb-hp-btn:active{background:#2a323d;}
 .cb-hp-mid{flex:1;text-align:center;}
-.cb-hp-n{font-family:'Noto Sans Mono',monospace;font-size:26px;font-weight:700;color:#e8eaed;line-height:1;}
-.cb-hp-track{height:8px;background:#12151a;border:1px solid #1b2129;margin:6px 0 4px;}
+.cb-hp-n{font-family:'Fira Sans',system-ui,sans-serif;font-size:26px;font-weight:700;color:#e8eaed;line-height:1;}
+.cb-hp-track{height:8px;background:#1c222b;border:1px solid #2a323d;border-radius:8px;margin:6px 0 4px;}
 .cb-hp-fill{height:100%;background:#4ade80;transition:width .2s;}
-.cb-hp-l{font-family:'Noto Sans Mono',monospace;font-size:11px;letter-spacing:2px;color:rgba(90,102,114,.9);}
+.cb-hp-l{font-family:'Fira Sans',system-ui,sans-serif;font-size:11px;letter-spacing:2px;color:rgba(90,102,114,.9);}
 
 .cb-slots{display:flex;gap:6px;padding:0 12px 10px;flex:0 0 auto;}
-.cb-slot{flex:1;padding:8px 4px;text-align:center;background:#12151a;border:2px solid #1b2129;}
-.cb-slot-l{font-family:'Noto Sans Mono',monospace;font-size:12px;font-weight:700;color:#38bdf8;letter-spacing:1px;}
+.cb-slot{
+  border-radius:8px;flex:1;padding:8px 4px;text-align:center;background:#1c222b;border:2px solid #2a323d;border-radius:8px;}
+.cb-slot-l{font-family:'Fira Sans',system-ui,sans-serif;font-size:12px;font-weight:700;color:#aeb8c4;letter-spacing:1px;}
 .cb-slot-s{font-family:'Zilla Slab',serif;font-size:11px;color:rgba(150,170,190,.8);margin-top:3px;line-height:1.25;}
 .cb-slot.spent{opacity:.4;}
 .cb-slot.spent .cb-slot-l{color:rgba(150,170,190,.7);text-decoration:line-through;}
 
 .cb-log{
+  border-radius:10px;
   flex:0 0 auto;margin:0 12px 10px;padding:12px;min-height:74px;
-  background:#12151a;border:2px solid #1b2129;
+  background:#1c222b;border:2px solid #2a323d;border-radius:8px;
   font-family:'Zilla Slab',serif;font-size:14px;color:rgba(200,206,214,.92);line-height:1.45;
 }
 .cb-log.flash{animation:cbflash .5s ease;}
-@keyframes cbflash{0%{border-color:#38bdf8;background:#16222c;}100%{border-color:#1b2129;background:#12151a;}}
-.cb-roll{display:block;font-family:'Noto Sans Mono',monospace;font-size:19px;color:#e8eaed;margin-top:5px;}
-.cb-roll b{color:#38bdf8;font-size:23px;}
-.cb-sub{display:block;font-family:'Noto Sans Mono',monospace;font-size:12px;color:rgba(90,102,114,.95);margin-top:2px;}
+@keyframes cbflash{0%{border-color:#e5322d;background:#232c38;}100%{border-color:#2a323d;background:#1c222b;}}
+.cb-roll{display:block;font-family:'Fira Sans',system-ui,sans-serif;font-size:19px;color:#e8eaed;margin-top:5px;}
+.cb-roll b{color:#aeb8c4;font-size:23px;}
+.cb-sub{display:block;font-family:'Fira Sans',system-ui,sans-serif;font-size:12px;color:rgba(90,102,114,.95);margin-top:2px;}
 
 .cb-acts{flex:1 1 auto;min-height:0;overflow-y:auto;padding:0 12px 12px;}
 .cb-group{margin-bottom:14px;}
 .cb-group-h{
-  font-family:'Noto Sans Mono',monospace;font-size:12px;letter-spacing:2px;
-  color:#38bdf8;padding:6px 0;display:flex;justify-content:space-between;align-items:baseline;
+  font-family:'Fira Sans',system-ui,sans-serif;font-size:12px;letter-spacing:2px;
+  color:#aeb8c4;padding:6px 0;display:flex;justify-content:space-between;align-items:baseline;
 }
 .cb-group-h span{font-family:'Zilla Slab',serif;font-size:12px;letter-spacing:0;color:rgba(90,102,114,.95);text-transform:none;}
 .cb-act{
+  border-radius:10px;
   display:block;width:100%;text-align:left;cursor:pointer;margin-bottom:6px;
-  padding:11px 12px;background:#12151a;
-  border:2px solid #1b2129;border-top-color:#3c4856;border-left-color:#3c4856;
+  padding:11px 12px;background:#1c222b;
+  border:2px solid #2a323d;border-radius:8px;border-top-color:#3a4450;border-left-color:#3a4450;
 }
-.cb-act:active{background:#1b2129;}
+.cb-act:active{background:#2a323d;}
 .cb-act.spent{opacity:.42;}
 .cb-act-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;}
-.cb-act-n{font-family:'Noto Sans Mono',monospace;font-size:14px;font-weight:700;color:#e8eaed;}
-.cb-act-x{font-family:'Noto Sans Mono',monospace;font-size:13px;color:#38bdf8;flex:0 0 auto;}
+.cb-act-n{font-family:'Fira Sans',system-ui,sans-serif;font-size:14px;font-weight:700;color:#e8eaed;}
+.cb-act-x{font-family:'Fira Sans',system-ui,sans-serif;font-size:13px;color:#aeb8c4;flex:0 0 auto;}
 .cb-act-w{font-family:'Zilla Slab',serif;font-size:13px;color:rgba(180,192,205,.9);margin-top:4px;line-height:1.35;}
-.cb-act-u{font-family:'Noto Sans Mono',monospace;font-size:11px;color:rgba(90,102,114,.95);margin-top:4px;}
+.cb-act-u{font-family:'Fira Sans',system-ui,sans-serif;font-size:11px;color:rgba(90,102,114,.95);margin-top:4px;}
 
 .cb-end{
+  border-radius:10px;
   flex:0 0 auto;margin:0 12px calc(env(safe-area-inset-bottom) + 12px);
-  padding:16px;cursor:pointer;border:0;background:#38bdf8;color:#08090c;
-  font-family:'Noto Sans Mono',monospace;font-size:14px;font-weight:700;letter-spacing:2px;
+  padding:16px;cursor:pointer;border:0;background:#e5322d;color:#fff;
+  font-family:'Fira Sans',system-ui,sans-serif;font-size:14px;font-weight:700;letter-spacing:2px;
 }
 .cb-end:active{background:#5f9bbf;}
 .sh-turn{
   margin-left:auto;padding:0 14px;height:44px;cursor:pointer;
-  background:#38bdf8;border:0;color:#08090c;
-  font-family:'Noto Sans Mono',monospace;font-size:12px;font-weight:700;letter-spacing:1.5px;
+  background:#aeb8c4;border:0;color:#12161c;
+  font-family:'Fira Sans',system-ui,sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;
 }
 .sh-print{margin-left:8px;}
 
@@ -308,6 +314,7 @@
    #sheetView and #combatView and the same bevel/type idiom -- no new
    components, just the existing ones carrying different copy. */
 .mission-bar{
+  border-radius:10px;
   /* .s-bg and .s-vignette are absolutely positioned and fill #selectScreen.
      Positioned elements paint above non-positioned ones whatever the DOM
      order, so without these two lines the bar renders at full size and is
@@ -316,18 +323,18 @@
   position:relative;z-index:7;
   flex:0 0 auto;margin:0 10px 8px;padding:11px 12px;cursor:pointer;
   display:flex;align-items:center;justify-content:space-between;
-  background:#12151a;
-  border:2px solid #1b2129;
-  border-top-color:#3c4856;border-left-color:#3c4856;
-  border-bottom-color:#08090c;border-right-color:#08090c;
-  font-family:'Noto Sans Mono',monospace;font-size:12px;font-weight:700;
-  letter-spacing:2px;color:#38bdf8;
+  background:#1c222b;
+  border:2px solid #2a323d;border-radius:8px;
+  border-top-color:#3a4450;border-left-color:#3a4450;
+  border-bottom-color:#12161c;border-right-color:#12161c;
+  font-family:'Fira Sans',system-ui,sans-serif;font-size:12px;font-weight:700;
+  letter-spacing:2px;color:#aeb8c4;
 }
 .mission-bar span{font-size:18px;line-height:1;color:rgba(90,102,114,.9);}
-.mission-bar:active{background:#1b2129;}
+.mission-bar:active{background:#2a323d;}
 
 #missionView{
-  position:fixed;inset:0;z-index:130;background:#08090c;
+  position:fixed;inset:0;z-index:130;background:#12161c;
   transform:translateX(100%);transition:transform .28s cubic-bezier(.23,1,.32,1);
   display:flex;flex-direction:column;overflow:hidden;
 }
@@ -335,11 +342,11 @@
 .ms-top{
   display:flex;align-items:center;gap:10px;flex:0 0 auto;
   padding:calc(env(safe-area-inset-top) + 10px) 12px 10px;
-  border-bottom:2px solid #1b2129;
+  border-bottom:2px solid #2a323d;
 }
 .ms-close{
   width:44px;height:44px;flex:0 0 auto;cursor:pointer;font-size:16px;
-  background:none;border:1px solid rgba(56,189,248,.5);color:rgba(56,189,248,.9);
+  background:none;border:1px solid rgba(229,50,45,.6);color:rgba(229,50,45,.95);
 }
 .ms-title{
   font-family:'Fira Sans',system-ui,sans-serif;font-style:italic;
@@ -350,24 +357,25 @@
   padding:16px 16px calc(env(safe-area-inset-bottom) + 24px);
 }
 .ms-setting{
-  font-family:'Noto Sans Mono',monospace;font-size:12px;line-height:1.6;
+  font-family:'Fira Sans',system-ui,sans-serif;font-size:12px;line-height:1.6;
   color:rgba(150,170,190,.9);
 }
-.ms-rule{height:2px;background:#1b2129;margin:16px 0;}
+.ms-rule{height:2px;background:#2a323d;margin:16px 0;}
 .ms-body p{
   font-family:'Zilla Slab',serif;font-size:16px;line-height:1.55;
   color:rgba(210,216,224,.94);margin-bottom:14px;
 }
 .ms-lead{color:#e8eaed !important;}
 .ms-quote{
+  border-radius:0 8px 8px 0;
   margin:18px 0;padding:12px 14px;
-  border-left:3px solid #38bdf8;background:#12151a;
+  border-left:3px solid #aeb8c4;background:#1c222b;
   font-family:'Zilla Slab',serif;font-style:italic;font-size:16px;
   line-height:1.5;color:#e8eaed;
 }
 .ms-foot{
-  margin-top:20px;padding-top:14px;border-top:2px solid #1b2129;
-  font-family:'Noto Sans Mono',monospace;font-size:12px;letter-spacing:1px;
+  margin-top:20px;padding-top:14px;border-top:2px solid #2a323d;
+  font-family:'Fira Sans',system-ui,sans-serif;font-size:12px;letter-spacing:1px;
   color:rgba(90,102,114,.95);
 }
 
@@ -377,20 +385,21 @@
    has to do arithmetic at the table. */
 .sh-saves{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
 .sh-save{
+  border-radius:8px;
   display:flex;align-items:center;gap:8px;
-  padding:9px 10px;background:#12151a;border:1px solid #232a33;
+  padding:9px 10px;background:#1c222b;border:1px solid #2a323d;border-radius:8px;
 }
 .sh-save-dot{
   width:11px;height:11px;flex:0 0 auto;border-radius:50%;
-  border:1.5px solid #3c4856;background:transparent;
+  border:1.5px solid #3a4450;background:transparent;
 }
 .sh-save.on .sh-save-dot{background:#e8eaed;border-color:#e8eaed;}
-.sh-save.on{border-color:#3c4856;}
+.sh-save.on{border-color:#3a4450;}
 .sh-save-n{
-  flex:1;font-family:'Noto Sans Mono',monospace;font-size:12px;
+  flex:1;font-family:'Fira Sans',system-ui,sans-serif;font-size:12px;
   letter-spacing:1px;color:rgba(190,200,212,.9);
 }
 .sh-save-v{
-  font-family:'Noto Sans Mono',monospace;font-size:15px;font-weight:700;
+  font-family:'Fira Sans',system-ui,sans-serif;font-size:15px;font-weight:700;
   color:#e8eaed;
 }

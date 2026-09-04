@@ -75,7 +75,7 @@
 .d-identity{margin-bottom:10px;}
 .d-identity-row{margin-bottom:7px;}
 .d-identity-label{
-  font-family:'Noto Sans Mono',monospace;font-weight:600;
+  font-family:'Fira Sans',system-ui,sans-serif;font-weight:600;
   font-size:8px;letter-spacing:2.5px;text-transform:uppercase;
   color:var(--ember);margin-bottom:3px;
 }
@@ -95,7 +95,7 @@
 .d-btn-back{
   padding:0 14px;min-height:52px;background:none;
   border:1px solid rgba(40,20,3,.7);
-  color:rgba(21,59,77,.65);font-family:'Noto Sans Mono',monospace;
+  color:rgba(21,59,77,.65);font-family:'Fira Sans',system-ui,sans-serif;
   font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;
   flex-shrink:0;align-self:stretch;
 }
@@ -106,7 +106,7 @@
   width:100%;padding:11px;
   background:linear-gradient(180deg,rgba(23,65,85,.28),rgba(15,35,46,.28));
   border:1px solid var(--gold);
-  color:var(--gold-lt);font-family:'Noto Sans Mono',monospace;
+  color:var(--gold-lt);font-family:'Fira Sans',system-ui,sans-serif;
   font-size:11px;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:all .2s;
   text-align:left;
 }
@@ -115,7 +115,7 @@
   width:100%;padding:0 11px;min-height:52px;
   background:rgba(18,28,10,.5);
   border:1px solid rgba(55,75,28,.55);
-  color:rgba(124,126,129,.8);font-family:'Noto Sans Mono',monospace;
+  color:rgba(124,126,129,.8);font-family:'Fira Sans',system-ui,sans-serif;
   font-size:1rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;
   text-align:left;display:flex;align-items:center;
 }
