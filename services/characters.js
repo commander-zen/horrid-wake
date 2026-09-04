@@ -3,6 +3,7 @@
 // phone. Claims are called in the group chat and added here.
 export const KNOWN_DIBS = {
   aragorn: 'Logan',
+  sam: 'Cullen',
 };
 
 export const CHARS = [
