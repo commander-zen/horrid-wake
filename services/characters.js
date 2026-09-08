@@ -5,6 +5,7 @@ export const KNOWN_DIBS = {
   aragorn: 'Logan',
   sam: 'Cullen',
   legolas: 'Adrian',
+  gimli: 'Dan',
 };
 
 export const CHARS = [
