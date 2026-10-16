@@ -1,16 +1,28 @@
 # SESSION_STATE.md — horrid-wake
-_Last updated: 2026-09-08 (session 7)_
+_Last updated: 2026-10-16 (session 8)_
 
 ---
 
 ## 🚀 Cold Start Prompt
 
 > Read this file top to bottom before doing anything.
-> Current priority: **Verify the ~60 derived combat numbers in `ACTIONS` (services/characters.js). They were reasoned out from the level-5 builds, not transcribed from the book, and nothing has checked them against the printable yet. After that: seed the remaining dibs in `KNOWN_DIBS` -- Logan/Aragorn, Cullen/Sam, Adrian/Legolas, Dan/Gimli and Deen/Merry are in, three still open.**
-> The AI-DM game stack has been stripped (2026-08-26). This repo is now ONLY the character-select app.
+> Current priority: **Add password protection to the soundboard (Vercel middleware or edge function — nothing exists yet), then drop the 13 real audio files into `/audio/` at the paths listed in `sounds.json`.**
+> As of 2026-10-16 this repo is ONLY the DM soundboard (iasime.vercel.app). The character-select app is preserved at tag `character-select-final` (afaa38a). Everything below "Soundboard" is history from the character-select era.
 > Do not suggest architectural changes unless I ask.
 > Do not create new files unless I ask — edit existing ones.
 > If anything is ambiguous, ask ONE clarifying question, then proceed.
+
+---
+
+## Soundboard (2026-10-16) ✅
+
+- ✅ Tagged the character-select site as `character-select-final` on origin (afaa38a) so it can be restored with `git checkout character-select-final`.
+- ✅ `index.html` is now the Old Road Soundboard, adapted from a claude.ai artifact: all `window.claude` cloud sync, the sync chip, "Sync to phone" and Edit mode removed.
+- ✅ Pads load from `/sounds.json` (15 pads, 5 scenes). Last good copy is cached in IndexedDB `kv/pads` so the board still opens offline.
+- ✅ Audio: `getBuffer` fetches `pad.file`, caches the bytes in IndexedDB `files` keyed by path, then decodes. Arm board pre-downloads everything.
+- ✅ `/audio/` exists with only `.gitkeep` — **no real sound files yet**; every pad except Silence/BAM toasts "isn't uploaded yet" until they land.
+- ✅ Deleted the character-select code: `app.js`, `components/`, `screens/`, `services/`, `styles/`, `images/*.jpg`.
+- Verified at 390px: 15 pads, keys 1–T, no horizontal scroll, every button ≥44px, cached-audio playback, missing-file toast, mixer saved per device.
 
 ---
 
@@ -190,8 +202,12 @@ _(The `summer-camp.html` and `api/dm.js` sections were removed — see "Removed 
 7. **Design direction changed 2026-08-29.** The app is now reskinned to **HELIX**, the design language of magikdex's Brew flow: cool near-black grounds (`#08090c` / `#12151a` / `#1b2129`), sky-blue accent `#38bdf8`, off-white `#e8eaed` text, HELIX red `#e0555f`, Noto Sans Mono + Zilla Slab type, chunky Win98-style bevels. The old gold/ember Frazetta skin is gone — the "Aesthetic Rules" section further down is **superseded** and kept only for history. Title is IASIP-style: Fira Sans 800 italic, white, no bloom.
 8. **The campfire is now blue — open design question.** The ember particles and fire glow were recoloured with everything else. Internally consistent, but a blue fire reads as a portal rather than a hearth. Options: keep as an abstract particle field, delete the fire entirely (recommended — it is a Frazetta idea with no role in a terminal aesthetic), or make the embers the one deliberate warm exception.
 9. **IASIP theme assets not yet supplied.** `fonts/iasip.woff2` and `audio/theme.mp3` are wired but absent (3 expected 404s). Note the jingle fires on first tap, not on load — browsers block autoplay with sound. Also: `.s-title h1` used to reference a font named `AVQuest` that was never loaded anywhere; it now uses `var(--display)`.
-10. **Two dice modules left dangling, deliberately** — `services/dice.js` (33-line pure roller) is now imported by nothing, and `components/diceRoller.js` is a no-op stub whose comment still claims "dice rolling is handled invisibly by the DM AI." Both were left in place because a dice tray was an old backlog item; delete them if it isn't coming back.
+10. ~~**Two dice modules left dangling, deliberately**~~ ✅ Gone 2026-10-16 with the rest of the character-select code. *Old note:* — `services/dice.js` (33-line pure roller) is now imported by nothing, and `components/diceRoller.js` is a no-op stub whose comment still claims "dice rolling is handled invisibly by the DM AI." Both were left in place because a dice tray was an old backlog item; delete them if it isn't coming back.
 11. **Progression gating / 6th-slot builder / combat system** — all obsolete for the fall one-shot per the scope change. Retained here only in case the summer campaign is revived.
+12. **Two local copies of this repo (found 2026-10-16).** `C:/repos/horrid-wake` (canonical, used for the soundboard commit) and `~/OneDrive/Desktop/repos/horrid-wake` (the "scrap" copy — git pull/push/tag worked from it fine this session). Neither had unpushed work; the "Unpushed work" section above is stale — those commits are on origin. Delete the OneDrive copy when convinced.
+13. **Left in place, unsure if still needed:** `signal-2026-03-27-092415.jpeg` (tracked, referenced by nothing), `package.json` (name/version only, no build), untracked `images/High_School_Musical.webp` and empty `fonts/`, and `vercel.json` cache headers written for the old JS/CSS/JPG assets.
+14. **Not password-protected yet** — the soundboard is publicly reachable at iasime.vercel.app.
+15. **Stale repo URL:** "What This Project Is" says `github.com/kylo-ben/horrid-wake`; the actual remote is `github.com/commander-zen/horrid-wake`.
 
 ## Aesthetic Rules — SUPERSEDED 2026-08-29 (kept for history; see Known Issues #7)
 
