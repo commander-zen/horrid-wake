@@ -1,170 +1,394 @@
-﻿<!DOCTYPE html>
+﻿<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>It&rsquo;s Always Sunny in Middle Earth</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Mono:wght@400;500;700&family=Zilla+Slab:ital,wght@0,400;0,600;0,700;1,400&family=Fira+Sans:ital,wght@0,400;0,600;0,700;1,800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles/main.css">
-<link rel="stylesheet" href="styles/cards.css">
-<link rel="stylesheet" href="styles/detail.css">
-<link rel="stylesheet" href="styles/sheet.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Old Road Soundboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
-.d-btn-chat{width:100%;padding:9px 11px;background:rgba(10,18,30,.5);border:1px solid rgba(40,70,110,.55);color:rgba(100,145,195,.8);font-family:'Noto Sans Mono',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;text-align:left;}
-.d-btn-chat:active{background:rgba(18,30,50,.65);border-color:rgba(60,100,155,.7);color:rgba(130,175,230,.9);}
-.d-btn-sub--chat{color:rgba(100,145,195,.55);}
+/* Layout: sticky mixing bar on top; below it the session in order, one band per scene, big tap pads inside each band. Deliberately single dark theme: run at a night table. */
+:root{
+  --bg:#13100d; --stone:#1d1814; --stone-2:#28211b; --line:#3b3129; --fg:#ece2d2; --muted:#a6978a;
+  --ember:#e2712b; --ember-deep:#8a3c16; --flame:#ffbe6b; --blood:#c8412c; --moss:#93ad6e;
+  --display:'Cinzel', 'Trajan Pro', Georgia, serif;
+  --body:'Noto Serif', Georgia, 'Times New Roman', serif;
+  --mono:ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--fg)}
+body{font-family:var(--body);font-size:15px;line-height:1.45;padding-inline:16px;padding-block:0 48px;margin:0;
+  background:radial-gradient(1200px 500px at 50% -200px, #2a1a10 0%, transparent 70%), var(--bg)}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--flame);outline-offset:2px}
+.wrap{max-width:1100px;margin:0 auto}
+
+/* top bar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;margin-inline:-16px;padding:12px 16px 10px;
+  background:linear-gradient(var(--bg) 70%, rgba(19,16,13,.85));border-bottom:1px solid var(--line);backdrop-filter:blur(6px)}
+.bar-in{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(18px,3.4vw,24px);letter-spacing:.08em;margin:0;text-wrap:balance}
+h1 small{display:block;font-family:var(--body);font-weight:400;font-style:italic;font-size:12px;letter-spacing:0;color:var(--muted)}
+.spacer{flex:1}
+.btn{border:1px solid var(--line);background:var(--stone-2);border-radius:8px;padding:9px 14px;min-height:44px;font-family:var(--display);font-weight:600;letter-spacing:.06em;font-size:13px}
+.btn:hover{border-color:var(--ember-deep)}
+.btn.armed{border-color:var(--moss);color:var(--moss)}
+.cut{background:var(--blood);border-color:#e0604a;color:#fff;font-weight:800;padding-inline:20px}
+.cut:hover{border-color:#fff}
+.mix{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.fader{display:flex;flex-direction:column;gap:2px;min-width:0}
+.fader label{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);display:flex;justify-content:space-between}
+.fader output{font-family:var(--mono);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--ember);min-height:28px}
+.now{font-size:12px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap;min-height:18px}
+.now b{color:var(--flame);font-weight:600}
+.notice{font-size:12px;color:var(--muted);border:1px dashed var(--line);border-radius:8px;padding:8px 10px}
+.notice strong{color:var(--fg)}
+
+/* scenes */
+main{display:flex;flex-direction:column;gap:22px;margin-top:18px}
+.scene{display:flex;flex-direction:column;gap:10px}
+.scene-head{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:6px}
+.scene-head h2{font-family:var(--display);font-weight:600;font-size:16px;letter-spacing:.1em;margin:0;text-transform:uppercase}
+.scene-head .note{font-style:italic;color:var(--muted);font-size:13px}
+.pads{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:10px}
+
+.pad{position:relative;display:flex;flex-direction:column;justify-content:space-between;gap:6px;min-height:92px;text-align:left;
+  border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:linear-gradient(160deg,var(--stone-2),var(--stone));
+  transition:border-color .2s, box-shadow .2s, transform .06s}
+.pad:active{transform:scale(.98)}
+.pad .lbl{font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:.03em;line-height:1.2;overflow-wrap:anywhere}
+.pad .meta{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.pad .key{position:absolute;top:8px;right:9px;font-family:var(--mono);font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 5px}
+.pad.empty{border-style:dashed}
+.pad.empty .meta{color:#c58f63}
+.pad.live{border-color:var(--ember);box-shadow:0 0 0 1px var(--ember), 0 0 22px -4px var(--ember)}
+.pad.live .meta{color:var(--flame)}
+.pad.live::after{content:"";position:absolute;left:12px;right:12px;bottom:6px;height:2px;border-radius:2px;
+  background:linear-gradient(90deg,transparent,var(--flame),transparent);animation:ember 1.6s ease-in-out infinite}
+@keyframes ember{0%,100%{opacity:.35}50%{opacity:1}}
+.pad.kind-cut{background:#0b0908;border-color:#2a2420}
+.pad.kind-cut .lbl{color:var(--muted)}
+.pad.kind-combo{background:linear-gradient(160deg,#5a2410,#2a120a);border-color:var(--ember)}
+.pad.kind-combo .lbl{font-weight:800;font-size:22px;letter-spacing:.12em;color:var(--flame)}
+
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--stone-2);
+  border:1px solid var(--ember-deep);border-radius:8px;padding:10px 14px;font-size:13px;max-width:min(92vw,460px);z-index:10}
+footer{margin-top:28px;font-size:12px;color:var(--muted);max-width:65ch}
+footer kbd{font-family:var(--mono);border:1px solid var(--line);border-radius:4px;padding:0 4px}
+@media (max-width:640px){.mix{grid-template-columns:1fr 1fr}.pads{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (prefers-reduced-motion:reduce){.pad.live::after{animation:none;opacity:.8}.pad{transition:none}}
 </style>
 </head>
 <body>
-<!-- SELECT -->
-<div class="screen" id="selectScreen">
-  <div class="s-bg"></div>
-  <div class="s-vignette"></div>
-
-  <div class="s-title">
-    <h1>It&rsquo;s Always Sunny <br>in Middle Earth</h1>
-  </div>
-
-  <button class="mission-bar" id="missionOpen" type="button">
-    THE MISSION <span>&rsaquo;</span>
-  </button>
-
-  <!-- Fighting-game roster: whole cast visible at once, no scrolling. -->
-  <div class="roster" id="roster" role="listbox" aria-label="Choose your character"></div>
-
-  <div class="roster-note" id="rosterNote"></div>
-</div>
-
-<!-- SHEET VIEW -->
-<div id="sheetView">
-  <div class="sh-topbar">
-    <button class="sh-close" onclick="closeSheet()">&#10005;</button>
-    <button class="sh-turn" onclick="openCombat(window.activeId)">MY TURN</button>
-    <button class="sh-print" onclick="window.print()">PRINT</button>
-    </div>
-  <div class="sh-hero" id="shHero">
-    <div class="sh-hero-img" id="shHeroImg"></div>
-    <div class="sh-hero-fade"></div>
-    <div class="sh-hero-info">
-      <div class="sh-char-name" id="shCharName"></div>
-      <div class="sh-class-line" id="shClassLine"></div>
-    </div>
-  </div>
-  <div class="sh-body" id="shBody"></div>
-</div>
-
-
-<script type="module" src="app.js"></script>
-<!-- MISSION -->
-<div id="missionView">
-  <div class="ms-top">
-    <button class="ms-close" id="missionClose" type="button">&#10005;</button>
-    <div class="ms-title">The Mission</div>
-  </div>
-
-  <div class="ms-body">
-    <div class="ms-setting">
-      A Fellowship-flavoured one-shot at 5th level. Familiar D&amp;D mechanics,
-      Middle-earth trappings &mdash; if you have played 5e you already know how
-      this works, and if you have not, the app does the sums for you.
-    </div>
-
-    <div class="ms-rule"></div>
-
-    <p class="ms-lead">
-      Something walked the Old Road three nights ago. No one who saw it will say
-      what it was &mdash; only that the trees bent away from it, and the moon
-      didn&rsquo;t rise until it had passed.
-    </p>
-
-    <p>
-      An old man named Rowan finds you on the road, breathless and limping. He
-      has tended a small wayside shrine on the old pilgrim road for forty years
-      &mdash; and three nights ago, in the terror left behind by whatever passed
-      through, a warband of Isengard&rsquo;s orcs overran it.
-    </p>
-
-    <p>
-      They are holding the shrine&rsquo;s one holy relic: the Old Watcher&rsquo;s
-      Blade, a sword laid there centuries ago, said to never rust and never dull.
-      Rowan fears what they mean to do with it.
-    </p>
-
-    <blockquote class="ms-quote">
-      &ldquo;Please. It&rsquo;s not just steel. It&rsquo;s the only thing that&rsquo;s
-      kept this stretch of road safe in my lifetime.&rdquo;
-    </blockquote>
-
-    <div class="ms-foot">Pick your character. Rowan is a desperate man.</div>
-  </div>
-</div>
-
-<!-- EXPLAIN -->
-<div id="explainView">
-  <div class="ex-backdrop" id="exBackdrop"></div>
-  <div class="ex-sheet">
-    <div class="ex-grip"></div>
-    <div class="ex-title" id="exTitle"></div>
-    <div class="ex-body" id="exBody"></div>
-    <button class="ex-close" id="exClose" type="button">GOT IT</button>
-  </div>
-</div>
-
-<!-- COMBAT -->
-<div id="combatView">
-  <div class="cb-top">
-    <button class="cb-close" id="cbClose" type="button">&#10005;</button>
-    <div class="cb-who"><span id="cbName"></span></div>
-  </div>
-
-  <div class="cb-hp">
-    <div class="cb-hp-row">
-      <button class="cb-hp-btn" id="cbHurt" type="button">&minus;</button>
-      <div class="cb-hp-mid">
-        <div class="cb-hp-n" id="cbHp"></div>
-        <div class="cb-hp-track"><div class="cb-hp-fill" id="cbHpBar"></div></div>
-        <div class="cb-hp-l">HEALTH</div>
+<div class="wrap">
+  <header class="bar">
+    <div class="bar-in">
+      <div class="row">
+        <h1>Old Road Soundboard<small>Shadow on the Old Road · tap a pad to play, tap a lit loop to fade it</small></h1>
+        <span class="spacer"></span>
+        <button class="btn" id="armBtn" type="button">Arm board</button>
+        <button class="btn" id="fadeBtn" type="button" title="Fade everything out over 3 seconds (Esc)">Fade out</button>
+        <button class="btn cut" id="cutBtn" type="button" title="Cut all sound instantly (Space)">Cut all</button>
       </div>
-      <button class="cb-hp-btn" id="cbHeal" type="button">+</button>
+      <div class="mix" id="mix"></div>
+      <div class="now" id="now"></div>
     </div>
-  </div>
+  </header>
 
-  <div class="cb-slots" id="cbSlots"></div>
-  <div class="cb-log" id="cbLog">Tap something to do it. The app rolls the dice and does the sums.</div>
-  <div class="cb-acts" id="cbActs"></div>
-  <button class="cb-end" id="cbEnd" type="button">END TURN</button>
+  <p class="notice" id="notice" hidden></p>
+  <main id="board"></main>
+
+  <footer>
+    <p><strong>Keys:</strong> each pad's key is in its corner. <kbd>Space</kbd> cuts everything; <kbd>Esc</kbd> fades everything out over 3 seconds.</p>
+    <p><strong>How sounds behave:</strong> a loop on the Music or Ambience channel crossfades out whatever was looping on that channel. One-shots layer on top. A Combo fires several pads at once, which is how BAM drops the crash and the Balrog theme together.</p>
+    <p><strong>Mixer:</strong> the sliders are saved per device, so the phone keeps its own levels.</p>
+    <p><strong>Before the session:</strong> open the board on your phone and tap <em>Arm board</em>. It downloads and decodes every sound and keeps a copy on the phone, so a weak Airbnb signal won't stall the Balrog. On an iPhone, flip the silent switch off, or the board stays quiet.</p>
+  </footer>
 </div>
+<div class="toast" id="toast" role="status" hidden></div>
 
+<script>
+(() => {
+  const SCENES = [
+    {id:'road',     name:'The Road at Dusk',      note:'Hook · Rowan finds the Company'},
+    {id:'approach', name:'The Shrine Approach',   note:'Area 1 · wargs in the cairns, orcs on the wall'},
+    {id:'court',    name:'The Courtyard',         note:'Area 2 · the war-captain, then Ghashnakh'},
+    {id:'balrog',   name:'What Walked the Road',  note:'Area 3 · rumble, rumble, silence, BAM'},
+    {id:'after',    name:'Aftermath',             note:'Rowan laughs on the shrine step'}
+  ];
+  const CHANNELS = ['music','ambience','sfx'];
+  const KEYS = '1234567890qwertyuiopasdfghjkl';
+  const KIND_NAME = {loop:'Loop', hit:'One-shot', combo:'Combo', cut:'Silence'};
 
-<!-- LOREMASTER -->
-<button class="lm-fab" id="lmFab" type="button" aria-label="Ask the Loremaster a rules question">
-  <svg viewBox="0 0 32 32" aria-hidden="true">
-    <!-- A bent, drooping hat plus a star. A straight cone reads as a traffic
-         cone at 30px; the bend in the tip is what makes it a wizard. -->
-    <path d="M9.4 3.4 C13.4 4.2 15.8 8 17.6 12.2 C18.9 15.3 20.4 18.6 21.8 21.2
-             L7.4 21.2 C8.6 17 9.2 12.6 8.6 9.2 C8.2 6.8 7.6 5 6.6 4.2 Z"
-          fill="currentColor" opacity=".93"/>
-    <path d="M4.6 21.2 C4.6 20.1 5.6 19.5 6.9 19.5 L25.1 19.5 C26.4 19.5 27.4 20.1 27.4 21.2
-             C27.4 23.3 22.5 24.9 16 24.9 C9.5 24.9 4.6 23.3 4.6 21.2 Z"
-          fill="currentColor"/>
-    <path d="M13.8 10.4 L15 13.6 L18.4 13.9 L15.8 16.1 L16.6 19.4 L13.8 17.5
-             L11 19.4 L11.8 16.1 L9.2 13.9 L12.6 13.6 Z" fill="#12161c"/>
-  </svg>
-</button>
+  const state = {
+    pads: [],                     // loaded from /sounds.json
+    mix: {master:.9, music:.8, ambience:.7, sfx:1},
+    crossfade: 2
+  };
 
-<div id="loremasterView">
-  <div class="lm-top">
-    <button class="lm-close" id="lmClose" type="button">&#10005;</button>
-    <div class="lm-who">THE LOREMASTER<span class="lm-sub">Rules, in plain English</span></div>
-  </div>
-  <div class="lm-log" id="lmLog"></div>
-  <div class="lm-suggest" id="lmSuggest"></div>
-  <div class="lm-bar">
-    <input class="lm-input" id="lmInput" type="text" autocomplete="off"
-           enterkeyhint="send" placeholder="Ask a rules question&hellip;">
-    <button class="lm-send" id="lmSend" type="button">ASK</button>
-  </div>
-</div>
+  /* ---------- storage (IndexedDB, this device only) ---------- */
+  let dbp = null, storageOk = true;
+  function idb(){
+    if (dbp) return dbp;
+    dbp = new Promise((res, rej) => {
+      try {
+        const r = indexedDB.open('old-road-soundboard', 1);
+        r.onupgradeneeded = () => { r.result.createObjectStore('files'); r.result.createObjectStore('kv'); };
+        r.onsuccess = () => res(r.result);
+        r.onerror = () => rej(r.error);
+      } catch (e) { rej(e); }
+    });
+    return dbp;
+  }
+  async function idbGet(store, key){
+    try { const d = await idb(); return await new Promise((res, rej) => {
+      const q = d.transaction(store).objectStore(store).get(key); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); });
+    } catch (e) { return undefined; }
+  }
+  async function idbPut(store, key, val){
+    try { const d = await idb(); await new Promise((res, rej) => {
+      const tx = d.transaction(store, 'readwrite'); tx.objectStore(store).put(val, key); tx.oncomplete = res; tx.onerror = () => rej(tx.error); });
+      return true;
+    } catch (e) { return false; }
+  }
+  let saveTimer = null;
+  function saveConfig(){
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(async () => {
+      const ok = await idbPut('kv', 'config', {mix: state.mix});
+      if (!ok && storageOk) { storageOk = false; showNotice(); }
+    }, 400);
+  }
+  const hasSound = p => !!p.file;
+  async function loadConfig(){
+    const c = await idbGet('kv', 'config');
+    if (c && c.mix) Object.assign(state.mix, c.mix);
+  }
+  // sounds.json is the only source of pads. The last good copy is kept in IndexedDB
+  // so the board still opens if the network drops mid-session.
+  async function loadPads(){
+    try {
+      const r = await fetch('/sounds.json', {cache: 'no-cache'});
+      if (!r.ok) throw new Error('http ' + r.status);
+      const pads = await r.json();
+      if (!Array.isArray(pads)) throw new Error('bad format');
+      state.pads = pads;
+      idbPut('kv', 'pads', pads);
+    } catch (e) {
+      const cached = await idbGet('kv', 'pads');
+      if (Array.isArray(cached)) { state.pads = cached; toast('Offline: using the last saved board.'); }
+      else toast('Couldn’t load sounds.json.');
+    }
+  }
 
+  /* ---------- audio engine ---------- */
+  let ctx = null, master = null; const chGain = {};
+  const buffers = {};             // file path -> AudioBuffer
+  const loops = {};               // padId -> {src, g}
+  const channelLoop = {};         // channel -> padId
+  const hits = new Set();         // {src, g, padId}
+  let wakeLock = null;
+
+  function ensureCtx(){
+    if (!ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      ctx = new AC();
+      master = ctx.createGain(); master.gain.value = state.mix.master; master.connect(ctx.destination);
+      for (const c of CHANNELS) { const g = ctx.createGain(); g.gain.value = state.mix[c]; g.connect(master); chGain[c] = g; }
+    }
+    if (ctx.state === 'suspended') ctx.resume();
+    return ctx;
+  }
+  async function getBuffer(pad){
+    const key = pad.file;
+    if (!key) return null;
+    if (buffers[key]) return buffers[key];
+    let blob = await idbGet('files', key);                     // cached copy keeps the board working on bad wifi
+    if (!blob) {
+      const r = await fetch(key);
+      if (!r.ok) throw new Error('missing');
+      blob = await r.blob();
+      const saved = await idbPut('files', key, blob);
+      if (!saved && storageOk) { storageOk = false; showNotice(); }
+      try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
+    }
+    const ab = await blob.arrayBuffer();
+    const buf = await new Promise((res, rej) => {
+      const p = ctx.decodeAudioData(ab, res, rej); if (p && p.then) p.then(res, rej);
+    });
+    buffers[key] = buf;
+    return buf;
+  }
+  const byId = id => state.pads.find(p => p.id === id);
+
+  function fadeOut(entry, secs){
+    const now = ctx.currentTime;
+    const g = entry.g.gain;
+    try { g.cancelScheduledValues(now); g.setValueAtTime(g.value, now); g.linearRampToValueAtTime(0, now + secs); } catch (e) {}
+    try { entry.src.stop(now + secs + 0.05); } catch (e) {}
+  }
+  function stopLoop(padId, secs){
+    const e = loops[padId]; if (!e) return;
+    fadeOut(e, secs); delete loops[padId];
+    const pad = byId(padId); if (pad && channelLoop[pad.channel] === padId) delete channelLoop[pad.channel];
+    paintLive();
+  }
+  function stopAll(secs){
+    if (!ctx) return;
+    for (const id of Object.keys(loops)) stopLoop(id, secs);
+    for (const h of hits) fadeOut(h, secs);
+    hits.clear();
+    paintLive();
+  }
+  async function trigger(pad){
+    ensureCtx(); keepAwake();
+    if (pad.kind === 'cut') { stopAll(.25); return; }
+    if (pad.kind === 'combo') {
+      const ts = (pad.targets || []).map(byId).filter(p => p && p.kind !== 'combo' && p.kind !== 'cut');
+      if (!ts.length) { toast(`“${pad.label}” has no pads to fire. Set its targets in sounds.json.`); return; }
+      await Promise.all(ts.map(t => getBuffer(t).catch(() => null)));   // decode first so all start together
+      ts.forEach(t => trigger(t));
+      blink(pad.id); return;
+    }
+    if (pad.kind === 'loop' && loops[pad.id]) { stopLoop(pad.id, Math.max(1, state.crossfade)); return; }
+    let buf;
+    try { buf = await getBuffer(pad); }
+    catch (e) { toast(e.message === 'missing' ? `“${pad.label}” isn’t uploaded yet (${pad.file}).` : `Couldn't load “${pad.label}”. Check the connection, or that the file is MP3, M4A, WAV or OGG.`); return; }
+    if (!buf) { toast(`“${pad.label}” has no sound file in sounds.json.`); return; }
+
+    if (pad.kind === 'loop') { const cur = channelLoop[pad.channel]; if (cur && cur !== pad.id) stopLoop(cur, state.crossfade); }
+    const src = ctx.createBufferSource(); src.buffer = buf; src.loop = pad.kind === 'loop';
+    const g = ctx.createGain(); const now = ctx.currentTime; const f = Math.max(0, +pad.fade || 0); const v = Math.max(0, +pad.vol);
+    if (f > 0) { g.gain.setValueAtTime(0, now); g.gain.linearRampToValueAtTime(v, now + f); } else g.gain.setValueAtTime(v, now);
+    src.connect(g); g.connect(chGain[pad.channel] || chGain.sfx);
+    src.start();
+    if (pad.kind === 'loop') { loops[pad.id] = {src, g}; channelLoop[pad.channel] = pad.id; }
+    else { const h = {src, g, padId: pad.id}; hits.add(h); src.onended = () => { hits.delete(h); paintLive(); }; }
+    paintLive();
+  }
+  async function armAll(){
+    ensureCtx(); keepAwake();
+    const withFiles = state.pads.filter(p => hasSound(p) && p.kind !== 'combo' && p.kind !== 'cut');
+    const armBtn = document.getElementById('armBtn');
+    let ok = 0, bad = [];
+    armBtn.textContent = 'Arming…';
+    for (const p of withFiles) { try { if (await getBuffer(p)) ok++; else bad.push(p.label); } catch (e) { bad.push(p.label); } }
+    const needs = state.pads.filter(p => (p.kind === 'loop' || p.kind === 'hit') && !hasSound(p)).length;
+    armBtn.textContent = `Armed · ${ok} ready`;
+    armBtn.classList.add('armed');
+    if (bad.length) toast(`Couldn't load: ${bad.join(', ')}.`);
+    else if (needs) toast(`${ok} sounds ready. ${needs} pad${needs>1?'s':''} still need a file.`);
+    else toast(`All ${ok} sounds decoded and ready.`);
+  }
+  async function keepAwake(){
+    try { if (!wakeLock && navigator.wakeLock) { wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', () => wakeLock = null); } } catch (e) {}
+  }
+
+  /* ---------- UI ---------- */
+  const $ = s => document.querySelector(s);
+  const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
+  let toastTimer = null;
+  function toast(msg){ const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => t.hidden = true, 3200); }
+  function showNotice(){
+    const n = $('#notice'); n.hidden = storageOk;
+    n.textContent = '';
+    const s = el('strong', null, 'This browser isn’t saving sounds. ');
+    n.append(s, document.createTextNode('They’ll play, but each one downloads again after you close this page. Open the board in a regular (not private) browser window to keep a copy on this device.'));
+  }
+  function blink(id){
+    const b = document.querySelector(`.pad[data-id="${id}"]`); if (!b) return;
+    b.classList.add('live'); setTimeout(() => paintLive(), 500);
+  }
+  function paintLive(){
+    const liveHits = new Set([...hits].map(h => h.padId));
+    document.querySelectorAll('.pad[data-id]').forEach(b => {
+      const id = b.dataset.id; b.classList.toggle('live', !!loops[id] || liveHits.has(id));
+    });
+    const now = $('#now'); now.textContent = '';
+    for (const c of ['music','ambience']) {
+      const id = channelLoop[c]; const span = el('span');
+      span.append(document.createTextNode(c === 'music' ? 'Music: ' : 'Ambience: '));
+      span.append(el('b', null, id && byId(id) ? byId(id).label : '—'));
+      now.append(span);
+    }
+    if (liveHits.size) { const s = el('span'); s.append(document.createTextNode('Effects: '), el('b', null, [...liveHits].map(i => byId(i)?.label).filter(Boolean).join(', '))); now.append(s); }
+  }
+
+  function renderMix(){
+    const mix = $('#mix'); mix.textContent = '';
+    const names = {master:'Master', music:'Music', ambience:'Ambience', sfx:'Effects'};
+    for (const k of ['master','music','ambience','sfx']) {
+      const f = el('div', 'fader');
+      const lab = el('label'); lab.htmlFor = 'mix-' + k;
+      const out = el('output', null, Math.round(state.mix[k] * 100));
+      lab.append(document.createTextNode(names[k]), out);
+      const r = el('input'); r.type = 'range'; r.min = 0; r.max = 1; r.step = .01; r.value = state.mix[k]; r.id = 'mix-' + k;
+      r.addEventListener('input', () => {
+        state.mix[k] = +r.value; out.textContent = Math.round(r.value * 100);
+        if (ctx) { const node = k === 'master' ? master : chGain[k]; node.gain.setTargetAtTime(+r.value, ctx.currentTime, .05); }
+        saveConfig();
+      });
+      f.append(lab, r); mix.append(f);
+    }
+  }
+
+  function padMeta(p){
+    if (p.kind === 'combo') { const n = (p.targets || []).length; return `Combo · fires ${n}`; }
+    if (p.kind === 'cut') return 'Cuts all sound';
+    if (!hasSound(p)) return 'No file yet';
+    const ch = p.channel === 'sfx' ? 'Effects' : p.channel[0].toUpperCase() + p.channel.slice(1);
+    return `${KIND_NAME[p.kind]} · ${ch}`;
+  }
+
+  function render(){
+    const board = $('#board'); board.textContent = '';
+    let keyIdx = 0;
+    for (const sc of SCENES) {
+      const sec = el('section', 'scene');
+      const head = el('div', 'scene-head');
+      head.append(el('h2', null, sc.name), el('span', 'note', sc.note));
+      const grid = el('div', 'pads');
+      for (const p of state.pads.filter(p => p.scene === sc.id)) {
+        p._key = KEYS[keyIdx++] || '';
+        grid.append(padButton(p));
+      }
+      sec.append(head, grid); board.append(sec);
+    }
+    paintLive();
+  }
+
+  function padButton(p){
+    const b = el('button', `pad kind-${p.kind}`); b.type = 'button'; b.dataset.id = p.id;
+    if ((p.kind === 'loop' || p.kind === 'hit') && !hasSound(p)) b.classList.add('empty');
+    b.append(el('span', 'lbl', p.label), el('span', 'meta', padMeta(p)));
+    if (p._key) b.append(el('span', 'key', p._key.toUpperCase()));
+    b.addEventListener('click', () => trigger(p));
+    return b;
+  }
+
+  /* ---------- wiring ---------- */
+  $('#cutBtn').addEventListener('click', () => { ensureCtx(); stopAll(.25); });
+  $('#fadeBtn').addEventListener('click', () => { ensureCtx(); stopAll(3); });
+  $('#armBtn').addEventListener('click', armAll);
+  document.addEventListener('keydown', e => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const t = e.target; if (t && (t.tagName === 'INPUT' || t.tagName === 'SELECT' || t.tagName === 'TEXTAREA')) return;
+    if (e.code === 'Space') { e.preventDefault(); ensureCtx(); stopAll(.25); return; }
+    if (e.key === 'Escape') { ensureCtx(); stopAll(3); return; }
+    const k = e.key.toLowerCase(); const p = state.pads.find(x => x._key === k);
+    if (p) { e.preventDefault(); trigger(p); }
+  });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && Object.keys(loops).length) keepAwake(); });
+
+  renderMix(); render();
+  Promise.all([loadConfig(), loadPads()]).then(() => { renderMix(); render(); });
+  idb().catch(() => { storageOk = false; showNotice(); });
+})();
+</script>
 </body>
 </html>
