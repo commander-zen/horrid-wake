@@ -1,0 +1,40 @@
+{
+  "areas": [
+    {
+      "id": "area1",
+      "name": "Area 1 · The Shrine Approach",
+      "monsters": [
+        {"id": "wolf-chieftain", "name": "Wolf-chieftain", "ac": 14, "hp": 37, "note": "When it dies, the wargs flee."},
+        {"id": "wild-wolf-1", "name": "Wild Wolf 1", "ac": 13, "hp": 16},
+        {"id": "wild-wolf-2", "name": "Wild Wolf 2", "ac": 13, "hp": 16},
+        {"id": "wild-wolf-3", "name": "Wild Wolf 3", "ac": 13, "hp": 16},
+        {"id": "wild-wolf-4", "name": "Wild Wolf 4", "ac": 13, "hp": 16},
+        {"id": "wild-wolf-5", "name": "Wild Wolf 5", "ac": 13, "hp": 16},
+        {"id": "wild-wolf-6", "name": "Wild Wolf 6", "ac": 13, "hp": 16},
+        {"id": "orc-guard-1", "name": "Orc Guard 1", "ac": 17, "hp": 26},
+        {"id": "orc-guard-2", "name": "Orc Guard 2", "ac": 17, "hp": 26}
+      ]
+    },
+    {
+      "id": "area2",
+      "name": "Area 2 · The Courtyard",
+      "monsters": [
+        {"id": "war-captain", "name": "War-captain", "ac": 17, "hp": 39, "note": "Yell of Triumph, once.", "once": "Yell of Triumph"},
+        {"id": "uruk-hai", "name": "Uruk-hai", "ac": 18, "hp": 60, "note": "Hideous Toughness, once: 7 or less damage that would drop it leaves it at 1 HP.", "once": "Hideous Toughness"},
+        {"id": "orc-guard-3", "name": "Orc Guard 3", "ac": 17, "hp": 26},
+        {"id": "ghashnakh", "name": "Ghashnakh", "ac": 18, "hp": 85, "cues": [
+          {"id": "rumble-1", "atOrBelow": 60, "text": "Cue Rumble 1"},
+          {"id": "balrog-arrives", "below": 42, "text": "Balrog arrives: Rumble 2, Silence, BAM"}
+        ]}
+      ]
+    },
+    {
+      "id": "area3",
+      "name": "Area 3 · What Walked the Road",
+      "monsters": [
+        {"id": "balrog", "name": "The Balrog", "ac": 17, "hp": 200, "note": "Terror of the Deep, once.", "once": "Terror of the Deep"},
+        {"id": "rotten-floor", "name": "Rotten floor", "ac": 10, "hp": 20, "note": "At 0 HP, the floor collapses and the Balrog falls if it's standing on it."}
+      ]
+    }
+  ]
+}

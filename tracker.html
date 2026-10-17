@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Old Road HP Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+/* Same palette tokens as the soundboard (index.html). Single dark theme: run at a night table. */
+:root{
+  --bg:#13100d; --stone:#1d1814; --stone-2:#28211b; --line:#3b3129; --fg:#ece2d2; --muted:#a6978a;
+  --ember:#e2712b; --ember-deep:#8a3c16; --flame:#ffbe6b; --blood:#c8412c; --moss:#93ad6e;
+  --display:'Cinzel', 'Trajan Pro', Georgia, serif;
+  --body:'Noto Serif', Georgia, 'Times New Roman', serif;
+  --mono:ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--fg)}
+body{font-family:var(--body);font-size:15px;line-height:1.45;margin:0;padding:0 16px 48px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  background:radial-gradient(1200px 500px at 50% -200px, #2a1a10 0%, transparent 70%), var(--bg)}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--flame);outline-offset:2px}
+.wrap{max-width:1100px;margin:0 auto}
+
+/* page nav, shared with the soundboard */
+.pages{display:flex;gap:2px;margin:0 -10px}
+.pages a{display:inline-flex;align-items:center;min-height:44px;padding:0 10px;font-family:var(--display);font-weight:600;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-decoration:none}
+.pages a:hover{color:var(--fg)}
+.pages a[aria-current="page"]{color:var(--flame)}
+
+h1{font-family:var(--display);font-weight:800;font-size:clamp(18px,3.4vw,24px);letter-spacing:.08em;margin:0 0 10px;text-wrap:balance}
+h1 small{display:block;font-family:var(--body);font-weight:400;font-style:italic;font-size:12px;letter-spacing:0;color:var(--muted)}
+.btn{border:1px solid var(--line);background:var(--stone-2);border-radius:8px;padding:9px 14px;min-height:44px;font-family:var(--display);font-weight:600;letter-spacing:.06em;font-size:13px}
+.btn:hover{border-color:var(--ember-deep)}
+.btn[aria-pressed="true"]{background:var(--ember-deep);border-color:var(--ember)}
+.btn.danger{background:var(--blood);border-color:#e0604a;color:#fff}
+
+/* sticky top: area filter and cue banners stay visible mid-fight */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;margin-inline:-16px;padding:10px 16px;
+  background:linear-gradient(var(--bg) 75%, rgba(19,16,13,.85));border-bottom:1px solid var(--line);backdrop-filter:blur(6px);
+  display:flex;flex-direction:column;gap:10px}
+.filters{display:flex;gap:8px;flex-wrap:wrap}
+.cue{display:flex;align-items:center;gap:12px;border:1px solid var(--flame);border-radius:10px;padding:6px 6px 6px 14px;
+  background:linear-gradient(90deg,#5a2410,#2a120a);box-shadow:0 0 22px -6px var(--ember)}
+.cue b{flex:1;font-family:var(--display);font-weight:800;letter-spacing:.06em;color:var(--flame)}
+.cue small{display:block;font-family:var(--body);font-weight:400;letter-spacing:0;color:var(--muted)}
+
+main{display:flex;flex-direction:column;gap:26px;margin-top:18px}
+.area-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:6px}
+.area-head h2{flex:1;font-family:var(--display);font-weight:600;font-size:16px;letter-spacing:.1em;margin:0;text-transform:uppercase}
+.confirm{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px;border:1px dashed var(--blood);border-radius:10px;padding:8px 8px 8px 14px}
+.confirm[hidden]{display:none}
+.confirm span{flex:1;min-width:12em}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:12px}
+
+.card{display:flex;flex-direction:column;gap:10px;border:1px solid var(--line);border-radius:10px;padding:12px;
+  background:linear-gradient(160deg,var(--stone-2),var(--stone));min-width:0}
+.card-head{display:flex;align-items:baseline;gap:10px}
+.card-head h3{flex:1;font-family:var(--display);font-weight:600;font-size:16px;letter-spacing:.03em;margin:0;overflow-wrap:anywhere}
+.ac{font-family:var(--mono);font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:1px 6px;white-space:nowrap}
+.hp{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--muted)}
+.hp b{font-size:22px;color:var(--fg)}
+.bar{height:8px;border-radius:4px;background:var(--bg);border:1px solid var(--line);overflow:hidden}
+.bar span{display:block;height:100%;background:var(--moss);transition:width .2s}
+.bar[data-level="mid"] span{background:var(--ember)}
+.bar[data-level="low"] span{background:var(--blood)}
+.note{margin:0;font-size:13px;font-style:italic;color:var(--muted)}
+.once{display:flex;align-items:center;gap:10px;min-height:44px;font-size:14px;cursor:pointer}
+.once input{width:22px;height:22px;accent-color:var(--ember);margin:0}
+.dmg{display:flex;gap:6px}
+.dmg input{flex:1;min-width:0;min-height:44px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:0 10px;font-size:16px;font-family:var(--mono)}
+.dmg .btn{padding-inline:10px}
+.quick{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.quick .btn{font-family:var(--mono)}
+.revive{min-height:44px;border:1px dashed var(--blood);border-radius:8px;background:transparent;font-family:var(--display);font-weight:800;letter-spacing:.12em;color:#e9846f}
+.card.down{border-color:#2a2420}
+.card.down .stats{opacity:.45}
+.card.down .controls{display:none}
+.card:not(.down) .revive{display:none}
+
+.empty{color:var(--muted);font-style:italic}
+@media (prefers-reduced-motion:reduce){.bar span{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="pages" aria-label="Pages"><a href="/">Soundboard</a><a href="/tracker" aria-current="page">HP tracker</a></nav>
+  <h1>HP Tracker<small>Shadow on the Old Road · Enter in an amount field deals damage</small></h1>
+  <div class="top">
+    <div class="filters" id="filters" role="group" aria-label="Show area"></div>
+    <div id="cues" role="status" aria-live="assertive"></div>
+  </div>
+  <main id="areas"><p class="empty">Loading monsters…</p></main>
+</div>
+
+<script>
+(() => {
+  // Everything persists in localStorage under the "oldroad_" prefix so a refresh or a closed tab keeps the fight.
+  const KEY = 'oldroad_tracker', VIEW_KEY = 'oldroad_view', ROSTER_KEY = 'oldroad_monsters';
+  const load = (k, fallback) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : fallback; } catch (e) { return fallback; } };
+  const store = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+
+  const saved = load(KEY, {});
+  const state = {hp: saved.hp || {}, used: saved.used || {}, dismissed: saved.dismissed || {}};
+  const save = () => store(KEY, state);
+
+  let areas = [];
+  const monsters = {};            // id -> monster
+  let view = load(VIEW_KEY, 'all');
+
+  const $ = s => document.querySelector(s);
+  const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; };
+  const btn = (text, cls) => { const b = el('button', 'btn' + (cls ? ' ' + cls : ''), text); b.type = 'button'; return b; };
+
+  const hpOf = m => { const v = state.hp[m.id]; return Number.isFinite(v) ? Math.min(m.hp, Math.max(0, v)) : m.hp; };
+
+  /* ---------- cues (Ghashnakh) ---------- */
+  const cueOn = (c, hp) => c.atOrBelow != null ? hp <= c.atOrBelow : hp < c.below;
+  const cueKey = (m, c) => m.id + ':' + c.id;
+  function renderCues(){
+    const box = $('#cues'); box.textContent = '';
+    for (const m of Object.values(monsters)) for (const c of (m.cues || [])) {
+      if (!cueOn(c, hpOf(m)) || state.dismissed[cueKey(m, c)]) continue;
+      const row = el('div', 'cue');
+      const msg = el('b', null, c.text); msg.append(el('small', null, `${m.name} at ${hpOf(m)} HP`));
+      const done = btn('Done'); done.addEventListener('click', () => { state.dismissed[cueKey(m, c)] = true; save(); renderCues(); });
+      row.append(msg, done); box.append(row);
+    }
+  }
+
+  /* ---------- HP changes ---------- */
+  function setHp(m, next){
+    const before = hpOf(m);
+    const after = Math.min(m.hp, Math.max(0, Math.round(next)));
+    state.hp[m.id] = after;
+    // A cue shows when HP crosses into its range, and re-arms once HP climbs back out.
+    for (const c of (m.cues || [])) if (cueOn(c, before) !== cueOn(c, after)) delete state.dismissed[cueKey(m, c)];
+    save(); paintCard(m); renderCues();
+  }
+
+  function paintCard(m){
+    const card = document.querySelector(`.card[data-id="${m.id}"]`); if (!card) return;
+    const hp = hpOf(m), pct = hp / m.hp;
+    card.classList.toggle('down', hp === 0);
+    card.querySelector('.hp b').textContent = hp;
+    const bar = card.querySelector('.bar');
+    bar.dataset.level = pct > .5 ? 'high' : pct > .25 ? 'mid' : 'low';
+    bar.firstChild.style.width = (pct * 100) + '%';
+  }
+
+  function card(m){
+    const c = el('article', 'card'); c.dataset.id = m.id;
+    const stats = el('div', 'stats');
+    const head = el('div', 'card-head'); head.append(el('h3', null, m.name), el('span', 'ac', 'AC ' + m.ac));
+    const hp = el('div', 'hp'); hp.append(el('b'), document.createTextNode(' / ' + m.hp + ' HP'));
+    const bar = el('div', 'bar'); bar.setAttribute('aria-hidden', 'true'); bar.append(el('span'));
+    stats.append(head, hp, bar);
+    if (m.note) stats.append(el('p', 'note', m.note));
+    c.append(stats);
+
+    if (m.once) {
+      const lab = el('label', 'once'); const cb = el('input'); cb.type = 'checkbox'; cb.checked = !!state.used[m.id];
+      cb.addEventListener('change', () => { if (cb.checked) state.used[m.id] = true; else delete state.used[m.id]; save(); });
+      lab.append(cb, document.createTextNode(m.once + ' used'));
+      c.append(lab);
+    }
+
+    const controls = el('div', 'controls');
+    const dmg = el('div', 'dmg');
+    const amt = el('input'); amt.type = 'number'; amt.min = 1; amt.step = 1; amt.inputMode = 'numeric'; amt.placeholder = 'Amount';
+    amt.setAttribute('aria-label', 'Amount for ' + m.name);
+    const take = () => { const n = Math.floor(+amt.value); if (!(n > 0)) return 0; amt.value = ''; return n; };
+    const hit = btn('Damage'); hit.addEventListener('click', () => { const n = take(); if (n) setHp(m, hpOf(m) - n); });
+    const heal = btn('Heal'); heal.addEventListener('click', () => { const n = take(); if (n) setHp(m, hpOf(m) + n); });
+    amt.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); hit.click(); } });
+    dmg.append(amt, hit, heal);
+    const quick = el('div', 'quick');
+    for (const n of [1, 5, 10]) {
+      const q = btn('−' + n); q.setAttribute('aria-label', `${n} damage to ${m.name}`);
+      q.addEventListener('click', () => setHp(m, hpOf(m) - n));
+      quick.append(q);
+    }
+    controls.append(dmg, quick);
+    c.append(controls);
+
+    const revive = el('button', 'revive', 'Down · tap to revive'); revive.type = 'button';
+    revive.setAttribute('aria-label', `${m.name} is down. Revive at 1 HP`);
+    revive.addEventListener('click', () => setHp(m, 1));
+    c.append(revive);
+    return c;
+  }
+
+  function areaSection(a){
+    const sec = el('section', 'area'); sec.dataset.area = a.id;
+    const head = el('div', 'area-head'); head.append(el('h2', null, a.name));
+    const reset = btn('Reset area'); head.append(reset);
+    // In-page confirm instead of window.confirm.
+    const ask = el('div', 'confirm'); ask.hidden = true;
+    const yes = btn('Reset', 'danger'), no = btn('Cancel');
+    ask.append(el('span', null, `Reset ${a.name} to full HP and clear its checkboxes?`), yes, no);
+    reset.addEventListener('click', () => { ask.hidden = false; no.focus(); });
+    no.addEventListener('click', () => { ask.hidden = true; reset.focus(); });
+    yes.addEventListener('click', () => {
+      for (const m of a.monsters) {
+        delete state.hp[m.id]; delete state.used[m.id];
+        for (const c of (m.cues || [])) delete state.dismissed[cueKey(m, c)];
+      }
+      save(); ask.hidden = true; render();
+    });
+    const grid = el('div', 'cards');
+    for (const m of a.monsters) grid.append(card(m));
+    sec.append(head, ask, grid);
+    return sec;
+  }
+
+  function renderFilters(){
+    const box = $('#filters'); box.textContent = '';
+    const opts = [{id: 'all', label: 'All'}, ...areas.map((a, i) => ({id: a.id, label: 'Area ' + (i + 1)}))];
+    if (!opts.some(o => o.id === view)) view = 'all';
+    for (const o of opts) {
+      const b = btn(o.label); b.setAttribute('aria-pressed', o.id === view);
+      b.addEventListener('click', () => { view = o.id; store(VIEW_KEY, view); renderFilters(); applyView(); });
+      box.append(b);
+    }
+  }
+  function applyView(){
+    document.querySelectorAll('.area').forEach(s => s.hidden = view !== 'all' && s.dataset.area !== view);
+  }
+
+  function render(){
+    const main = $('#areas'); main.textContent = '';
+    for (const a of areas) main.append(areaSection(a));
+    for (const m of Object.values(monsters)) paintCard(m);
+    renderFilters(); applyView(); renderCues();
+  }
+
+  // monsters.json is the roster. The last good copy is kept so a dropped connection still opens the page.
+  async function start(){
+    let data;
+    try {
+      const r = await fetch('/monsters.json', {cache: 'no-cache'});
+      if (!r.ok) throw new Error('http ' + r.status);
+      data = await r.json(); store(ROSTER_KEY, data);
+    } catch (e) { data = load(ROSTER_KEY, null); }
+    if (!data || !Array.isArray(data.areas)) { $('#areas').textContent = 'Couldn’t load monsters.json.'; return; }
+    areas = data.areas;
+    for (const a of areas) for (const m of a.monsters) monsters[m.id] = m;
+    render();
+  }
+  start();
+})();
+</script>
+</body>
+</html>
