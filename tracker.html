@@ -75,8 +75,28 @@ main{display:flex;flex-direction:column;gap:26px;margin-top:18px}
 .dmg{display:flex;gap:6px}
 .dmg input{flex:1;min-width:0;min-height:44px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:0 10px;font-size:16px;font-family:var(--mono)}
 .dmg .btn{padding-inline:10px}
-.quick{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-.quick .btn{font-family:var(--mono)}
+.controls{display:flex;flex-direction:column;gap:10px}
+/* attack rolls */
+.attacks{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:8px}
+.atk-head{display:flex;align-items:center;gap:6px}
+.atk-title{flex:1;font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+.atk-head .atk-title + .atk-title{flex:0;white-space:nowrap;font-style:italic;text-transform:none;letter-spacing:0}
+.atk-mode{padding-inline:12px;font-size:12px}
+.atk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:6px}
+.atk{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:1px;text-align:left;padding:6px 10px;min-height:44px;min-width:0}
+.atk b{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.03em}
+.atk span{font-family:var(--mono);font-size:11px;letter-spacing:0;color:var(--muted)}
+.atk small{font-size:11px;font-style:italic;color:var(--muted);letter-spacing:0}
+.atk.extra{border-style:dashed}
+.atk.static{border:1px dashed var(--line);border-radius:8px}
+.atk.static span{color:var(--flame);font-size:12px}
+.atk-result:empty{display:none}
+.atk-result{display:flex;flex-direction:column;gap:6px;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--bg)}
+.atk-result p{margin:0;display:flex;flex-direction:column}
+.atk-result b{font-family:var(--mono);font-size:14px;font-weight:600}
+.atk-result small{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.atk-result .crit b{color:var(--flame)}
+.atk-result .miss b{color:var(--muted)}
 .revive{min-height:44px;border:1px dashed var(--blood);border-radius:8px;background:transparent;font-family:var(--display);font-weight:800;letter-spacing:.12em;color:#e9846f}
 .card.down{border-color:#2a2420}
 .card.down .stats{opacity:.45}
@@ -153,6 +173,79 @@ main{display:flex;flex-direction:column;gap:26px;margin-top:18px}
     bar.firstChild.style.width = (pct * 100) + '%';
   }
 
+  /* ---------- attack rolls ---------- */
+  // Attacks live in monsters.json "statblocks", shared by every monster that points at one via "stats".
+  // A "manual" stat block (the Balrog) only shows its numbers, for real dice at the table.
+  let statblocks = {};
+  const die = sides => 1 + Math.floor(Math.random() * sides);
+  function rollDamage(expr, crit){
+    const [, n, sides, mod = '0'] = /^(\d+)d(\d+)([+-]\d+)?$/.exec(expr.replace(/\s/g, ''));
+    const rolls = Array.from({length: +n * (crit ? 2 : 1)}, () => die(+sides));   // a crit doubles the dice, not the modifier
+    return {total: Math.max(0, rolls.reduce((s, r) => s + r, 0) + +mod), rolls, mod: +mod};
+  }
+  const showDice = d => d.rolls.join('+') + (d.mod ? (d.mod > 0 ? ' + ' : ' − ') + Math.abs(d.mod) : '');
+  const formula = a => (a.hit != null ? `d20+${a.hit} · ` : '') + a.dmg + (a.type ? ' ' + a.type : '');
+
+  // One line per target: to-hit (with advantage/disadvantage), crit on a natural 20, miss on a natural 1.
+  function rollAttack(a, mode){
+    const lines = [];
+    const kind = a.type ? a.type + ' ' : '';
+    if (a.hit == null) {
+      const d = rollDamage(a.dmg, false);
+      lines.push({cls: '', text: `${a.name}: ${d.total} ${kind}damage`, detail: `${a.dmg}: ${showDice(d)}` + (a.when ? ` · ${a.when}` : '')});
+      return lines;
+    }
+    for (let t = 0; t < (a.targets || 1); t++) {
+      const pair = [die(20), die(20)];
+      const nat = mode === 'adv' ? Math.max(...pair) : mode === 'dis' ? Math.min(...pair) : pair[0];
+      const d20 = mode === 'normal' ? `d20 ${nat}` : `d20 ${pair[0]}/${pair[1]} ${mode}`;
+      const who = a.targets > 1 ? ` · target ${t + 1}` : '';
+      if (nat === 1) { lines.push({cls: 'miss', text: `${a.name}${who}: miss (natural 1)`, detail: d20}); continue; }
+      const crit = nat === 20, d = rollDamage(a.dmg, crit);
+      lines.push({cls: crit ? 'crit' : '',
+        text: `${a.name}${who}: ${crit ? 'CRIT · ' : ''}${nat + a.hit} to hit · ${d.total} ${kind}damage`,
+        detail: `${d20} + ${a.hit}; ${a.dmg}${crit ? ' doubled' : ''}: ${showDice(d)}` + (a.save ? ` · ${a.save}` : '')});
+    }
+    return lines;
+  }
+
+  function attackSection(m){
+    const sb = statblocks[m.stats]; if (!sb || !sb.attacks) return null;
+    const box = el('div', 'attacks');
+    const head = el('div', 'atk-head'); head.append(el('span', 'atk-title', sb.perTurn || 'Attack'));
+    const out = el('output', 'atk-result'); out.setAttribute('aria-live', 'polite');
+    let mode = 'normal';
+    if (sb.manual) head.append(el('span', 'atk-title', 'Roll real dice'));
+    else for (const [id, label] of [['adv', 'Adv'], ['dis', 'Dis']]) {
+      const t = btn(label, 'atk-mode'); t.setAttribute('aria-pressed', 'false');
+      t.title = id === 'adv' ? 'Advantage: roll two d20s, keep the higher' : 'Disadvantage: roll two d20s, keep the lower';
+      t.addEventListener('click', () => {
+        mode = mode === id ? 'normal' : id;
+        head.querySelectorAll('.atk-mode').forEach(b => b.setAttribute('aria-pressed', b === t && mode === id));
+      });
+      head.append(t);
+    }
+    const grid = el('div', 'atk-grid');
+    for (const a of sb.attacks) {
+      const tip = [a.range, a.save, a.when].filter(Boolean).join(' · ');
+      if (sb.manual) {
+        const s = el('div', 'atk static'); s.append(el('b', null, a.name), el('span', null, formula(a)));
+        if (tip) s.append(el('small', null, tip));
+        grid.append(s); continue;
+      }
+      const b = el('button', 'btn atk' + (a.hit == null ? ' extra' : '')); b.type = 'button';
+      b.append(el('b', null, a.name), el('span', null, formula(a)));
+      if (tip) b.title = tip;
+      b.addEventListener('click', () => {
+        out.textContent = '';
+        for (const l of rollAttack(a, mode)) { const p = el('p', l.cls); p.append(el('b', null, l.text), el('small', null, l.detail)); out.append(p); }
+      });
+      grid.append(b);
+    }
+    box.append(head, grid, out);
+    return box;
+  }
+
   function card(m){
     const c = el('article', 'card'); c.dataset.id = m.id;
     const stats = el('div', 'stats');
@@ -179,13 +272,9 @@ main{display:flex;flex-direction:column;gap:26px;margin-top:18px}
     const heal = btn('Heal'); heal.addEventListener('click', () => { const n = take(); if (n) setHp(m, hpOf(m) + n); });
     amt.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); hit.click(); } });
     dmg.append(amt, hit, heal);
-    const quick = el('div', 'quick');
-    for (const n of [1, 5, 10]) {
-      const q = btn('−' + n); q.setAttribute('aria-label', `${n} damage to ${m.name}`);
-      q.addEventListener('click', () => setHp(m, hpOf(m) - n));
-      quick.append(q);
-    }
-    controls.append(dmg, quick);
+    controls.append(dmg);
+    const atk = attackSection(m);
+    if (atk) controls.append(atk);
     c.append(controls);
 
     const revive = el('button', 'revive', 'Down · tap to revive'); revive.type = 'button';
@@ -248,7 +337,7 @@ main{display:flex;flex-direction:column;gap:26px;margin-top:18px}
       data = await r.json(); store(ROSTER_KEY, data);
     } catch (e) { data = load(ROSTER_KEY, null); }
     if (!data || !Array.isArray(data.areas)) { $('#areas').textContent = 'Couldn’t load monsters.json.'; return; }
-    areas = data.areas;
+    areas = data.areas; statblocks = data.statblocks || {};
     for (const a of areas) for (const m of a.monsters) monsters[m.id] = m;
     render();
   }
