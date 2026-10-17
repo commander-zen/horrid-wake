@@ -4,25 +4,25 @@
     {
       "source": "/",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+        { "key": "Cache-Control", "value": "no-cache" }
       ]
     },
     {
-      "source": "/index.html",
+      "source": "/(index|tracker)(\\.html)?",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+        { "key": "Cache-Control", "value": "no-cache" }
       ]
     },
     {
-      "source": "/(.*)\\.(js|css)",
+      "source": "/(sounds|monsters)\\.json",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+        { "key": "Cache-Control", "value": "no-cache" }
       ]
     },
     {
-      "source": "/(.*)\\.(jpg|jpeg|png|webp|svg|woff|woff2|ico)",
+      "source": "/audio/(.*)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+        { "key": "Cache-Control", "value": "public, max-age=3600" }
       ]
     }
   ]
