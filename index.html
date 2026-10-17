@@ -133,7 +133,7 @@ footer kbd{font-family:var(--mono);border:1px solid var(--line);border-radius:4p
     <p><strong>How sounds behave:</strong> a loop on the Music or Ambience channel crossfades out whatever was looping on that channel. One-shots layer on top. A Combo fires several pads at once, which is how BAM drops the crash and the Balrog theme together.</p>
     <p><strong>Combat strip:</strong> the pads pinned to the bottom each play a random clip from their pool, slightly varied every tap, so rapid hits layer without sounding copy-pasted.</p>
     <p><strong>Mixer:</strong> the sliders are saved per device, so the phone keeps its own levels.</p>
-    <p><strong>Before the session:</strong> open the board on your phone and tap <em>Arm board</em>. It downloads and decodes every sound and keeps a copy on the phone, so a weak Airbnb signal won't stall the Balrog. On an iPhone, flip the silent switch off, or the board stays quiet.</p>
+    <p><strong>Before the session:</strong> open the board on your phone and tap <em>Arm board</em>. It downloads and decodes every sound and keeps a copy on the phone, so a weak Airbnb signal won't stall the Balrog. Pads marked <em>Stream</em> are long music or ambience tracks: they play straight from the site instead, so they need signal at the table. On an iPhone, flip the silent switch off, or the board stays quiet.</p>
   </footer>
 </div>
 <section class="strip" id="strip" aria-label="Combat sounds" hidden>
@@ -275,7 +275,7 @@ footer kbd{font-family:var(--mono);border:1px solid var(--line);border-radius:4p
     delete buffers[key];
     return !!cached;
   }
-  const getBuffer = pad => pad.file ? bufferFor(pad.file) : Promise.resolve(null);
+  const getBuffer = pad => pad.file && !pad.stream ? bufferFor(pad.file) : Promise.resolve(null);
   async function bufferFor(key){
     if (buffers[key]) return buffers[key];
     const cached = await readCached(key);                       // cached copy keeps the board working on bad wifi
@@ -298,7 +298,36 @@ footer kbd{font-family:var(--mono);border:1px solid var(--line);border-radius:4p
     const now = ctx.currentTime;
     const g = entry.g.gain;
     try { g.cancelScheduledValues(now); g.setValueAtTime(g.value, now); g.linearRampToValueAtTime(0, now + secs); } catch (e) {}
+    if (entry.el) { clearTimeout(entry.stopTimer); entry.stopTimer = setTimeout(() => entry.el.pause(), (secs + 0.05) * 1000); return; }
     try { entry.src.stop(now + secs + 0.05); } catch (e) {}
+  }
+
+  // Long tracks ("stream": true) play through an <audio> element instead of being downloaded and decoded
+  // whole, which a phone can't hold for hour-long files. One element per pad, wired once into the mixer,
+  // so faders, fade-ins and channel crossfades work the same. Streams are never cached on the device.
+  const streams = {};             // padId -> {el, g, padId, stopTimer}
+  function streamFor(pad){
+    if (streams[pad.id]) return streams[pad.id];
+    const el = new Audio(); el.preload = 'none'; el.loop = pad.kind === 'loop'; el.src = pad.file;
+    const g = ctx.createGain(); g.gain.value = 0;
+    ctx.createMediaElementSource(el).connect(g); g.connect(chGain[pad.channel] || chGain.sfx);
+    return streams[pad.id] = {el, g, padId: pad.id, stopTimer: null};
+  }
+  async function playStream(pad){
+    if (pad.kind === 'loop') { const cur = channelLoop[pad.channel]; if (cur && cur !== pad.id) stopLoop(cur, state.crossfade); }
+    const s = streamFor(pad); clearTimeout(s.stopTimer);
+    const now = ctx.currentTime, f = Math.max(0, +pad.fade || 0), v = Math.max(0, +pad.vol);
+    s.g.gain.cancelScheduledValues(now);
+    if (f > 0) { s.g.gain.setValueAtTime(0, now); s.g.gain.linearRampToValueAtTime(v, now + f); } else s.g.gain.setValueAtTime(v, now);
+    if (pad.kind === 'loop') { loops[pad.id] = s; channelLoop[pad.channel] = pad.id; }
+    else { hits.add(s); s.el.onended = () => { hits.delete(s); paintLive(); }; }
+    paintLive();
+    s.el.currentTime = 0;
+    try { await s.el.play(); }
+    catch (e) {
+      if (pad.kind === 'loop') stopLoop(pad.id, 0); else { hits.delete(s); paintLive(); }
+      toast(`Couldn't stream “${pad.label}”. Check the signal, or that ${pad.file} is uploaded.`);
+    }
   }
   function stopLoop(padId, secs){
     const e = loops[padId]; if (!e) return;
@@ -324,6 +353,7 @@ footer kbd{font-family:var(--mono);border:1px solid var(--line);border-radius:4p
       blink(pad.id); return;
     }
     if (pad.kind === 'loop' && loops[pad.id]) { stopLoop(pad.id, Math.max(1, state.crossfade)); return; }
+    if (pad.stream && pad.file) { playStream(pad); return; }
     const path = pad.kind === 'pool' ? pickPoolFile(pad) : pad.file;
     let buf;
     try { buf = path ? await bufferFor(path) : null; }
@@ -355,9 +385,15 @@ footer kbd{font-family:var(--mono);border:1px solid var(--line);border-radius:4p
     ensureCtx(); keepAwake();
     const withFiles = state.pads.filter(p => hasSound(p) && p.kind !== 'combo' && p.kind !== 'cut');
     const armBtn = document.getElementById('armBtn');
-    let ok = 0, updated = 0; const bad = new Set();
+    let ok = 0, updated = 0, streamed = 0; const bad = new Set();
     armBtn.textContent = 'Arming…';
     for (const p of withFiles) {
+      // Streams aren't downloaded: check the file is there and buffer its opening so it starts promptly.
+      if (p.stream) {
+        try { const r = await fetch(p.file, {method: 'HEAD', cache: 'no-cache'}); if (r.status === 404) { bad.add(p.label); continue; } } catch (e) {}
+        const s = streamFor(p); if (s.el.paused) { s.el.preload = 'auto'; s.el.load(); }
+        streamed++; continue;
+      }
       for (const path of padFiles(p)) {
         try {
           if (await revalidate(path)) updated++;
@@ -367,11 +403,12 @@ footer kbd{font-family:var(--mono);border:1px solid var(--line);border-radius:4p
     }
     const needs = state.pads.filter(p => (p.kind === 'loop' || p.kind === 'hit' || p.kind === 'pool') && !hasSound(p)).length;
     const summary = `Armed: ${ok} sound${ok === 1 ? '' : 's'}, ${updated} updated`;
+    const streamNote = streamed ? ` ${streamed} long track${streamed > 1 ? 's' : ''} stream and need signal.` : '';
     armBtn.textContent = summary;
     armBtn.classList.add('armed');
     if (bad.size) toast(`Couldn't load: ${[...bad].join(', ')}.`);
-    else if (needs) toast(`${summary}. ${needs} pad${needs>1?'s':''} still need a file.`);
-    else toast(`${summary}.`);
+    else if (needs) toast(`${summary}. ${needs} pad${needs>1?'s':''} still need a file.${streamNote}`);
+    else toast(`${summary}.${streamNote}`);
   }
   async function keepAwake(){
     try { if (!wakeLock && navigator.wakeLock) { wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', () => wakeLock = null); } } catch (e) {}
@@ -431,7 +468,7 @@ footer kbd{font-family:var(--mono);border:1px solid var(--line);border-radius:4p
     if (!hasSound(p)) return 'No file yet';
     if (p.kind === 'pool') { const n = p.files.length; return `Pool · ${n} clip${n === 1 ? '' : 's'}`; }
     const ch = p.channel === 'sfx' ? 'Effects' : p.channel[0].toUpperCase() + p.channel.slice(1);
-    return `${KIND_NAME[p.kind]} · ${ch}`;
+    return `${KIND_NAME[p.kind]} · ${ch}` + (p.stream ? ' · Stream' : '');
   }
 
   function render(){
