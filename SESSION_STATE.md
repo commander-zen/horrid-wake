@@ -6,7 +6,7 @@ _Last updated: 2026-10-16 (session 8)_
 ## 🚀 Cold Start Prompt
 
 > Read this file top to bottom before doing anything.
-> Current priority: **Add password protection to the soundboard (Vercel middleware or edge function — nothing exists yet), then drop the 13 real audio files into `/audio/` at the paths listed in `sounds.json`.**
+> Current priority: **Add password protection to the soundboard (Vercel middleware or edge function — nothing exists yet), then drop the 13 real audio files into `/audio/` at the paths listed in `sounds.json`, and fill the 11 combat pools: put clips in each `/audio/combat/<pool>/` folder AND list every clip path in that pad's `"files"` array (the folder is not scanned).**
 > As of 2026-10-16 this repo is ONLY the DM soundboard (iasime.vercel.app). The character-select app is preserved at tag `character-select-final` (afaa38a). Everything below "Soundboard" is history from the character-select era.
 > Do not suggest architectural changes unless I ask.
 > Do not create new files unless I ask — edit existing ones.
@@ -23,6 +23,9 @@ _Last updated: 2026-10-16 (session 8)_
 - ✅ `/audio/` exists with only `.gitkeep` — **no real sound files yet**; every pad except Silence/BAM toasts "isn't uploaded yet" until they land.
 - ✅ Deleted the character-select code: `app.js`, `components/`, `screens/`, `services/`, `styles/`, `images/*.jpg`.
 - Verified at 390px: 15 pads, keys 1–T, no horizontal scroll, every button ≥44px, cached-audio playback, missing-file toast, mixer saved per device.
+- ✅ Warg howl pad (p3) renamed "Release the warg", file `/audio/release-the-warg.m4a`.
+- ✅ **Combat pools (2026-10-16).** New pad kind `pool` with `folder` + `files` (array of paths). Each tap plays a random file, never the same one twice in a row, layered like a one-shot, with playbackRate 0.94–1.06 and volume within ±10% of `vol`. 11 pools (p16–p26) in scene `combat` live in a strip fixed to the bottom of the screen (4 per row on a phone, collapse toggle, safe-area padding; the page reserves the strip's height so it never covers the last scene). Spells (folders named `spell-*`) are grouped under "Sam's ring". Keys z x c v b n m , . / ; in sounds.json order. Arm board fetches, revalidates (ETag/304) and decodes every pool file and counts them in "N sounds, M updated". Pads use an optional `"short"` label in the strip; the full `label` is the tooltip/aria-label. Folders `/audio/combat/*/` exist with `.gitkeep`; every `files` array is empty for now, so every pool shows as empty.
+- Verified at 390px with 3 temporary clips: 24 rapid taps, 0 back-to-back repeats, rates 0.947–1.052, volume 0.906–1.085, overlapping plays, `B` key fires Melee, empty pool toasts, arm counted 3 files and 1 updated after a clip changed, strip 221px expanded / 53px collapsed, footer clears the strip.
 
 ---
 
@@ -209,6 +212,9 @@ _(The `summer-camp.html` and `api/dm.js` sections were removed — see "Removed 
 14. **Not password-protected yet** — the soundboard is publicly reachable at iasime.vercel.app.
 15. **Stale repo URL:** "What This Project Is" says `github.com/kylo-ben/horrid-wake`; the actual remote is `github.com/commander-zen/horrid-wake`.
 16. ~~**Replacing an audio file at the same path won't reach phones that already armed.**~~ ✅ Fixed 2026-10-16. IndexedDB `files` now stores `{blob, etag, lastModified}` per path (older bare-Blob entries still read fine). **Arm board** revalidates every file with `If-None-Match` (or `If-Modified-Since`) and `cache: 'no-cache'`: 304 keeps the copy, 200 with a new ETag replaces the bytes and drops the decoded buffer, and any failure falls back to the cached copy silently. The button then reads "Armed: N sounds, M updated". Tapping a pad without arming still uses the cache first. Live check: Vercel sends a content-hash ETag on `/audio/*` and answers a matching `If-None-Match` with 304 (curl and Chromium fetch). Last-Modified is the deploy time, so it changes every deploy — it's only a fallback. Note: a phone's first arm after this change counts every already-cached file as "updated" once, because the old entries have no ETag.
+17. **Pool folders are not scanned.** A static site can't list a directory, so `"folder"` is only a note for where clips go. Each clip must also be added to the pad's `"files"` array or it never plays.
+18. **Arm button text wraps the header on a phone.** At 390px, "Armed: N sounds, M updated" is wide enough to push Cut all onto a second row. Still ≥44px and usable, but the header grows ~50px after arming.
+19. **The combat strip takes ~221px of a 844px phone screen when expanded** (53px collapsed). Collapse state isn't remembered across reloads.
 
 ## Aesthetic Rules — SUPERSEDED 2026-08-29 (kept for history; see Known Issues #7)
 
