@@ -76,7 +76,25 @@ main{display:flex;flex-direction:column;gap:22px;margin-top:18px}
 .pad.kind-combo{background:linear-gradient(160deg,#5a2410,#2a120a);border-color:var(--ember)}
 .pad.kind-combo .lbl{font-weight:800;font-size:22px;letter-spacing:.12em;color:var(--flame)}
 
-.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--stone-2);
+/* combat strip: fixed to the bottom, always one thumb away; body reserves --strip-h so it never covers a scene */
+body{padding-bottom:calc(48px + var(--strip-h,0px))}
+.strip{position:fixed;left:0;right:0;bottom:0;z-index:6;border-top:1px solid var(--line);backdrop-filter:blur(6px);
+  background:linear-gradient(rgba(19,16,13,.88),var(--bg) 40%);
+  padding:0 max(16px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.strip-in{max-width:1100px;margin:0 auto}
+.strip-head{display:flex;align-items:center;justify-content:space-between}
+.strip-head h2{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.14em;text-transform:uppercase;margin:0;color:var(--muted)}
+.strip-toggle{min-height:44px;min-width:44px;margin-right:-8px;padding:0 8px;border:0;background:none;color:var(--muted);font-size:12px;letter-spacing:.1em;text-transform:uppercase}
+.strip-pads{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.strip.collapsed .strip-pads{display:none}
+.strip-group{grid-column:1/-1;font-size:11px;font-style:italic;letter-spacing:.06em;color:var(--muted);margin-top:2px}
+.strip .pad{min-height:44px;justify-content:center;padding:6px 14px 6px 8px;border-radius:8px}
+.strip .pad .lbl{font-size:12px;letter-spacing:.02em}
+.strip .pad .key{top:3px;right:4px;font-size:9px;padding:0 3px}
+.strip .pad.live::after{left:8px;right:8px;bottom:3px}
+@media (min-width:641px){.strip-pads{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}}
+
+.toast{position:fixed;left:50%;bottom:calc(12px + max(var(--strip-h,0px), env(safe-area-inset-bottom,0px)));transform:translateX(-50%);background:var(--stone-2);
   border:1px solid var(--ember-deep);border-radius:8px;padding:10px 14px;font-size:13px;max-width:min(92vw,460px);z-index:10}
 footer{margin-top:28px;font-size:12px;color:var(--muted);max-width:65ch}
 footer kbd{font-family:var(--mono);border:1px solid var(--line);border-radius:4px;padding:0 4px}
@@ -106,10 +124,20 @@ footer kbd{font-family:var(--mono);border:1px solid var(--line);border-radius:4p
   <footer>
     <p><strong>Keys:</strong> each pad's key is in its corner. <kbd>Space</kbd> cuts everything; <kbd>Esc</kbd> fades everything out over 3 seconds.</p>
     <p><strong>How sounds behave:</strong> a loop on the Music or Ambience channel crossfades out whatever was looping on that channel. One-shots layer on top. A Combo fires several pads at once, which is how BAM drops the crash and the Balrog theme together.</p>
+    <p><strong>Combat strip:</strong> the pads pinned to the bottom each play a random clip from their pool, slightly varied every tap, so rapid hits layer without sounding copy-pasted.</p>
     <p><strong>Mixer:</strong> the sliders are saved per device, so the phone keeps its own levels.</p>
     <p><strong>Before the session:</strong> open the board on your phone and tap <em>Arm board</em>. It downloads and decodes every sound and keeps a copy on the phone, so a weak Airbnb signal won't stall the Balrog. On an iPhone, flip the silent switch off, or the board stays quiet.</p>
   </footer>
 </div>
+<section class="strip" id="strip" aria-label="Combat sounds" hidden>
+  <div class="strip-in">
+    <div class="strip-head">
+      <h2>Combat</h2>
+      <button class="strip-toggle" id="stripToggle" type="button" aria-expanded="true" aria-controls="stripPads">Hide ▾</button>
+    </div>
+    <div class="strip-pads" id="stripPads"></div>
+  </div>
+</section>
 <div class="toast" id="toast" role="status" hidden></div>
 
 <script>
@@ -123,7 +151,8 @@ footer kbd{font-family:var(--mono);border:1px solid var(--line);border-radius:4p
   ];
   const CHANNELS = ['music','ambience','sfx'];
   const KEYS = '1234567890qwertyuiopasdfghjkl';
-  const KIND_NAME = {loop:'Loop', hit:'One-shot', combo:'Combo', cut:'Silence'};
+  const COMBAT_KEYS = ['z','x','c','v','b','n','m',',','.','/',';'];
+  const KIND_NAME = {loop:'Loop', hit:'One-shot', combo:'Combo', cut:'Silence', pool:'Pool'};
 
   const state = {
     pads: [],                     // loaded from /sounds.json
@@ -164,7 +193,9 @@ footer kbd{font-family:var(--mono);border:1px solid var(--line);border-radius:4p
       if (!ok && storageOk) { storageOk = false; showNotice(); }
     }, 400);
   }
-  const hasSound = p => !!p.file;
+  // Every audio path a pad plays: a pool has many, a loop or one-shot has one.
+  const padFiles = p => p.kind === 'pool' ? (p.files || []) : (p.file ? [p.file] : []);
+  const hasSound = p => padFiles(p).length > 0;
   async function loadConfig(){
     const c = await idbGet('kv', 'config');
     if (c && c.mix) Object.assign(state.mix, c.mix);
@@ -220,8 +251,7 @@ footer kbd{font-family:var(--mono);border:1px solid var(--line);border-radius:4p
   // Arm board only: ask the server whether the cached copy is still current.
   // Returns true when new bytes replaced the cached ones. Any failure falls back to the
   // cached copy silently; it only throws when there is nothing cached to fall back on.
-  async function revalidate(pad){
-    const key = pad.file;
+  async function revalidate(key){
     const cached = await readCached(key);
     const headers = {};
     if (cached && cached.etag) headers['If-None-Match'] = cached.etag;
@@ -238,9 +268,8 @@ footer kbd{font-family:var(--mono);border:1px solid var(--line);border-radius:4p
     delete buffers[key];
     return !!cached;
   }
-  async function getBuffer(pad){
-    const key = pad.file;
-    if (!key) return null;
+  const getBuffer = pad => pad.file ? bufferFor(pad.file) : Promise.resolve(null);
+  async function bufferFor(key){
     if (buffers[key]) return buffers[key];
     const cached = await readCached(key);                       // cached copy keeps the board working on bad wifi
     let blob = cached && cached.blob;
@@ -288,14 +317,26 @@ footer kbd{font-family:var(--mono);border:1px solid var(--line);border-radius:4p
       blink(pad.id); return;
     }
     if (pad.kind === 'loop' && loops[pad.id]) { stopLoop(pad.id, Math.max(1, state.crossfade)); return; }
+    const path = pad.kind === 'pool' ? pickPoolFile(pad) : pad.file;
     let buf;
-    try { buf = await getBuffer(pad); }
-    catch (e) { toast(e.message === 'missing' ? `“${pad.label}” isn’t uploaded yet (${pad.file}).` : `Couldn't load “${pad.label}”. Check the connection, or that the file is MP3, M4A, WAV or OGG.`); return; }
+    try { buf = path ? await bufferFor(path) : null; }
+    catch (e) { toast(e.message === 'missing' ? `“${pad.label}” isn’t uploaded yet (${path}).` : `Couldn't load “${pad.label}”. Check the connection, or that the file is MP3, M4A, WAV or OGG.`); return; }
     if (!buf) { toast(`“${pad.label}” has no sound file in sounds.json.`); return; }
-
+    // Pools layer like one-shots, with a little pitch and level drift so repeats don't sound identical.
+    if (pad.kind === 'pool') play(pad, buf, 0.94 + Math.random() * 0.12, pad.vol * (0.9 + Math.random() * 0.2));
+    else play(pad, buf, 1, pad.vol);
+  }
+  const poolLast = {};            // padId -> last file played, so a pool never repeats back to back
+  function pickPoolFile(pad){
+    const files = pad.files || [];
+    if (files.length < 2) return files[0] || null;
+    const choices = files.filter(f => f !== poolLast[pad.id]);
+    return poolLast[pad.id] = choices[Math.floor(Math.random() * choices.length)];
+  }
+  function play(pad, buf, rate, vol){
     if (pad.kind === 'loop') { const cur = channelLoop[pad.channel]; if (cur && cur !== pad.id) stopLoop(cur, state.crossfade); }
-    const src = ctx.createBufferSource(); src.buffer = buf; src.loop = pad.kind === 'loop';
-    const g = ctx.createGain(); const now = ctx.currentTime; const f = Math.max(0, +pad.fade || 0); const v = Math.max(0, +pad.vol);
+    const src = ctx.createBufferSource(); src.buffer = buf; src.loop = pad.kind === 'loop'; src.playbackRate.value = rate;
+    const g = ctx.createGain(); const now = ctx.currentTime; const f = Math.max(0, +pad.fade || 0); const v = Math.max(0, +vol);
     if (f > 0) { g.gain.setValueAtTime(0, now); g.gain.linearRampToValueAtTime(v, now + f); } else g.gain.setValueAtTime(v, now);
     src.connect(g); g.connect(chGain[pad.channel] || chGain.sfx);
     src.start();
@@ -307,19 +348,21 @@ footer kbd{font-family:var(--mono);border:1px solid var(--line);border-radius:4p
     ensureCtx(); keepAwake();
     const withFiles = state.pads.filter(p => hasSound(p) && p.kind !== 'combo' && p.kind !== 'cut');
     const armBtn = document.getElementById('armBtn');
-    let ok = 0, updated = 0, bad = [];
+    let ok = 0, updated = 0; const bad = new Set();
     armBtn.textContent = 'Arming…';
     for (const p of withFiles) {
-      try {
-        if (await revalidate(p)) updated++;
-        if (await getBuffer(p)) ok++; else bad.push(p.label);
-      } catch (e) { bad.push(p.label); }
+      for (const path of padFiles(p)) {
+        try {
+          if (await revalidate(path)) updated++;
+          if (await bufferFor(path)) ok++; else bad.add(p.label);
+        } catch (e) { bad.add(p.label); }
+      }
     }
-    const needs = state.pads.filter(p => (p.kind === 'loop' || p.kind === 'hit') && !hasSound(p)).length;
+    const needs = state.pads.filter(p => (p.kind === 'loop' || p.kind === 'hit' || p.kind === 'pool') && !hasSound(p)).length;
     const summary = `Armed: ${ok} sound${ok === 1 ? '' : 's'}, ${updated} updated`;
     armBtn.textContent = summary;
     armBtn.classList.add('armed');
-    if (bad.length) toast(`Couldn't load: ${bad.join(', ')}.`);
+    if (bad.size) toast(`Couldn't load: ${[...bad].join(', ')}.`);
     else if (needs) toast(`${summary}. ${needs} pad${needs>1?'s':''} still need a file.`);
     else toast(`${summary}.`);
   }
@@ -379,6 +422,7 @@ footer kbd{font-family:var(--mono);border:1px solid var(--line);border-radius:4p
     if (p.kind === 'combo') { const n = (p.targets || []).length; return `Combo · fires ${n}`; }
     if (p.kind === 'cut') return 'Cuts all sound';
     if (!hasSound(p)) return 'No file yet';
+    if (p.kind === 'pool') { const n = p.files.length; return `Pool · ${n} clip${n === 1 ? '' : 's'}`; }
     const ch = p.channel === 'sfx' ? 'Effects' : p.channel[0].toUpperCase() + p.channel.slice(1);
     return `${KIND_NAME[p.kind]} · ${ch}`;
   }
@@ -397,13 +441,37 @@ footer kbd{font-family:var(--mono);border:1px solid var(--line);border-radius:4p
       }
       sec.append(head, grid); board.append(sec);
     }
+    renderStrip();
     paintLive();
   }
 
-  function padButton(p){
+  // Combat pads live in a strip fixed to the bottom of the screen, not in a scene band.
+  function renderStrip(){
+    const strip = $('#strip'), grid = $('#stripPads'); grid.textContent = '';
+    const pads = state.pads.filter(p => p.scene === 'combat');
+    strip.hidden = !pads.length;
+    pads.forEach((p, i) => p._key = COMBAT_KEYS[i] || '');
+    // Spell pools (folders named spell-*) are grouped at the end under the ring.
+    const isSpell = p => /\/spell-/.test(p.folder || '');
+    for (const p of pads.filter(p => !isSpell(p))) grid.append(padButton(p, true));
+    const spells = pads.filter(isSpell);
+    if (spells.length) {
+      grid.append(el('div', 'strip-group', 'Sam’s ring'));
+      for (const p of spells) grid.append(padButton(p, true));
+    }
+    syncStripHeight();
+  }
+  // The page reserves room under the last scene for the strip, so it never covers a pad.
+  function syncStripHeight(){
+    const strip = $('#strip');
+    document.documentElement.style.setProperty('--strip-h', (strip.hidden ? 0 : strip.offsetHeight) + 'px');
+  }
+
+  function padButton(p, compact){
     const b = el('button', `pad kind-${p.kind}`); b.type = 'button'; b.dataset.id = p.id;
-    if ((p.kind === 'loop' || p.kind === 'hit') && !hasSound(p)) b.classList.add('empty');
-    b.append(el('span', 'lbl', p.label), el('span', 'meta', padMeta(p)));
+    if ((p.kind === 'loop' || p.kind === 'hit' || p.kind === 'pool') && !hasSound(p)) b.classList.add('empty');
+    if (compact) { b.append(el('span', 'lbl', p.short || p.label)); b.setAttribute('aria-label', p.label); b.title = p.label; }
+    else b.append(el('span', 'lbl', p.label), el('span', 'meta', padMeta(p)));
     if (p._key) b.append(el('span', 'key', p._key.toUpperCase()));
     b.addEventListener('click', () => trigger(p));
     return b;
@@ -421,6 +489,12 @@ footer kbd{font-family:var(--mono);border:1px solid var(--line);border-radius:4p
     const k = e.key.toLowerCase(); const p = state.pads.find(x => x._key === k);
     if (p) { e.preventDefault(); trigger(p); }
   });
+  $('#stripToggle').addEventListener('click', () => {
+    const strip = $('#strip'), collapsed = strip.classList.toggle('collapsed'), btn = $('#stripToggle');
+    btn.setAttribute('aria-expanded', !collapsed); btn.textContent = collapsed ? 'Show ▴' : 'Hide ▾';
+    syncStripHeight();
+  });
+  window.addEventListener('resize', syncStripHeight);
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && Object.keys(loops).length) keepAwake(); });
 
   renderMix(); render();

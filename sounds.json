@@ -1,7 +1,7 @@
 [
   {"id": "p1",  "scene": "road",     "label": "Road ambience",      "kind": "loop",  "channel": "ambience", "vol": 0.8,  "fade": 3,   "file": "/audio/road-ambience.m4a"},
   {"id": "p2",  "scene": "road",     "label": "Travel music",       "kind": "loop",  "channel": "music",    "vol": 0.7,  "fade": 3,   "file": "/audio/travel-music.m4a"},
-  {"id": "p3",  "scene": "approach", "label": "Warg howl",          "kind": "hit",   "channel": "sfx",      "vol": 1,    "fade": 0,   "file": "/audio/warg-howl.m4a"},
+  {"id": "p3",  "scene": "approach", "label": "Release the warg",   "kind": "hit",   "channel": "sfx",      "vol": 1,    "fade": 0,   "file": "/audio/release-the-warg.m4a"},
   {"id": "p4",  "scene": "approach", "label": "Fight music",        "kind": "loop",  "channel": "music",    "vol": 0.8,  "fade": 1.5, "file": "/audio/fight-music.m4a"},
   {"id": "p5",  "scene": "court",    "label": "Fire crackle",       "kind": "loop",  "channel": "ambience", "vol": 0.7,  "fade": 2,   "file": "/audio/fire-crackle.m4a"},
   {"id": "p6",  "scene": "court",    "label": "Orc war chant",      "kind": "hit",   "channel": "sfx",      "vol": 0.9,  "fade": 0,   "file": "/audio/orc-war-chant.m4a"},
@@ -13,5 +13,16 @@
   {"id": "p12", "scene": "balrog",   "label": "Wall crash",         "kind": "hit",   "channel": "sfx",      "vol": 1,    "fade": 0,   "file": "/audio/wall-crash.m4a"},
   {"id": "p13", "scene": "balrog",   "label": "Balrog roar",        "kind": "hit",   "channel": "sfx",      "vol": 1,    "fade": 0,   "file": "/audio/balrog-roar.m4a"},
   {"id": "p14", "scene": "balrog",   "label": "Balrog theme",       "kind": "loop",  "channel": "music",    "vol": 1,    "fade": 0,   "file": "/audio/balrog-theme.m4a"},
-  {"id": "p15", "scene": "after",    "label": "Quiet aftermath",    "kind": "loop",  "channel": "music",    "vol": 0.6,  "fade": 4,   "file": "/audio/quiet-aftermath.m4a"}
+  {"id": "p15", "scene": "after",    "label": "Quiet aftermath",    "kind": "loop",  "channel": "music",    "vol": 0.6,  "fade": 4,   "file": "/audio/quiet-aftermath.m4a"},
+  {"id": "p16", "scene": "combat",   "label": "Warg attack",     "short": "Warg atk", "kind": "pool",  "channel": "sfx",      "vol": 1,    "fade": 0,   "folder": "/audio/combat/warg-attack/", "files": []},
+  {"id": "p17", "scene": "combat",   "label": "Warg hit",        "short": "Warg hit", "kind": "pool",  "channel": "sfx",      "vol": 1,    "fade": 0,   "folder": "/audio/combat/warg-hit/", "files": []},
+  {"id": "p18", "scene": "combat",   "label": "Orc hit",         "short": "Orc hit",  "kind": "pool",  "channel": "sfx",      "vol": 1,    "fade": 0,   "folder": "/audio/combat/orc-hit/", "files": []},
+  {"id": "p19", "scene": "combat",   "label": "Hero hit",        "short": "Hero hit", "kind": "pool",  "channel": "sfx",      "vol": 1,    "fade": 0,   "folder": "/audio/combat/hero-hit/", "files": []},
+  {"id": "p20", "scene": "combat",   "label": "Melee attack",    "short": "Melee",    "kind": "pool",  "channel": "sfx",      "vol": 1,    "fade": 0,   "folder": "/audio/combat/melee/", "files": []},
+  {"id": "p21", "scene": "combat",   "label": "Ranged attack",   "short": "Ranged",   "kind": "pool",  "channel": "sfx",      "vol": 1,    "fade": 0,   "folder": "/audio/combat/ranged/", "files": []},
+  {"id": "p22", "scene": "combat",   "label": "Balrog attack",   "short": "Balrog",   "kind": "pool",  "channel": "sfx",      "vol": 1,    "fade": 0,   "folder": "/audio/combat/balrog-attack/", "files": []},
+  {"id": "p23", "scene": "combat",   "label": "Shield",          "short": "Shield",   "kind": "pool",  "channel": "sfx",      "vol": 1,    "fade": 0,   "folder": "/audio/combat/spell-shield/", "files": []},
+  {"id": "p24", "scene": "combat",   "label": "Healing Word",    "short": "Heal",     "kind": "pool",  "channel": "sfx",      "vol": 1,    "fade": 0,   "folder": "/audio/combat/spell-healing-word/", "files": []},
+  {"id": "p25", "scene": "combat",   "label": "Thunderwave",     "short": "Thunder",  "kind": "pool",  "channel": "sfx",      "vol": 1,    "fade": 0,   "folder": "/audio/combat/spell-thunderwave/", "files": []},
+  {"id": "p26", "scene": "combat",   "label": "Shatter",         "short": "Shatter",  "kind": "pool",  "channel": "sfx",      "vol": 1,    "fade": 0,   "folder": "/audio/combat/spell-shatter/", "files": []}
 ]
