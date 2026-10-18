@@ -32,25 +32,29 @@ button{cursor:pointer}
 .pages a:hover{color:var(--fg)}
 .pages a[aria-current="page"]{color:var(--flame)}
 
-/* top bar */
-.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;margin-inline:-16px;padding:12px 16px 10px;
-  background:linear-gradient(var(--bg) 70%, rgba(19,16,13,.85));border-bottom:1px solid var(--line);backdrop-filter:blur(6px)}
-.bar-in{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
-.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-h1{font-family:var(--display);font-weight:800;font-size:clamp(18px,3.4vw,24px);letter-spacing:.08em;margin:0;text-wrap:balance}
+/* top bar: only what's needed mid-scene stays pinned (NN/g: keep sticky chrome small and opaque).
+   The title scrolls away; the mixer opens on demand from the Mix button. */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;margin-inline:-16px;padding:8px 16px 6px;
+  background:var(--bg);border-bottom:1px solid var(--line)}
+.bar-in{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:6px}
+.controls{display:grid;grid-template-columns:auto repeat(3,minmax(0,1fr));gap:8px}
+.controls .btn{padding-inline:10px;white-space:nowrap}
+#mixBtn[aria-expanded="true"]{background:var(--ember-deep);border-color:var(--ember)}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(18px,3.4vw,24px);letter-spacing:.08em;margin:0 0 10px;text-wrap:balance}
 h1 small{display:block;font-family:var(--body);font-weight:400;font-style:italic;font-size:12px;letter-spacing:0;color:var(--muted)}
-.spacer{flex:1}
 .btn{border:1px solid var(--line);background:var(--stone-2);border-radius:8px;padding:9px 14px;min-height:44px;font-family:var(--display);font-weight:600;letter-spacing:.06em;font-size:13px}
 .btn:hover{border-color:var(--ember-deep)}
 .btn.armed{border-color:var(--moss);color:var(--moss)}
 .cut{background:var(--blood);border-color:#e0604a;color:#fff;font-weight:800;padding-inline:20px}
 .cut:hover{border-color:#fff}
-.mix{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.mix{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding:4px 0}
+.mix[hidden]{display:none}
 .fader{display:flex;flex-direction:column;gap:2px;min-width:0}
 .fader label{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);display:flex;justify-content:space-between}
 .fader output{font-family:var(--mono);font-variant-numeric:tabular-nums}
 input[type=range]{width:100%;accent-color:var(--ember);min-height:28px}
-.now{font-size:12px;color:var(--muted);display:flex;gap:14px;flex-wrap:wrap;min-height:18px}
+.now{font-size:12px;color:var(--muted);display:flex;gap:14px;min-height:18px;white-space:nowrap;overflow:hidden}
+.now span{overflow:hidden;text-overflow:ellipsis}
 .now b{color:var(--flame);font-weight:600}
 .notice{font-size:12px;color:var(--muted);border:1px dashed var(--line);border-radius:8px;padding:8px 10px}
 .notice strong{color:var(--fg)}
@@ -84,21 +88,24 @@ main{display:flex;flex-direction:column;gap:22px;margin-top:18px}
 
 /* combat strip: fixed to the bottom, always one thumb away; body reserves --strip-h so it never covers a scene */
 body{padding-bottom:calc(48px + var(--strip-h,0px))}
-.strip{position:fixed;left:0;right:0;bottom:0;z-index:6;border-top:1px solid var(--line);backdrop-filter:blur(6px);
-  background:linear-gradient(rgba(19,16,13,.88),var(--bg) 40%);
-  padding:0 max(16px,env(safe-area-inset-right,0px)) calc(8px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
-.strip-in{max-width:1100px;margin:0 auto}
-.strip-head{display:flex;align-items:center;justify-content:space-between}
-.strip-head h2{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.14em;text-transform:uppercase;margin:0;color:var(--muted)}
-.strip-toggle{min-height:44px;min-width:44px;margin-right:-8px;padding:0 8px;border:0;background:none;color:var(--muted);font-size:12px;letter-spacing:.1em;text-transform:uppercase}
-.strip-pads{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
-.strip.collapsed .strip-pads{display:none}
-.strip-group{grid-column:1/-1;font-size:11px;font-style:italic;letter-spacing:.06em;color:var(--muted);margin-top:2px}
-.strip .pad{min-height:44px;justify-content:center;padding:6px 14px 6px 8px;border-radius:8px}
-.strip .pad .lbl{font-size:12px;letter-spacing:.02em}
-.strip .pad .key{top:3px;right:4px;font-size:9px;padding:0 3px}
-.strip .pad.live::after{left:8px;right:8px;bottom:3px}
-@media (min-width:641px){.strip-pads{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}}
+.strip{position:fixed;left:0;right:0;bottom:0;z-index:6;border-top:1px solid var(--line);background:var(--bg);
+  padding:6px max(10px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px))}
+.strip-in{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:6px}
+.strip-pads,.ring-pads{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:5px}
+.ring-pads[hidden]{display:none}
+.strip .pad{min-height:48px;justify-content:center;align-items:center;text-align:center;padding:4px;border-radius:8px}
+.strip .pad .lbl{font-size:11px;letter-spacing:.01em;line-height:1.15;overflow-wrap:normal}
+.strip .pad .key{display:none}
+.strip .pad.live::after{left:6px;right:6px;bottom:3px}
+.ring-toggle{border-color:var(--ember-deep);background:linear-gradient(160deg,#3a1d0e,var(--stone))}
+.ring-toggle .lbl{color:var(--flame)}
+.ring-toggle[aria-expanded="true"]{border-color:var(--ember);box-shadow:0 0 0 1px var(--ember)}
+.ring-pads .pad{border-color:var(--ember-deep)}
+/* wider screens: room for the shortcut keys and bigger labels */
+@media (min-width:641px){
+  .strip .pad .lbl{font-size:13px}
+  .strip .pad .key{display:block;top:3px;right:4px;font-size:9px;padding:0 3px}
+}
 
 .toast{position:fixed;left:50%;bottom:calc(12px + max(var(--strip-h,0px), env(safe-area-inset-bottom,0px)));transform:translateX(-50%);background:var(--stone-2);
   border:1px solid var(--ember-deep);border-radius:8px;padding:10px 14px;font-size:13px;max-width:min(92vw,460px);z-index:10}
@@ -111,16 +118,16 @@ footer kbd{font-family:var(--mono);border:1px solid var(--line);border-radius:4p
 <body>
 <div class="wrap">
   <nav class="pages" aria-label="Pages"><a href="/" aria-current="page">Soundboard</a><a href="/tracker">HP tracker</a></nav>
+  <h1>Old Road Soundboard<small>Shadow on the Old Road · tap a pad to play, tap a lit loop to fade it</small></h1>
   <header class="bar">
     <div class="bar-in">
-      <div class="row">
-        <h1>Old Road Soundboard<small>Shadow on the Old Road · tap a pad to play, tap a lit loop to fade it</small></h1>
-        <span class="spacer"></span>
+      <div class="controls">
+        <button class="btn" id="mixBtn" type="button" aria-expanded="false" aria-controls="mix">Mix</button>
         <button class="btn" id="armBtn" type="button">Arm board</button>
         <button class="btn" id="fadeBtn" type="button" title="Fade everything out over 3 seconds (Esc)">Fade out</button>
         <button class="btn cut" id="cutBtn" type="button" title="Cut all sound instantly (Space)">Cut all</button>
       </div>
-      <div class="mix" id="mix"></div>
+      <div class="mix" id="mix" hidden></div>
       <div class="now" id="now"></div>
     </div>
   </header>
@@ -132,16 +139,13 @@ footer kbd{font-family:var(--mono);border:1px solid var(--line);border-radius:4p
     <p><strong>Keys:</strong> each pad's key is in its corner. <kbd>Space</kbd> cuts everything; <kbd>Esc</kbd> fades everything out over 3 seconds.</p>
     <p><strong>How sounds behave:</strong> a loop on the Music or Ambience channel crossfades out whatever was looping on that channel. One-shots layer on top. A Combo fires several pads at once, which is how BAM drops the crash and the Balrog theme together.</p>
     <p><strong>Combat strip:</strong> the pads pinned to the bottom each play a random clip from their pool, slightly varied every tap, so rapid hits layer without sounding copy-pasted.</p>
-    <p><strong>Mixer:</strong> the sliders are saved per device, so the phone keeps its own levels.</p>
+    <p><strong>Mixer:</strong> tap <em>Mix</em> to open the sliders. They're saved per device, so the phone keeps its own levels.</p>
     <p><strong>Before the session:</strong> open the board on your phone and tap <em>Arm board</em>. It downloads and decodes every sound and keeps a copy on the phone, so a weak Airbnb signal won't stall the Balrog. Pads marked <em>Stream</em> are long music or ambience tracks: they play straight from the site instead, so they need signal at the table. On an iPhone, flip the silent switch off, or the board stays quiet.</p>
   </footer>
 </div>
 <section class="strip" id="strip" aria-label="Combat sounds" hidden>
   <div class="strip-in">
-    <div class="strip-head">
-      <h2>Combat</h2>
-      <button class="strip-toggle" id="stripToggle" type="button" aria-expanded="true" aria-controls="stripPads">Hide ▾</button>
-    </div>
+    <div class="ring-pads" id="ringPads" role="group" aria-label="Sam’s ring spells" hidden></div>
     <div class="strip-pads" id="stripPads"></div>
   </div>
 </section>
@@ -404,7 +408,8 @@ footer kbd{font-family:var(--mono);border:1px solid var(--line);border-radius:4p
     const needs = state.pads.filter(p => (p.kind === 'loop' || p.kind === 'hit' || p.kind === 'pool') && !hasSound(p)).length;
     const summary = `Armed: ${ok} sound${ok === 1 ? '' : 's'}, ${updated} updated`;
     const streamNote = streamed ? ` ${streamed} long track${streamed > 1 ? 's' : ''} stream and need signal.` : '';
-    armBtn.textContent = summary;
+    // Short label keeps the pinned bar on one row; the full count is in the toast and the tooltip.
+    armBtn.textContent = 'Armed ✓'; armBtn.title = summary;
     armBtn.classList.add('armed');
     if (bad.size) toast(`Couldn't load: ${[...bad].join(', ')}.`);
     else if (needs) toast(`${summary}. ${needs} pad${needs>1?'s':''} still need a file.${streamNote}`);
@@ -489,19 +494,29 @@ footer kbd{font-family:var(--mono);border:1px solid var(--line);border-radius:4p
     paintLive();
   }
 
-  // Combat pads live in a strip fixed to the bottom of the screen, not in a scene band.
+  // Combat pads live in one row fixed to the bottom of the screen, not in a scene band.
+  // Spell pools (folders named spell-*) sit behind a "Sam's ring" button that opens them in a row above.
   function renderStrip(){
-    const strip = $('#strip'), grid = $('#stripPads'); grid.textContent = '';
+    const strip = $('#strip'), grid = $('#stripPads'), ring = $('#ringPads');
+    grid.textContent = ''; ring.textContent = ''; ring.hidden = true;
     const pads = state.pads.filter(p => p.scene === 'combat');
     strip.hidden = !pads.length;
     pads.forEach((p, i) => p._key = COMBAT_KEYS[i] || '');
-    // Spell pools (folders named spell-*) are grouped at the end under the ring.
     const isSpell = p => /\/spell-/.test(p.folder || '');
     for (const p of pads.filter(p => !isSpell(p))) grid.append(padButton(p, true));
     const spells = pads.filter(isSpell);
     if (spells.length) {
-      grid.append(el('div', 'strip-group', 'Sam’s ring'));
-      for (const p of spells) grid.append(padButton(p, true));
+      const toggle = el('button', 'pad ring-toggle'); toggle.type = 'button';
+      toggle.append(el('span', 'lbl', 'Sam’s ring'));
+      toggle.setAttribute('aria-expanded', 'false'); toggle.setAttribute('aria-controls', 'ringPads');
+      const setRing = open => { ring.hidden = !open; toggle.setAttribute('aria-expanded', open); syncStripHeight(); };
+      toggle.addEventListener('click', () => setRing(ring.hidden));
+      for (const p of spells) {
+        const b = padButton(p, true);
+        b.addEventListener('click', () => setRing(false));   // one spell a turn, so the row closes after a cast
+        ring.append(b);
+      }
+      grid.append(toggle);
     }
     syncStripHeight();
   }
@@ -533,10 +548,9 @@ footer kbd{font-family:var(--mono);border:1px solid var(--line);border-radius:4p
     const k = e.key.toLowerCase(); const p = state.pads.find(x => x._key === k);
     if (p) { e.preventDefault(); trigger(p); }
   });
-  $('#stripToggle').addEventListener('click', () => {
-    const strip = $('#strip'), collapsed = strip.classList.toggle('collapsed'), btn = $('#stripToggle');
-    btn.setAttribute('aria-expanded', !collapsed); btn.textContent = collapsed ? 'Show ▴' : 'Hide ▾';
-    syncStripHeight();
+  $('#mixBtn').addEventListener('click', () => {
+    const mix = $('#mix'); mix.hidden = !mix.hidden;
+    $('#mixBtn').setAttribute('aria-expanded', !mix.hidden);
   });
   window.addEventListener('resize', syncStripHeight);
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && Object.keys(loops).length) keepAwake(); });
