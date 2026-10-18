@@ -1,9 +1,9 @@
 [
-  {"id": "p1",  "scene": "road",     "label": "Road ambience",      "kind": "loop",  "channel": "ambience", "vol": 0.8,  "fade": 3,   "file": "/audio/road-ambience.m4a"},
-  {"id": "p2",  "scene": "road",     "label": "Travel music",       "kind": "loop",  "channel": "music",    "vol": 0.7,  "fade": 3,   "file": "/audio/travel-music.m4a"},
+  {"id": "p1",  "scene": "road",     "label": "Road ambience",      "kind": "loop",  "channel": "ambience", "vol": 0.8,  "fade": 3,   "file": "/audio/road-ambiance.mp3", "stream": true},
+  {"id": "p2",  "scene": "road",     "label": "Travel music",       "kind": "loop",  "channel": "music",    "vol": 0.7,  "fade": 3,   "file": "/audio/travel-music.mp3"},
   {"id": "p3",  "scene": "approach", "label": "Release the warg",   "kind": "hit",   "channel": "sfx",      "vol": 1,    "fade": 0,   "file": "/audio/release-the-warg.mp3"},
   {"id": "p4",  "scene": "approach", "label": "Fight music",        "kind": "loop",  "channel": "music",    "vol": 0.8,  "fade": 1.5, "file": "/audio/fight-music(1).mp3", "stream": true},
-  {"id": "p5",  "scene": "court",    "label": "Fire crackle",       "kind": "loop",  "channel": "ambience", "vol": 0.7,  "fade": 2,   "file": "/audio/fire-crackle.m4a"},
+  {"id": "p5",  "scene": "court",    "label": "Fire crackle",       "kind": "loop",  "channel": "ambience", "vol": 0.7,  "fade": 2,   "file": "/audio/fire-crackle.mp3"},
   {"id": "p6",  "scene": "court",    "label": "Orc war chant",      "kind": "loop",  "channel": "ambience", "vol": 0.9,  "fade": 0,   "file": "/audio/orc-war-chant.mp3"},
   {"id": "p7",  "scene": "court",    "label": "Boss fight music",   "kind": "loop",  "channel": "music",    "vol": 0.8,  "fade": 1.5, "file": "/audio/boss-fight-music(1).mp3", "stream": true},
   {"id": "p8",  "scene": "balrog",   "label": "Rumble 1 · distant", "kind": "hit",   "channel": "sfx",      "vol": 0.45, "fade": 0,   "file": "/audio/rumbe-1-distant.mp3"},
