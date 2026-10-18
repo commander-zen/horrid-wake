@@ -98,6 +98,16 @@ main{display:flex;flex-direction:column;gap:26px;margin-top:18px}
 .atk-result .crit b{color:var(--flame)}
 .atk-result .miss b{color:var(--muted)}
 .revive{min-height:44px;border:1px dashed var(--blood);border-radius:8px;background:transparent;font-family:var(--display);font-weight:800;letter-spacing:.12em;color:#e9846f}
+/* special abilities */
+.event:empty{display:none}
+.event{margin:0;border-left:3px solid var(--flame);padding:4px 0 4px 10px;font-size:13px;color:var(--fg)}
+.atk[hidden],.redirect[hidden],.pick[hidden]{display:none}
+.redirect{display:flex;flex-direction:column;gap:6px}
+.pick{display:flex;flex-wrap:wrap;gap:6px}
+.btn.fire{border-color:var(--ember-deep);color:var(--flame)}
+.btn.fire:disabled{opacity:.4;cursor:default}
+.fire-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:10px}
+.fire-out{font-size:13px;color:var(--muted);font-style:italic}
 .card.down{border-color:#2a2420}
 .card.down .stats{opacity:.45}
 .card.down .controls{display:none}
@@ -126,7 +136,8 @@ main{display:flex;flex-direction:column;gap:26px;margin-top:18px}
   const store = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
 
   const saved = load(KEY, {});
-  const state = {hp: saved.hp || {}, used: saved.used || {}, dismissed: saved.dismissed || {}};
+  // cleansed: monster id -> blade cleansed (Shield of Flesh and Black Reaping off). fireOut: area id -> fire scattered.
+  const state = {hp: saved.hp || {}, used: saved.used || {}, dismissed: saved.dismissed || {}, cleansed: saved.cleansed || {}, fireOut: saved.fireOut || {}};
   const save = () => store(KEY, state);
 
   let areas = [];
@@ -163,6 +174,46 @@ main{display:flex;flex-direction:column;gap:26px;margin-top:18px}
     save(); paintCard(m); renderCues();
   }
 
+  /* ---------- special abilities from the DM guide ---------- */
+  // Flags live on the stat blocks in monsters.json (orc, shieldOfFlesh, hideousToughness, redirect, parry, fearOfFire).
+  const events = {};              // monster id -> last automatic thing that happened to it, shown on its card
+  const lastHit = {};             // monster id -> HP it lost to the last damage entry (for Redirect Attack)
+  const sbOf = m => statblocks[m.stats] || {};
+  const areaOfMonster = m => areas.find(a => a.monsters.includes(m));
+  // Orcs still standing in the same area, optionally excluding one (the guide's "orc allies").
+  const orcsNear = (m, except) => areaOfMonster(m).monsters.filter(o => o !== except && sbOf(o).orc && hpOf(o) > 0);
+  function note(m, text){ events[m.id] = text; paintCard(m); }
+
+  // Every damage entry goes through here so the automatic abilities apply.
+  function damage(m, n, {fire = false} = {}){
+    const sb = sbOf(m), before = hpOf(m), msgs = [];
+    // Shield of Flesh: while Ghashnakh holds the corrupted blade, the first 5 of each attack go to a random orc ally.
+    // Assumes every orc in the area is within 30 ft. (true in the courtyard).
+    if (sb.shieldOfFlesh && !state.cleansed[m.id]) {
+      const allies = orcsNear(m, m);
+      if (allies.length) {
+        const ally = allies[Math.floor(Math.random() * allies.length)], moved = Math.min(sb.shieldOfFlesh, n);
+        n -= moved; damage(ally, moved);
+        note(ally, `Took ${moved} from ${m.name}'s Shield of Flesh.` + (events[ally.id] && /Hideous/.test(events[ally.id]) ? ' ' + events[ally.id] : ''));
+        msgs.push(`Shield of Flesh: ${ally.name} took ${moved}, ${m.name} took ${n}.`);
+      }
+    }
+    // Hideous Toughness: once, damage of 7 or less that would drop it leaves it at 1 HP.
+    if (sb.hideousToughness && !state.used[m.id] && before > 0 && before - n <= 0 && n <= sb.hideousToughness) {
+      state.used[m.id] = true;
+      const cb = document.querySelector(`.card[data-id="${m.id}"] .once input`); if (cb) cb.checked = true;
+      setHp(m, 1); lastHit[m.id] = before - 1;
+      note(m, `Hideous Toughness! ${n} damage would have dropped it; it stays at 1 HP. (Used up.)`);
+      return;
+    }
+    setHp(m, before - n);
+    lastHit[m.id] = before - hpOf(m);
+    // Fear of Fire: a warg hurt by fire checks Intimidation against DC 10 + the damage or flees.
+    if (fire && sb.fearOfFire && n > 0 && hpOf(m) > 0) msgs.push(`Fear of Fire: Intimidation check DC ${10 + n}, or it flees until the end of its next turn.`);
+    if (msgs.length) note(m, msgs.join(' '));
+    else if (events[m.id]) { delete events[m.id]; paintCard(m); }
+  }
+
   function paintCard(m){
     const card = document.querySelector(`.card[data-id="${m.id}"]`); if (!card) return;
     const hp = hpOf(m), pct = hp / m.hp;
@@ -171,6 +222,11 @@ main{display:flex;flex-direction:column;gap:26px;margin-top:18px}
     const bar = card.querySelector('.bar');
     bar.dataset.level = pct > .5 ? 'high' : pct > .25 ? 'mid' : 'low';
     bar.firstChild.style.width = (pct * 100) + '%';
+    const ev = card.querySelector('.event'); ev.textContent = events[m.id] || '';
+    const redirect = card.querySelector('.redirect');
+    if (redirect) redirect.hidden = !(lastHit[m.id] > 0 && hp > 0 && orcsNear(m, m).length);
+    // Black Reaping needs the corrupted blade.
+    card.querySelectorAll('.atk[data-needs-blade]').forEach(b => b.hidden = !!state.cleansed[m.id]);
   }
 
   /* ---------- attack rolls ---------- */
@@ -236,6 +292,7 @@ main{display:flex;flex-direction:column;gap:26px;margin-top:18px}
       const b = el('button', 'btn atk' + (a.hit == null ? ' extra' : '')); b.type = 'button';
       b.append(el('b', null, a.name), el('span', null, formula(a)));
       if (tip) b.title = tip;
+      if (a.needsBlade) b.dataset.needsBlade = '';
       b.addEventListener('click', () => {
         out.textContent = '';
         for (const l of rollAttack(a, mode)) { const p = el('p', l.cls); p.append(el('b', null, l.text), el('small', null, l.detail)); out.append(p); }
@@ -249,12 +306,22 @@ main{display:flex;flex-direction:column;gap:26px;margin-top:18px}
   function card(m){
     const c = el('article', 'card'); c.dataset.id = m.id;
     const stats = el('div', 'stats');
-    const head = el('div', 'card-head'); head.append(el('h3', null, m.name), el('span', 'ac', 'AC ' + m.ac));
+    const sb = sbOf(m);
+    // Parry is a reaction after a hit, so it's a reminder: the AC it would take to beat it.
+    const head = el('div', 'card-head'); head.append(el('h3', null, m.name), el('span', 'ac', 'AC ' + m.ac + (sb.parry ? ` · ${m.ac + sb.parry} Parry` : '')));
     const hp = el('div', 'hp'); hp.append(el('b'), document.createTextNode(' / ' + m.hp + ' HP'));
     const bar = el('div', 'bar'); bar.setAttribute('aria-hidden', 'true'); bar.append(el('span'));
     stats.append(head, hp, bar);
     if (m.note) stats.append(el('p', 'note', m.note));
-    c.append(stats);
+    const ev = el('p', 'event'); ev.setAttribute('aria-live', 'polite');
+    c.append(stats, ev);
+
+    if (sb.shieldOfFlesh) {
+      const lab = el('label', 'once'); const cb = el('input'); cb.type = 'checkbox'; cb.checked = !!state.cleansed[m.id];
+      cb.addEventListener('change', () => { if (cb.checked) state.cleansed[m.id] = true; else delete state.cleansed[m.id]; save(); paintCard(m); });
+      lab.append(cb, document.createTextNode('Blade cleansed (no Shield of Flesh or Black Reaping)'));
+      c.append(lab);
+    }
 
     if (m.once) {
       const lab = el('label', 'once'); const cb = el('input'); cb.type = 'checkbox'; cb.checked = !!state.used[m.id];
@@ -268,11 +335,38 @@ main{display:flex;flex-direction:column;gap:26px;margin-top:18px}
     const amt = el('input'); amt.type = 'number'; amt.min = 1; amt.step = 1; amt.inputMode = 'numeric'; amt.placeholder = 'Amount';
     amt.setAttribute('aria-label', 'Amount for ' + m.name);
     const take = () => { const n = Math.floor(+amt.value); if (!(n > 0)) return 0; amt.value = ''; return n; };
-    const hit = btn('Damage'); hit.addEventListener('click', () => { const n = take(); if (n) setHp(m, hpOf(m) - n); });
-    const heal = btn('Heal'); heal.addEventListener('click', () => { const n = take(); if (n) setHp(m, hpOf(m) + n); });
+    const hit = btn('Damage'); hit.addEventListener('click', () => { const n = take(); if (n) damage(m, n); });
+    const heal = btn('Heal'); heal.addEventListener('click', () => { const n = take(); if (n) { delete lastHit[m.id]; setHp(m, hpOf(m) + n); } });
     amt.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); hit.click(); } });
     dmg.append(amt, hit, heal);
+    if (sb.fearOfFire) {
+      const fire = btn('Fire', 'fire'); fire.title = 'Fire damage: applies it and shows the Fear of Fire check';
+      fire.addEventListener('click', () => { const n = take(); if (n) damage(m, n, {fire: true}); });
+      dmg.append(fire);
+    }
     controls.append(dmg);
+    // Redirect Attack: move the last hit Ghashnakh took onto an adjacent orc of your choice.
+    if (sb.redirect) {
+      const r = el('div', 'redirect'); r.hidden = true;
+      const open = btn('Redirect last hit to an orc…');
+      const pick = el('div', 'pick'); pick.hidden = true;
+      open.addEventListener('click', () => {
+        pick.textContent = '';
+        for (const o of orcsNear(m, m)) {
+          const b = btn(o.name); b.addEventListener('click', () => {
+            const n = lastHit[m.id]; if (!(n > 0)) return;
+            delete lastHit[m.id]; setHp(m, hpOf(m) + n); damage(o, n);
+            note(o, `Took ${n} redirected from ${m.name}.` + (events[o.id] && /Hideous/.test(events[o.id]) ? ' ' + events[o.id] : ''));
+            note(m, `Redirect Attack: ${o.name} took the ${n}.`);
+            pick.hidden = true;
+          });
+          pick.append(b);
+        }
+        const cancel = btn('Cancel'); cancel.addEventListener('click', () => pick.hidden = true); pick.append(cancel);
+        pick.hidden = false;
+      });
+      r.append(open, pick); controls.append(r);
+    }
     const atk = attackSection(m);
     if (atk) controls.append(atk);
     c.append(controls);
@@ -287,7 +381,25 @@ main{display:flex;flex-direction:column;gap:26px;margin-top:18px}
   function areaSection(a){
     const sec = el('section', 'area'); sec.dataset.area = a.id;
     const head = el('div', 'area-head'); head.append(el('h2', null, a.name));
-    const reset = btn('Reset area'); head.append(reset);
+    const reset = btn('Reset area');
+    // The courtyard fire: one tap per round on initiative 10 heals every standing orc 1 HP, until a hero scatters it.
+    let fireRow = null;
+    if (a.fire) {
+      fireRow = el('div', 'fire-row');
+      const tick = btn(`Fire tick +${a.fire.heal}`, 'fire'); tick.title = a.fire.when;
+      const out = el('span', 'fire-out'); out.setAttribute('aria-live', 'polite');
+      const lab = el('label', 'once'); const cb = el('input'); cb.type = 'checkbox'; cb.checked = !!state.fireOut[a.id];
+      const sync = () => { tick.disabled = cb.checked; if (cb.checked) out.textContent = 'Fire scattered: no more healing.'; };
+      cb.addEventListener('change', () => { if (cb.checked) state.fireOut[a.id] = true; else { delete state.fireOut[a.id]; out.textContent = ''; } save(); sync(); });
+      lab.append(cb, document.createTextNode('Fire scattered'));
+      tick.addEventListener('click', () => {
+        const healed = a.monsters.filter(o => sbOf(o).orc && hpOf(o) > 0 && hpOf(o) < o.hp);
+        healed.forEach(o => setHp(o, hpOf(o) + a.fire.heal));
+        out.textContent = healed.length ? `+${a.fire.heal} HP: ${healed.map(o => o.name).join(', ')}` : 'No hurt orcs to heal.';
+      });
+      fireRow.append(tick, lab, out); sync();
+    }
+    head.append(reset);
     // In-page confirm instead of window.confirm.
     const ask = el('div', 'confirm'); ask.hidden = true;
     const yes = btn('Reset', 'danger'), no = btn('Cancel');
@@ -296,14 +408,18 @@ main{display:flex;flex-direction:column;gap:26px;margin-top:18px}
     no.addEventListener('click', () => { ask.hidden = true; reset.focus(); });
     yes.addEventListener('click', () => {
       for (const m of a.monsters) {
-        delete state.hp[m.id]; delete state.used[m.id];
+        delete state.hp[m.id]; delete state.used[m.id]; delete state.cleansed[m.id];
+        delete events[m.id]; delete lastHit[m.id];
         for (const c of (m.cues || [])) delete state.dismissed[cueKey(m, c)];
       }
+      delete state.fireOut[a.id];
       save(); ask.hidden = true; render();
     });
     const grid = el('div', 'cards');
     for (const m of a.monsters) grid.append(card(m));
-    sec.append(head, ask, grid);
+    sec.append(head, ask);
+    if (fireRow) sec.append(fireRow);
+    sec.append(grid);
     return sec;
   }
 

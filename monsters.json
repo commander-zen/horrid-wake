@@ -1,52 +1,144 @@
 {
   "statblocks": {
     "wild-wolf": {
+      "fearOfFire": true,
       "attacks": [
-        {"name": "Bite", "hit": 4, "dmg": "1d6+2", "save": "DC 12 Strength or prone"}
+        {
+          "name": "Bite",
+          "hit": 4,
+          "dmg": "1d6+2",
+          "save": "DC 12 Strength or prone"
+        }
       ]
     },
     "wolf-chieftain": {
+      "fearOfFire": true,
       "attacks": [
-        {"name": "Bite", "hit": 5, "dmg": "2d6+3", "save": "DC 13 Strength or prone"}
+        {
+          "name": "Bite",
+          "hit": 5,
+          "dmg": "2d6+3",
+          "save": "DC 13 Strength or prone"
+        }
       ]
     },
     "orc-guard": {
+      "orc": true,
       "perTurn": "Two attacks",
       "attacks": [
-        {"name": "Scimitar", "hit": 4, "dmg": "1d6+2"},
-        {"name": "Spear", "hit": 4, "dmg": "1d6+2", "range": "20/60 ft."},
-        {"name": "Sneak Attack", "dmg": "1d6", "extra": true, "when": "once per turn, ally adjacent to the target"}
+        {
+          "name": "Scimitar",
+          "hit": 4,
+          "dmg": "1d6+2"
+        },
+        {
+          "name": "Spear",
+          "hit": 4,
+          "dmg": "1d6+2",
+          "range": "20/60 ft."
+        },
+        {
+          "name": "Sneak Attack",
+          "dmg": "1d6",
+          "extra": true,
+          "when": "once per turn, ally adjacent to the target"
+        }
       ]
     },
     "war-captain": {
+      "orc": true,
+      "parry": 2,
       "perTurn": "Two attacks",
       "attacks": [
-        {"name": "Scimitar", "hit": 5, "dmg": "1d6+3"},
-        {"name": "Shield Bash", "hit": 5, "dmg": "1d4+3", "save": "DC 13 Strength or prone"},
-        {"name": "Sneak Attack", "dmg": "2d6", "extra": true}
+        {
+          "name": "Scimitar",
+          "hit": 5,
+          "dmg": "1d6+3"
+        },
+        {
+          "name": "Shield Bash",
+          "hit": 5,
+          "dmg": "1d4+3",
+          "save": "DC 13 Strength or prone"
+        },
+        {
+          "name": "Sneak Attack",
+          "dmg": "2d6",
+          "extra": true
+        }
       ]
     },
     "uruk-hai": {
+      "hideousToughness": 7,
+      "orc": true,
       "perTurn": "Two attacks",
       "attacks": [
-        {"name": "Battle Axe", "hit": 5, "dmg": "2d8+3"},
-        {"name": "Axe, two-handed", "hit": 5, "dmg": "2d10+3"}
+        {
+          "name": "Battle Axe",
+          "hit": 5,
+          "dmg": "2d8+3"
+        },
+        {
+          "name": "Axe, two-handed",
+          "hit": 5,
+          "dmg": "2d10+3"
+        }
       ]
     },
     "ghashnakh": {
+      "orc": true,
+      "parry": 2,
       "perTurn": "Two attacks, or Black Reaping with the blade",
+      "redirect": true,
+      "shieldOfFlesh": 5,
       "attacks": [
-        {"name": "Heavy Scimitar", "hit": 6, "dmg": "2d8+4"},
-        {"name": "Shield Bash", "hit": 6, "dmg": "2d4+4", "save": "DC 15 Strength or prone"},
-        {"name": "Black Reaping", "hit": 6, "dmg": "1d8+4", "type": "slashing", "targets": 4, "range": "reach 10 ft., up to 4 creatures"}
+        {
+          "name": "Heavy Scimitar",
+          "hit": 6,
+          "dmg": "2d8+4"
+        },
+        {
+          "name": "Shield Bash",
+          "hit": 6,
+          "dmg": "2d4+4",
+          "save": "DC 15 Strength or prone"
+        },
+        {
+          "name": "Black Reaping",
+          "hit": 6,
+          "dmg": "1d8+4",
+          "type": "slashing",
+          "targets": 4,
+          "range": "reach 10 ft., up to 4 creatures",
+          "needsBlade": true
+        }
       ]
     },
     "balrog": {
       "manual": true,
       "attacks": [
-        {"name": "Flame Whip", "hit": 9, "dmg": "4d6+6", "type": "fire", "range": "reach 15 ft.", "save": "DC 15 Strength or pulled 10 ft. toward it"},
-        {"name": "Blade of Shadow", "hit": 9, "dmg": "4d8+6", "type": "slashing", "range": "reach 10 ft."},
-        {"name": "Fire Aura", "dmg": "2d6", "type": "fire", "extra": true, "when": "start of its turn, everything within 5 ft."}
+        {
+          "name": "Flame Whip",
+          "hit": 9,
+          "dmg": "4d6+6",
+          "type": "fire",
+          "range": "reach 15 ft.",
+          "save": "DC 15 Strength or pulled 10 ft. toward it"
+        },
+        {
+          "name": "Blade of Shadow",
+          "hit": 9,
+          "dmg": "4d8+6",
+          "type": "slashing",
+          "range": "reach 10 ft."
+        },
+        {
+          "name": "Fire Aura",
+          "dmg": "2d6",
+          "type": "fire",
+          "extra": true,
+          "when": "start of its turn, everything within 5 ft."
+        }
       ]
     }
   },
@@ -55,36 +147,146 @@
       "id": "area1",
       "name": "Area 1 · The Shrine Approach",
       "monsters": [
-        {"id": "wolf-chieftain", "name": "Wolf-chieftain", "ac": 14, "hp": 37, "stats": "wolf-chieftain", "note": "When it dies, the wargs flee."},
-        {"id": "wild-wolf-1", "name": "Wild Wolf 1", "ac": 13, "hp": 16, "stats": "wild-wolf"},
-        {"id": "wild-wolf-2", "name": "Wild Wolf 2", "ac": 13, "hp": 16, "stats": "wild-wolf"},
-        {"id": "wild-wolf-3", "name": "Wild Wolf 3", "ac": 13, "hp": 16, "stats": "wild-wolf"},
-        {"id": "wild-wolf-4", "name": "Wild Wolf 4", "ac": 13, "hp": 16, "stats": "wild-wolf"},
-        {"id": "wild-wolf-5", "name": "Wild Wolf 5", "ac": 13, "hp": 16, "stats": "wild-wolf"},
-        {"id": "wild-wolf-6", "name": "Wild Wolf 6", "ac": 13, "hp": 16, "stats": "wild-wolf"},
-        {"id": "orc-guard-1", "name": "Orc Guard 1", "ac": 17, "hp": 26, "stats": "orc-guard"},
-        {"id": "orc-guard-2", "name": "Orc Guard 2", "ac": 17, "hp": 26, "stats": "orc-guard"}
+        {
+          "id": "wolf-chieftain",
+          "name": "Wolf-chieftain",
+          "ac": 14,
+          "hp": 37,
+          "stats": "wolf-chieftain",
+          "note": "When it dies, the wargs flee."
+        },
+        {
+          "id": "wild-wolf-1",
+          "name": "Wild Wolf 1",
+          "ac": 13,
+          "hp": 16,
+          "stats": "wild-wolf"
+        },
+        {
+          "id": "wild-wolf-2",
+          "name": "Wild Wolf 2",
+          "ac": 13,
+          "hp": 16,
+          "stats": "wild-wolf"
+        },
+        {
+          "id": "wild-wolf-3",
+          "name": "Wild Wolf 3",
+          "ac": 13,
+          "hp": 16,
+          "stats": "wild-wolf"
+        },
+        {
+          "id": "wild-wolf-4",
+          "name": "Wild Wolf 4",
+          "ac": 13,
+          "hp": 16,
+          "stats": "wild-wolf"
+        },
+        {
+          "id": "wild-wolf-5",
+          "name": "Wild Wolf 5",
+          "ac": 13,
+          "hp": 16,
+          "stats": "wild-wolf"
+        },
+        {
+          "id": "wild-wolf-6",
+          "name": "Wild Wolf 6",
+          "ac": 13,
+          "hp": 16,
+          "stats": "wild-wolf"
+        },
+        {
+          "id": "orc-guard-1",
+          "name": "Orc Guard 1",
+          "ac": 17,
+          "hp": 26,
+          "stats": "orc-guard"
+        },
+        {
+          "id": "orc-guard-2",
+          "name": "Orc Guard 2",
+          "ac": 17,
+          "hp": 26,
+          "stats": "orc-guard"
+        }
       ]
     },
     {
       "id": "area2",
       "name": "Area 2 · The Courtyard",
       "monsters": [
-        {"id": "war-captain", "name": "War-captain", "ac": 17, "hp": 39, "stats": "war-captain", "note": "Yell of Triumph, once.", "once": "Yell of Triumph"},
-        {"id": "uruk-hai", "name": "Uruk-hai", "ac": 18, "hp": 60, "stats": "uruk-hai", "note": "Hideous Toughness, once: 7 or less damage that would drop it leaves it at 1 HP.", "once": "Hideous Toughness"},
-        {"id": "orc-guard-3", "name": "Orc Guard 3", "ac": 17, "hp": 26, "stats": "orc-guard"},
-        {"id": "ghashnakh", "name": "Ghashnakh", "ac": 18, "hp": 85, "stats": "ghashnakh", "cues": [
-          {"id": "rumble-1", "atOrBelow": 60, "text": "Cue Rumble 1"},
-          {"id": "balrog-arrives", "below": 42, "text": "Balrog arrives: Rumble 2, Silence, BAM"}
-        ]}
-      ]
+        {
+          "id": "war-captain",
+          "name": "War-captain",
+          "ac": 17,
+          "hp": 39,
+          "stats": "war-captain",
+          "note": "Yell of Triumph, once.",
+          "once": "Yell of Triumph"
+        },
+        {
+          "id": "uruk-hai",
+          "name": "Uruk-hai",
+          "ac": 18,
+          "hp": 60,
+          "stats": "uruk-hai",
+          "note": "Hideous Toughness, once: 7 or less damage that would drop it leaves it at 1 HP.",
+          "once": "Hideous Toughness"
+        },
+        {
+          "id": "orc-guard-3",
+          "name": "Orc Guard 3",
+          "ac": 17,
+          "hp": 26,
+          "stats": "orc-guard"
+        },
+        {
+          "id": "ghashnakh",
+          "name": "Ghashnakh",
+          "ac": 18,
+          "hp": 85,
+          "stats": "ghashnakh",
+          "cues": [
+            {
+              "id": "rumble-1",
+              "atOrBelow": 60,
+              "text": "Cue Rumble 1"
+            },
+            {
+              "id": "balrog-arrives",
+              "below": 42,
+              "text": "Balrog arrives: Rumble 2, Silence, BAM"
+            }
+          ]
+        }
+      ],
+      "fire": {
+        "heal": 1,
+        "when": "initiative 10, every orc within 25 ft. of the fire"
+      }
     },
     {
       "id": "area3",
       "name": "Area 3 · What Walked the Road",
       "monsters": [
-        {"id": "balrog", "name": "The Balrog", "ac": 17, "hp": 200, "stats": "balrog", "note": "Terror of the Deep, once.", "once": "Terror of the Deep"},
-        {"id": "rotten-floor", "name": "Rotten floor", "ac": 10, "hp": 20, "note": "At 0 HP, the floor collapses and the Balrog falls if it's standing on it."}
+        {
+          "id": "balrog",
+          "name": "The Balrog",
+          "ac": 17,
+          "hp": 200,
+          "stats": "balrog",
+          "note": "Terror of the Deep, once.",
+          "once": "Terror of the Deep"
+        },
+        {
+          "id": "rotten-floor",
+          "name": "Rotten floor",
+          "ac": 10,
+          "hp": 20,
+          "note": "At 0 HP, the floor collapses and the Balrog falls if it's standing on it."
+        }
       ]
     }
   ]
