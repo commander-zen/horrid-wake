@@ -228,7 +228,16 @@
         },
         {
           "id": "uruk-hai",
-          "name": "Uruk-hai",
+          "name": "Uruk-hai 1",
+          "ac": 18,
+          "hp": 60,
+          "stats": "uruk-hai",
+          "note": "Hideous Toughness, once: 7 or less damage that would drop it leaves it at 1 HP.",
+          "once": "Hideous Toughness"
+        },
+        {
+          "id": "uruk-hai-2",
+          "name": "Uruk-hai 2",
           "ac": 18,
           "hp": 60,
           "stats": "uruk-hai",
