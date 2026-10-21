@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Old Road HP Tracker</title>
+<title>Old Road Initiative</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Noto+Serif:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
@@ -45,6 +45,7 @@ h1 small{display:block;font-family:var(--body);font-weight:400;font-style:italic
   background:linear-gradient(var(--bg) 75%, rgba(19,16,13,.85));border-bottom:1px solid var(--line);backdrop-filter:blur(6px);
   display:flex;flex-direction:column;gap:10px}
 .filters{display:flex;gap:8px;flex-wrap:wrap}
+.filters[hidden]{display:none}
 .cue{display:flex;align-items:center;gap:12px;border:1px solid var(--flame);border-radius:10px;padding:6px 6px 6px 14px;
   background:linear-gradient(90deg,#5a2410,#2a120a);box-shadow:0 0 22px -6px var(--ember)}
 .cue b{flex:1;font-family:var(--display);font-weight:800;letter-spacing:.06em;color:var(--flame)}
@@ -98,6 +99,38 @@ main{display:flex;flex-direction:column;gap:26px;margin-top:18px}
 .atk-result .crit b{color:var(--flame)}
 .atk-result .miss b{color:var(--muted)}
 .revive{min-height:44px;border:1px dashed var(--blood);border-radius:8px;background:transparent;font-family:var(--display);font-weight:800;letter-spacing:.12em;color:#e9846f}
+/* initiative */
+.btn.next{background:var(--ember-deep);border-color:var(--ember)}
+.btn:disabled{opacity:.4;cursor:default}
+.turn[hidden],.setup[hidden]{display:none}
+.turn{display:flex;flex-direction:column;gap:6px}
+.turn-info{margin:0;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.turn-info b{font-family:var(--display);font-weight:800;font-size:18px;letter-spacing:.04em;color:var(--flame)}
+.turn-round,.turn-next{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.turn-next{margin-left:auto;text-transform:none;letter-spacing:0;font-style:italic}
+.turn-btns{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:8px}
+.order{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.entry{position:relative;display:flex;flex-direction:column;gap:4px;border-left:3px solid transparent;padding-left:10px}
+.entry.now{border-left-color:var(--flame)}
+.entry.now > .card,.entry.now > .hero-row{border-color:var(--ember);box-shadow:0 0 0 1px var(--ember),0 0 22px -6px var(--ember)}
+.entry.waiting{opacity:.5}
+.init{position:absolute;left:-1px;top:8px;transform:translateX(-50%);min-width:26px;text-align:center;font-family:var(--mono);font-size:11px;
+  background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:1px 5px;color:var(--muted)}
+.entry.now .init{border-color:var(--flame);color:var(--flame)}
+.joins{font-size:11px;font-style:italic;color:var(--muted)}
+.hero-row{display:flex;align-items:center;gap:10px;min-height:48px;border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:var(--stone)}
+.hero-row b{font-family:var(--display);font-weight:600;font-size:16px}
+.hero-player{flex:1;font-size:13px;font-style:italic;color:var(--muted)}
+.fire-entry{border-style:dashed;border-color:var(--ember-deep)}
+.fire-note{font-size:13px;color:var(--flame)}
+.terrain-head{font-family:var(--display);font-weight:600;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:18px 0 0}
+.setup{margin-top:10px;border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--stone);display:flex;flex-direction:column;gap:10px}
+.setup-help{margin:0;font-size:13px;color:var(--muted)}
+.setup-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.setup-hero{display:flex;flex-direction:column;gap:3px;font-size:13px}
+.setup-hero input{min-height:44px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:0 10px;font-size:16px;font-family:var(--mono)}
+.setup-btns{display:flex;gap:8px;flex-wrap:wrap}
+
 /* special abilities */
 .event:empty{display:none}
 .event{margin:0;border-left:3px solid var(--flame);padding:4px 0 4px 10px;font-size:13px;color:var(--fg)}
@@ -119,10 +152,11 @@ main{display:flex;flex-direction:column;gap:26px;margin-top:18px}
 </head>
 <body>
 <div class="wrap">
-  <nav class="pages" aria-label="Pages"><a href="/">Soundboard</a><a href="/tracker" aria-current="page">HP tracker</a></nav>
-  <h1>HP Tracker<small>Shadow on the Old Road · Enter in an amount field deals damage</small></h1>
+  <nav class="pages" aria-label="Pages"><a href="/">Soundboard</a><a href="/tracker" aria-current="page">Initiative</a></nav>
+  <h1>Initiative Tracker<small>Shadow on the Old Road · Start fight, then Next turn · Enter in an amount field deals damage</small></h1>
   <div class="top">
     <div class="filters" id="filters" role="group" aria-label="Show area"></div>
+    <div class="turn" id="turn" hidden></div>
     <div id="cues" role="status" aria-live="assertive"></div>
   </div>
   <main id="areas"><p class="empty">Loading monsters…</p></main>
@@ -137,10 +171,11 @@ main{display:flex;flex-direction:column;gap:26px;margin-top:18px}
 
   const saved = load(KEY, {});
   // cleansed: monster id -> blade cleansed (Shield of Flesh and Black Reaping off). fireOut: area id -> fire scattered.
-  const state = {hp: saved.hp || {}, used: saved.used || {}, dismissed: saved.dismissed || {}, cleansed: saved.cleansed || {}, fireOut: saved.fireOut || {}};
+  // fight: the running initiative order, or null. {area, round, turn, order: [{t: 'hero'|'monster'|'fire', id, roll}], arrived: [monster ids]}
+  const state = {hp: saved.hp || {}, used: saved.used || {}, dismissed: saved.dismissed || {}, cleansed: saved.cleansed || {}, fireOut: saved.fireOut || {}, fight: saved.fight || null};
   const save = () => store(KEY, state);
 
-  let areas = [];
+  let areas = [], heroes = [];
   const monsters = {};            // id -> monster
   let view = load(VIEW_KEY, 'all');
 
@@ -378,26 +413,199 @@ main{display:flex;flex-direction:column;gap:26px;margin-top:18px}
     return c;
   }
 
+  /* ---------- initiative (zipper) ---------- */
+  // Ben's house rule: everyone rolls, each side lines up highest to lowest, the side with the single
+  // highest roll goes first, then turns alternate hero / monster down the line. A tie at the top goes
+  // to the heroes. The order is set once and repeats every round.
+  const fight = () => state.fight;
+  const areaById = id => areas.find(a => a.id === id);
+  const heroById = id => heroes.find(h => h.id === id);
+  const fireHeal = a => {
+    const healed = a.monsters.filter(o => sbOf(o).orc && hpOf(o) > 0 && hpOf(o) < o.hp);
+    healed.forEach(o => setHp(o, hpOf(o) + a.fire.heal));
+    return healed.length ? `+${a.fire.heal} HP: ${healed.map(o => o.name).join(', ')}` : 'No hurt orcs to heal.';
+  };
+  function zipper(h, m){
+    const byRoll = (x, y) => y.roll - x.roll;           // stable sort keeps roster order on ties
+    h = [...h].sort(byRoll); m = [...m].sort(byRoll);
+    const out = []; let heroTurn = !m.length || (h.length && h[0].roll >= m[0].roll);
+    while (h.length || m.length) {
+      const from = (heroTurn && h.length) || !m.length ? h : m;
+      out.push(from.shift()); heroTurn = from === m;
+    }
+    return out;
+  }
+  function startFight(a, heroRolls){
+    const hs = heroes.filter(h => Number.isFinite(heroRolls[h.id])).map(h => ({t: 'hero', id: h.id, roll: heroRolls[h.id]}));
+    const ms = a.monsters.filter(m => !m.terrain).map(m => ({t: 'monster', id: m.id, roll: die(20) + (sbOf(m).init || 0)}));
+    // Zip only the monsters fighting from round 1, so round 1 alternates cleanly. Late joiners (Orc Guards 1–2,
+    // Ghashnakh) then slot in after the last monster that rolled at least as high, keeping the monster side sorted.
+    const late = e => (monsters[e.id].joinsRound || 1) > 1;
+    const order = zipper(hs, ms.filter(e => !late(e)));
+    for (const j of ms.filter(late).sort((x, y) => y.roll - x.roll)) {
+      let at = -1;
+      order.forEach((e, i) => { if (e.t === 'monster' && e.roll >= j.roll) at = i; });
+      if (at === -1) { const firstM = order.findIndex(e => e.t === 'monster'); at = firstM === -1 ? order.length - 1 : firstM - 1; }
+      order.splice(at + 1, 0, j);
+    }
+    // The courtyard fire acts once a round, at the end ("initiative 10" has no fixed spot in a zippered order).
+    if (a.fire) order.push({t: 'fire', id: a.id, roll: 10});
+    state.fight = {area: a.id, round: 1, turn: 0, order, arrived: []};
+    if (!isActive(order[0], 1)) step(1, true);
+    save(); render(); scrollToTurn();
+  }
+  const entryMonster = e => e.t === 'monster' ? monsters[e.id] : null;
+  // Who gets a turn: heroes always (they make death saves too); monsters while standing and once they've joined; the fire until scattered.
+  function isActive(e, round){
+    if (e.t === 'hero') return true;
+    if (e.t === 'fire') return !state.fireOut[e.id];
+    const m = monsters[e.id]; return hpOf(m) > 0 && (m.joinsRound || 1) <= round;
+  }
+  function step(dir, quiet){
+    const f = fight(), n = f.order.length; if (!n) return;
+    let i = f.turn, r = f.round;
+    for (let tries = 0; tries < n * 2; tries++) {
+      i += dir;
+      if (i >= n) { i = 0; r++; }
+      if (i < 0) { if (r === 1) { i = f.turn; break; } i = n - 1; r--; }
+      if (isActive(f.order[i], r)) break;
+    }
+    f.turn = i; f.round = r;
+    const e = f.order[i];
+    if (e.t === 'fire' && dir > 0 && !quiet) fireNote = fireHeal(areaById(e.id));
+    save(); if (!quiet) { paintTurn(); scrollToTurn(); }
+  }
+  let fireNote = '';
+  function balrogArrives(id){
+    const f = fight(), m = monsters[id];
+    // It bursts in and acts right after whoever is up now, then keeps that spot every round.
+    f.order.splice(f.turn + 1, 0, {t: 'monster', id, roll: die(20) + (sbOf(m).init || 0)});
+    f.arrived.push(id);
+    save(); render(); scrollToTurn();
+  }
+  function endFight(){ state.fight = null; fireNote = ''; save(); render(); }
+
+  // The sticky turn bar: round, who's up, who's next, and the buttons to move on.
+  function renderTurnBar(){
+    const box = $('#turn'); box.textContent = '';
+    const f = fight(); box.hidden = !f; if (!f) return;
+    const a = areaById(f.area);
+    const nameOf = e => e.t === 'hero' ? heroById(e.id).name : e.t === 'fire' ? 'The fire' : monsters[e.id].name;
+    const now = f.order[f.turn];
+    let next = null;
+    for (let k = 1; k <= f.order.length; k++) {
+      const idx = (f.turn + k) % f.order.length, round = f.round + (f.turn + k >= f.order.length ? 1 : 0);
+      if (isActive(f.order[idx], round)) { next = f.order[idx]; break; }
+    }
+    const info = el('p', 'turn-info');
+    info.append(el('span', 'turn-round', `Round ${f.round}`), el('b', null, nameOf(now)), el('span', 'turn-next', next ? `Next: ${nameOf(next)}` : ''));
+    const row = el('div', 'turn-btns');
+    const back = btn('Back'); back.addEventListener('click', () => step(-1)); back.disabled = f.round === 1 && f.turn === firstActive();
+    const go = btn('Next turn', 'next'); go.addEventListener('click', () => step(1));
+    row.append(back, go);
+    for (const id of (a.arrivals || [])) if (!f.arrived.includes(id)) {
+      const b = btn(`${monsters[id].name.replace(/^The /, '')} arrives`, 'danger'); b.addEventListener('click', () => balrogArrives(id)); row.append(b);
+    }
+    box.append(info, row);
+  }
+  const firstActive = () => fight().order.findIndex(e => isActive(e, 1));
+  function paintTurn(){
+    const f = fight(); if (!f) return;
+    document.querySelectorAll('.entry').forEach(n => {
+      const e = f.order[+n.dataset.idx];
+      n.classList.toggle('now', +n.dataset.idx === f.turn);
+      n.classList.toggle('waiting', e.t === 'monster' && (monsters[e.id].joinsRound || 1) > f.round);
+      if (e.t === 'fire') n.querySelector('.fire-note').textContent = state.fireOut[e.id] ? 'Scattered: no more healing.' : (+n.dataset.idx === f.turn ? fireNote : '');
+    });
+    renderTurnBar();
+  }
+  function scrollToTurn(){
+    const n = document.querySelector('.entry.now'); if (!n) return;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    n.scrollIntoView({block: 'center', behavior: reduce ? 'auto' : 'smooth'});
+  }
+
+  function heroRow(h){
+    const r = el('div', 'hero-row');
+    r.append(el('b', null, h.name), el('span', 'hero-player', h.player), el('span', 'ac', 'AC ' + h.ac));
+    return r;
+  }
+  function fightList(a){
+    const f = fight(), list = el('ol', 'order');
+    f.order.forEach((e, idx) => {
+      const li = el('li', 'entry ' + e.t); li.dataset.idx = idx;
+      const tag = el('span', 'init', String(e.roll)); tag.title = 'Initiative';
+      if (e.t === 'hero') li.append(tag, heroRow(heroById(e.id)));
+      else if (e.t === 'fire') {
+        const r = el('div', 'hero-row fire-entry');
+        r.append(el('b', null, 'The fire'), el('span', 'hero-player', `heals orcs +${a.fire.heal}`), el('span', 'fire-note'));
+        li.append(el('span', 'init', 'end'), r);
+      } else {
+        const m = monsters[e.id];
+        if (m.joinsRound > 1) li.append(el('span', 'joins', `joins round ${m.joinsRound}`));
+        li.append(tag, card(m));
+      }
+      list.append(li);
+    });
+    // Terrain (the rotten floor) has HP but no turn: listed under the order once its area is in the fight.
+    const terrainAreas = new Set([a.id, ...f.arrived.map(id => areaOfMonster(monsters[id]).id)]);
+    const terrain = areas.filter(x => terrainAreas.has(x.id)).flatMap(x => x.monsters.filter(m => m.terrain));
+    const wrap = el('div'); wrap.append(list);
+    if (terrain.length) { const t = el('div', 'cards'); terrain.forEach(m => t.append(card(m))); wrap.append(el('h3', 'terrain-head', 'Terrain'), t); }
+    return wrap;
+  }
+  function fightSetup(a, open){
+    const box = el('div', 'setup'); box.hidden = true;
+    box.append(el('p', 'setup-help', 'Type each hero’s initiative roll. Leave a box empty if that hero isn’t in this fight. Monsters roll their own.'));
+    const grid = el('div', 'setup-grid'); const inputs = {};
+    for (const h of heroes) {
+      const lab = el('label', 'setup-hero'); const i = el('input'); i.type = 'number'; i.inputMode = 'numeric'; i.min = 1; i.max = 40; i.placeholder = 'Roll';
+      lab.append(el('span', null, `${h.name} · ${h.player}`), i); inputs[h.id] = i; grid.append(lab);
+    }
+    const go = btn('Roll monsters & start', 'next'), cancel = btn('Cancel');
+    go.addEventListener('click', () => {
+      const rolls = {}; for (const [id, i] of Object.entries(inputs)) { const v = parseInt(i.value, 10); if (Number.isFinite(v)) rolls[id] = v; }
+      startFight(a, rolls);
+    });
+    cancel.addEventListener('click', () => { box.hidden = true; open.focus(); });
+    const btns = el('div', 'setup-btns'); btns.append(go, cancel);
+    box.append(grid, btns);
+    open.addEventListener('click', () => { box.hidden = false; inputs[heroes[0].id].focus(); });
+    return box;
+  }
+
   function areaSection(a){
     const sec = el('section', 'area'); sec.dataset.area = a.id;
     const head = el('div', 'area-head'); head.append(el('h2', null, a.name));
+    const f = fight(), fightingHere = f && f.area === a.id;
     const reset = btn('Reset area');
-    // The courtyard fire: one tap per round on initiative 10 heals every standing orc 1 HP, until a hero scatters it.
+    // The courtyard fire: once a round (the fight's last turn, or the manual button outside a fight) heals every standing orc 1 HP, until scattered.
     let fireRow = null;
     if (a.fire) {
       fireRow = el('div', 'fire-row');
-      const tick = btn(`Fire tick +${a.fire.heal}`, 'fire'); tick.title = a.fire.when;
+      const tick = btn(`Fire tick +${a.fire.heal}`, 'fire'); tick.title = a.fire.when; tick.hidden = fightingHere;
       const out = el('span', 'fire-out'); out.setAttribute('aria-live', 'polite');
       const lab = el('label', 'once'); const cb = el('input'); cb.type = 'checkbox'; cb.checked = !!state.fireOut[a.id];
       const sync = () => { tick.disabled = cb.checked; if (cb.checked) out.textContent = 'Fire scattered: no more healing.'; };
-      cb.addEventListener('change', () => { if (cb.checked) state.fireOut[a.id] = true; else { delete state.fireOut[a.id]; out.textContent = ''; } save(); sync(); });
+      cb.addEventListener('change', () => { if (cb.checked) state.fireOut[a.id] = true; else { delete state.fireOut[a.id]; out.textContent = ''; } save(); sync(); paintTurn(); });
       lab.append(cb, document.createTextNode('Fire scattered'));
-      tick.addEventListener('click', () => {
-        const healed = a.monsters.filter(o => sbOf(o).orc && hpOf(o) > 0 && hpOf(o) < o.hp);
-        healed.forEach(o => setHp(o, hpOf(o) + a.fire.heal));
-        out.textContent = healed.length ? `+${a.fire.heal} HP: ${healed.map(o => o.name).join(', ')}` : 'No hurt orcs to heal.';
-      });
+      tick.addEventListener('click', () => { out.textContent = fireHeal(a); });
       fireRow.append(tick, lab, out); sync();
+    }
+    // Start fight / End fight. Only one fight runs at a time.
+    let setup = null, endAsk = null;
+    if (fightingHere) {
+      const end = btn('End fight');
+      endAsk = el('div', 'confirm'); endAsk.hidden = true;
+      const yesEnd = btn('End fight', 'danger'), noEnd = btn('Cancel');
+      endAsk.append(el('span', null, 'End this fight? HP stays as it is.'), yesEnd, noEnd);
+      end.addEventListener('click', () => { endAsk.hidden = false; noEnd.focus(); });
+      noEnd.addEventListener('click', () => { endAsk.hidden = true; end.focus(); });
+      yesEnd.addEventListener('click', endFight);
+      head.append(end);
+    } else if (!f && a.monsters.some(m => !m.terrain)) {
+      const startBtn = btn('Start fight', 'next'); head.append(startBtn);
+      setup = fightSetup(a, startBtn);
     }
     head.append(reset);
     // In-page confirm instead of window.confirm.
@@ -413,13 +621,24 @@ main{display:flex;flex-direction:column;gap:26px;margin-top:18px}
         for (const c of (m.cues || [])) delete state.dismissed[cueKey(m, c)];
       }
       delete state.fireOut[a.id];
+      if (fightingHere) { state.fight = null; fireNote = ''; }
       save(); ask.hidden = true; render();
     });
-    const grid = el('div', 'cards');
-    for (const m of a.monsters) grid.append(card(m));
     sec.append(head, ask);
+    if (endAsk) sec.append(endAsk);
+    if (setup) sec.append(setup);
     if (fireRow) sec.append(fireRow);
-    sec.append(grid);
+    // Monsters that arrived in another area's fight are shown there, not twice.
+    // (an arrival brings its area's terrain with it, e.g. the Balrog and the rotten floor).
+    const elsewhere = f && f.area !== a.id ? new Set(f.arrived) : new Set();
+    const moved = a.monsters.some(m => elsewhere.has(m.id)) ? a.monsters.filter(m => elsewhere.has(m.id) || m.terrain) : [];
+    if (moved.length) sec.append(el('p', 'empty', `${moved.map(m => m.name).join(' and ')} joined the ${areaById(f.area).name} fight; see it there.`));
+    if (fightingHere) sec.append(fightList(a));
+    else {
+      const grid = el('div', 'cards');
+      for (const m of a.monsters) if (!moved.includes(m)) grid.append(card(m));
+      sec.append(grid);
+    }
     return sec;
   }
 
@@ -433,15 +652,18 @@ main{display:flex;flex-direction:column;gap:26px;margin-top:18px}
       box.append(b);
     }
   }
+  // During a fight only the fight's area shows and the area buttons hide, keeping the pinned bar small.
   function applyView(){
-    document.querySelectorAll('.area').forEach(s => s.hidden = view !== 'all' && s.dataset.area !== view);
+    const f = fight(), shown = f ? f.area : view;
+    $('#filters').hidden = !!f;
+    document.querySelectorAll('.area').forEach(s => s.hidden = shown !== 'all' && s.dataset.area !== shown);
   }
 
   function render(){
     const main = $('#areas'); main.textContent = '';
     for (const a of areas) main.append(areaSection(a));
     for (const m of Object.values(monsters)) paintCard(m);
-    renderFilters(); applyView(); renderCues();
+    renderFilters(); applyView(); renderCues(); paintTurn(); renderTurnBar();
   }
 
   // monsters.json is the roster. The last good copy is kept so a dropped connection still opens the page.
@@ -453,7 +675,7 @@ main{display:flex;flex-direction:column;gap:26px;margin-top:18px}
       data = await r.json(); store(ROSTER_KEY, data);
     } catch (e) { data = load(ROSTER_KEY, null); }
     if (!data || !Array.isArray(data.areas)) { $('#areas').textContent = 'Couldn’t load monsters.json.'; return; }
-    areas = data.areas; statblocks = data.statblocks || {};
+    areas = data.areas; statblocks = data.statblocks || {}; heroes = data.heroes || [];
     for (const a of areas) for (const m of a.monsters) monsters[m.id] = m;
     render();
   }

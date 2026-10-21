@@ -1,4 +1,42 @@
 {
+  "heroes": [
+    {
+      "id": "aragorn",
+      "name": "Aragorn",
+      "player": "Logan",
+      "ac": 15
+    },
+    {
+      "id": "samwise",
+      "name": "Samwise",
+      "player": "Cullen",
+      "ac": 17
+    },
+    {
+      "id": "legolas",
+      "name": "Legolas",
+      "player": "Adrian",
+      "ac": 15
+    },
+    {
+      "id": "gimli",
+      "name": "Gimli",
+      "player": "Dan",
+      "ac": 15
+    },
+    {
+      "id": "merry",
+      "name": "Merry",
+      "player": "Deen",
+      "ac": 14
+    },
+    {
+      "id": "boblin",
+      "name": "Boblin",
+      "player": "Troy",
+      "ac": 15
+    }
+  ],
   "statblocks": {
     "wild-wolf": {
       "fearOfFire": true,
@@ -139,7 +177,8 @@
           "extra": true,
           "when": "start of its turn, everything within 5 ft."
         }
-      ]
+      ],
+      "init": 1
     }
   },
   "areas": [
@@ -202,14 +241,16 @@
           "name": "Orc Guard 1",
           "ac": 17,
           "hp": 26,
-          "stats": "orc-guard"
+          "stats": "orc-guard",
+          "joinsRound": 2
         },
         {
           "id": "orc-guard-2",
           "name": "Orc Guard 2",
           "ac": 17,
           "hp": 26,
-          "stats": "orc-guard"
+          "stats": "orc-guard",
+          "joinsRound": 2
         }
       ]
     },
@@ -268,13 +309,17 @@
               "below": 42,
               "text": "Balrog arrives: Rumble 2, Silence, BAM"
             }
-          ]
+          ],
+          "joinsRound": 2
         }
       ],
       "fire": {
         "heal": 1,
         "when": "initiative 10, every orc within 25 ft. of the fire"
-      }
+      },
+      "arrivals": [
+        "balrog"
+      ]
     },
     {
       "id": "area3",
@@ -294,7 +339,8 @@
           "name": "Rotten floor",
           "ac": 10,
           "hp": 20,
-          "note": "At 0 HP, the floor collapses and the Balrog falls if it's standing on it."
+          "note": "At 0 HP, the floor collapses and the Balrog falls if it's standing on it.",
+          "terrain": true
         }
       ]
     }
